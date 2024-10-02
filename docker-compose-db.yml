@@ -1,0 +1,16 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.psql        
+    image: footballstats.db
+    container_name: footballstats-db-container  
+    environment:
+      POSTGRES_USER: postgres    
+      POSTGRES_PASSWORD: postgres  
+      PGDATA: /var/lib/postgresql/data/pgdata    
+    ports:
+      - 5442:5432  # Expose PostgreSQL port, use a non-standard port to avoid interfering with the local PostgreSQL server
+
+networks:
+  internal:
