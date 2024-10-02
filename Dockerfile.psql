@@ -1,0 +1,16 @@
+# Use the official PostgreSQL 15 image as a base
+FROM postgres:15
+
+# Copy the script for creating databases
+COPY ./psqlinit/init.sql /docker-entrypoint-initdb.d/
+
+# Set permissions for the script
+RUN chmod +x /docker-entrypoint-initdb.d/init.sql
+
+# Additional commands to allow password authentication for the postgres user
+USER postgres
+RUN echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
+
+# Restart the PostgreSQL service to apply the changes
+USER root
+RUN service postgresql restart

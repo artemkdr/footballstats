@@ -7,6 +7,7 @@ services:
         - API_HOST=backend
         - API_PORT=5000
     image: footballstats.client        
+    container_name: footballstats-client-container
     ports:
       - "80:80"
     networks:
@@ -19,10 +20,24 @@ services:
       args:
         - PORT=5000
     image: footballstats.api
+    container_name: footballstats-api-container
     ports:
       - "5000:5000"
     networks:
       - internal
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.psql        
+    image: footballstats.db
+    container_name: footballstats-db-container  
+    environment:
+      POSTGRES_USER: postgres    
+      POSTGRES_PASSWORD: postgres  
+      PGDATA: /var/lib/postgresql/data/pgdata    
+    ports:
+      - 5442:5432  # Expose PostgreSQL port, use a non-standard port to avoid interfering with the local PostgreSQL server
 
 networks:
   internal:
