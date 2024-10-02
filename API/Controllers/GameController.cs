@@ -26,9 +26,9 @@ public class GameController : ControllerBase
     protected readonly IConfiguration _configuration;
     private readonly Logger _logger;
 
-    private readonly GameContext _context;
+    private readonly BaseDBContext<Game> _context;
     
-    public GameController(IConfiguration configuration, GameContext context)
+    public GameController(IConfiguration configuration, BaseDBContext<Game> context)
     {    
         _configuration = configuration;
         _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -40,7 +40,7 @@ public class GameController : ControllerBase
     public IActionResult GetGame(int id)
     {
         try {
-            var item = _context.Games.Find(id);
+            var item = _context.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id));
@@ -80,7 +80,7 @@ public class GameController : ControllerBase
             newItem.CompletedDate = (DateTime)data.CompletedDate;
 
         try {
-            _context.Games.Add(newItem);
+            _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetGame), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
@@ -92,7 +92,7 @@ public class GameController : ControllerBase
     [HttpPost]
     public IActionResult UpdateGame(int id, GameModel data)
     {
-        var item = _context.Games.Find(id);
+        var item = _context.Items.Find(id);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
         
@@ -117,7 +117,7 @@ public class GameController : ControllerBase
             item.Modifydate = DateTime.UtcNow; 
 
             try {
-                _context.Games.Update(item);
+                _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {

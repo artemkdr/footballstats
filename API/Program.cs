@@ -4,6 +4,7 @@ using NLog.Extensions.Logging;
 using NLog;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
+using API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,9 +29,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<UserContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));   
-builder.Services.AddDbContext<TeamContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));   
-builder.Services.AddDbContext<GameContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));   
+builder.Services
+    .AddDbContext<BaseDBContext<User>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))  
+    .AddDbContext<BaseDBContext<Game>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+    .AddDbContext<BaseDBContext<Team>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));   
 
 
 var app = builder.Build();

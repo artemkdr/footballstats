@@ -23,9 +23,9 @@ public class UserController : ControllerBase
     protected readonly IConfiguration _configuration;
     private readonly Logger _logger;
 
-    private readonly UserContext _context;
+    private readonly BaseDBContext<User> _context;
     
-    public UserController(IConfiguration configuration, UserContext context)
+    public UserController(IConfiguration configuration, BaseDBContext<User> context)
     {    
         _configuration = configuration;
         _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -37,7 +37,7 @@ public class UserController : ControllerBase
     public IActionResult GetUser(string username)
     {
         try {
-            var item = _context.Users.Find(username);
+            var item = _context.Items.Find(username);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("username", username));
@@ -66,7 +66,7 @@ public class UserController : ControllerBase
         };
 
         try {
-            _context.Users.Add(newItem);
+            _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
         } catch (Exception ex) {
@@ -78,7 +78,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public IActionResult UpdateUser(string username, UserModel userData)
     {        
-        var item = _context.Users.Find(username);
+        var item = _context.Items.Find(username);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
         
@@ -98,7 +98,7 @@ public class UserController : ControllerBase
             
             item.Modifydate = DateTime.UtcNow; 
             try {
-                _context.Users.Update(item);
+                _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("username", item.Username!));
             } catch (Exception ex) {

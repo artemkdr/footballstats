@@ -20,9 +20,9 @@ public class TeamController : ControllerBase
     protected readonly IConfiguration _configuration;
     private readonly Logger _logger;
 
-    private readonly TeamContext _context;
+    private readonly BaseDBContext<Team> _context;
     
-    public TeamController(IConfiguration configuration, TeamContext context)
+    public TeamController(IConfiguration configuration, BaseDBContext<Team> context)
     {    
         _configuration = configuration;
         _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -34,7 +34,7 @@ public class TeamController : ControllerBase
     public IActionResult GetTeam(int id)
     {
         try {
-            var item = _context.Teams.Find(id);
+            var item = _context.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id, "name", item.Name ?? ""));
@@ -62,7 +62,7 @@ public class TeamController : ControllerBase
         };
 
         try {
-            _context.Teams.Add(newItem);
+            _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
@@ -74,7 +74,7 @@ public class TeamController : ControllerBase
     [HttpPost]
     public IActionResult UpdateTeam(int id, TeamModel data)
     {
-        var item = _context.Teams.Find(id);
+        var item = _context.Items.Find(id);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
         
@@ -85,7 +85,7 @@ public class TeamController : ControllerBase
             // TODO: check that the players exist   
 
             if (data.Name != null && data.Name != item.Name) {                
-                if (_context.Teams.FirstOrDefault(x => x.Name == data.Name) != null)
+                if (_context.Items.FirstOrDefault(x => x.Name == data.Name) != null)
                     return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"team name {data.Name} is already used"));
                 item.Name = data.Name;
             }
@@ -95,7 +95,7 @@ public class TeamController : ControllerBase
                         
             item.Modifydate = DateTime.UtcNow; 
             try {
-                _context.Teams.Update(item);
+                _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {
