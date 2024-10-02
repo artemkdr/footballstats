@@ -1,0 +1,29 @@
+# Build .NET API stage
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-api
+WORKDIR /app
+COPY API .
+RUN dotnet restore
+# build and publish a Release
+RUN dotnet publish -c Release -o api
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+
+# Install curl for using for a healthcheck then
+RUN apt-get update && apt-get install -y curl
+
+# Install gettext (provides envsubst)
+RUN apt-get update && apt-get install -y gettext-base
+
+ARG PORT=5000
+ARG DB_CONNECTION_STRING=
+ENV PORT=${PORT}
+ENV DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
+COPY --from=build-api /app/api /app/api
+COPY /API/appsettings.json /tmp/appsettings.json
+RUN envsubst '$DB_CONNECTION_STRING' < /tmp/appsettings.json > /app/api/appsettings.json
+WORKDIR /app/api/
+
+EXPOSE ${PORT}
+
+ENTRYPOINT dotnet API.dll --urls http://*:${PORT}

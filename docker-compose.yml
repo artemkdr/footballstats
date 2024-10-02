@@ -1,0 +1,28 @@
+services:
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.client
+      args:
+        - API_HOST=backend
+        - API_PORT=5000
+    image: footballstats.client        
+    ports:
+      - "80:80"
+    networks:
+      - internal
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.api      
+      args:
+        - PORT=5000
+    image: footballstats.api
+    ports:
+      - "5000:5000"
+    networks:
+      - internal
+
+networks:
+  internal:
