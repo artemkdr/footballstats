@@ -31,6 +31,18 @@ public class RequestHelpers {
             response.StatusCode = code;
         return new JsonResult(data) { StatusCode = code };
     }    
+
+    public static Dictionary<string, object> ToDict(params object[] keyvalues)
+    {
+        if (keyvalues.Length % 2 != 0)
+            throw new ArgumentException("Parameters must be the pairs, i.e. it must be an even number of parameters");
+        var dict = new Dictionary<string, object>();
+        for (var i = 0; i < keyvalues.Length; i += 2)
+        {
+            dict[keyvalues[i] + ""] = keyvalues[i + 1];
+        }
+        return dict;
+    }
 }
 
 public enum ErrorCodes {
