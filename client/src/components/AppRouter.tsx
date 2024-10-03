@@ -6,11 +6,11 @@ import { NotFound } from "../pages/NotFound";
 import { RouterError } from "../pages/RouterError";
 import { ErrorBoundary } from "react-error-boundary";
 import { Teams } from "../pages/Teams";
-import { Team } from "../pages/Team";
+import { TeamPage } from "../pages/TeamPage";
 import { Players } from "../pages/Players";
 import { Player } from "../pages/Player";
 import { Games } from "../pages/Games";
-import { Game } from "../pages/Game";
+import { GamePage } from "../pages/GamePage";
 import callApi from "../net/api";
 
 export const router: Router = createBrowserRouter([
@@ -28,7 +28,12 @@ export const router: Router = createBrowserRouter([
 				path: '/dashboard',
 				element: <Dashboard />,
 				loader: async({ params }) => {											
-					return null;
+					const response = await callApi(`stats`);
+					if (response.ok) {
+						var json = await response.json();
+						return json;
+					}
+					throw new Error("LoaderError", { cause: response.status });
 				}
 			},
 			{				
@@ -45,7 +50,7 @@ export const router: Router = createBrowserRouter([
 			},
 			{				
 				path: '/team/:id',
-				element: <Team />,
+				element: <TeamPage />,
 				loader: async({ params }) => {											
 					const response = await callApi(`team/${params.id}`);
 					if (response.ok) {
@@ -93,7 +98,7 @@ export const router: Router = createBrowserRouter([
 			},
 			{				
 				path: '/game/:id',
-				element: <Game />,
+				element: <GamePage />,
 				loader: async({ params }) => {											
 					const response = await callApi(`game/${params.id}`);
 					if (response.ok) {

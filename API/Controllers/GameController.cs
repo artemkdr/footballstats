@@ -5,18 +5,16 @@ using API.Models;
 using Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NLog;
 
 namespace API.Controllers;
 
-public class GameModel
-{
+abstract public class GameDTOBase {
+    public int Id { get; set; }    
+
     public string? Status { get; set; }
-    
-    public int Team1 { get; set; }    
-    
-    public int Team2 { get; set; }    
-    
+        
     public int Goals1 { get; set; }    
     
     public int Goals2 { get; set; }    
@@ -24,6 +22,31 @@ public class GameModel
     public DateTime? CompleteDate { get; set; }
     
     public JsonDocument? Vars { get; set; }
+}
+
+public class GameDTOLight {
+    public int Id { get; set; }
+}
+
+public class GameDTO : GameDTOBase
+{    
+    public int Team1 { get; set; }    
+    
+    public int Team2 { get; set; }    
+}
+
+public class GameDTOExtended : GameDTOBase
+{   
+    public TeamDTOLight? Team1 { get; set; }    
+    
+    public TeamDTOLight? Team2 { get; set; }    
+}
+
+public class GameDTOFull : GameDTOBase
+{   
+    public TeamDTO? Team1 { get; set; }    
+    
+    public TeamDTO? Team2 { get; set; }    
 }
 
 [ApiController]
@@ -42,7 +65,31 @@ public class GameController : BaseController
             var item = _gameContext.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
-            return RequestHelpers.Success(RequestHelpers.ToDict("id", id));
+            
+            var team1 = _teamContext.Items.Find(item.Team1);
+            var team2 = _teamContext.Items.Find(item.Team2);
+
+            var dto = new GameDTOFull() {
+                Id = item.Id,
+                Team1 = new TeamDTO() {
+                    Id = item.Team1,
+                    Name = team1?.Name,
+                    Players = team1?.Players,
+                    Status = team1?.Status.ToString()
+                },
+                Team2 = new TeamDTO() {
+                    Id = item.Team2,
+                    Name = team2?.Name,
+                    Players = team2?.Players,
+                    Status = team2?.Status.ToString()
+                },
+                Status = item.Status.ToString(),
+                CompleteDate = item.CompleteDate,
+                Goals1 = item.Goals1,
+                Goals2 = item.Goals2,
+                Vars = item.Vars
+            };
+            return Ok(dto);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }          
@@ -73,16 +120,38 @@ public class GameController : BaseController
             if (toDate.HasValue)
                 query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date <= toDate.Value.Date);
 
-            var items = query.
-                    OrderBy(x => x.Status == GameStatus.Playing ? 0 : 
+            var items = query                    
+                    .OrderBy(x => x.Status == GameStatus.Playing ? 0 : 
                                  x.Status == GameStatus.Completed ? 1 :
                                  x.Status == GameStatus.NotStarted ? 2 : 3) // Order by Status priority
                     .ThenByDescending(x => x.Status == GameStatus.Playing ? x.ModifyDate :
                                          x.Status == GameStatus.Completed ? x.CompleteDate : x.ModifyDate)
-                    .Take(LIST_LIMIT)
+                    .Take(LIST_LIMIT)                    
                     .ToList();
-
-            return Ok(items);
+            
+            var teamIds = items.SelectMany(x => new[] { x.Team1, x.Team2 }).Distinct().ToList();
+            var teams = _teamContext.Items.Where(x => teamIds.Contains(x.Id)).ToList().ToDictionary(x => x.Id);
+            var itemsWithTeams = new List<GameDTOExtended>();
+            foreach (var t in items) {
+                var t1 = teams.ContainsKey(t.Team1) ? teams[t.Team1] : new Team() { Id = t.Team1 };
+                var t2 = teams.ContainsKey(t.Team2) ? teams[t.Team2] : new Team() { Id = t.Team2 };
+                itemsWithTeams.Add(new GameDTOExtended() {
+                    Id = t.Id,
+                    Team1 = new TeamDTOLight() {
+                        Id = t1.Id,
+                        Name = t1.Name
+                    },
+                    Team2 = new TeamDTOLight() {
+                        Id = t2.Id,
+                        Name = t2.Name
+                    },
+                    Status = t.Status.ToString(),
+                    CompleteDate = t.CompleteDate,
+                    Goals1 = t.Goals1,
+                    Goals2 = t.Goals2                        
+                });
+            }
+            return Ok(itemsWithTeams);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
@@ -90,7 +159,7 @@ public class GameController : BaseController
 
     [Route("game")]
     [HttpPost]
-    public IActionResult CreateGame(GameModel data)
+    public IActionResult CreateGame(GameDTO data)
     {
         if (data == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game is missing"));        
@@ -131,7 +200,7 @@ public class GameController : BaseController
 
     [Route("game/{id}")]
     [HttpPost]
-    public IActionResult UpdateGame(int id, GameModel data)
+    public IActionResult UpdateGame(int id, GameDTO data)
     {
         var item = _gameContext.Items.Find(id);
         if (item == null)
@@ -167,7 +236,10 @@ public class GameController : BaseController
             try {
                 _gameContext.Items.Update(item);
                 _gameContext.SaveChanges();            
-                return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
+                var dto = new GameDTOLight() {
+                    Id = item.Id
+                };
+                return Ok(dto);
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }

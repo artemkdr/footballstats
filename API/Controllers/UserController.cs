@@ -10,15 +10,21 @@ using NLog;
 
 namespace API.Controllers;
 
-public class UserModel
+public class UserDTOLight
 {
     public string? Username { get; set; }
-    
-    public string? Password { get; set; }
-    
+}
+
+public class UserDTO : UserDTOLight
+{   
     public JsonDocument? Vars { get; set;}
     
     public string? Status { get; set; }
+}
+
+public class UserDTOFull : UserDTO 
+{
+    public string? Password { get; set; }
 }
 
 [ApiController]
@@ -37,7 +43,11 @@ public class UserController : BaseController
             var item = _userContext.Items.Find(username);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
-            return RequestHelpers.Success(RequestHelpers.ToDict("username", username));
+            return Ok(new UserDTO() {
+               Username = item.Username,
+               Vars = item.Vars,
+               Status = item.Status.ToString()
+            });
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
@@ -62,6 +72,11 @@ public class UserController : BaseController
             
             var items = query.OrderBy(x => x.Username)
                             .Take(LIST_LIMIT)
+                            .Select(x => new UserDTO() {
+                                Username = x.Username,
+                                Vars = x.Vars,                                
+                                Status = x.Status.ToString()
+                            })
                             .ToList();
 
             return Ok(items);
@@ -72,7 +87,7 @@ public class UserController : BaseController
 
     [Route("user")]
     [HttpPost]
-    public IActionResult CreateUser(UserModel userData)
+    public IActionResult CreateUser(UserDTOFull userData)
     {
         if (userData == null || userData.Username == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", "username is missing"));
@@ -103,7 +118,7 @@ public class UserController : BaseController
 
     [Route("user/{username}")]
     [HttpPost]
-    public IActionResult UpdateUser(string username, UserModel userData)
+    public IActionResult UpdateUser(string username, UserDTOFull userData)
     {        
         var item = _userContext.Items.Find(username);
         if (item == null)
@@ -130,7 +145,10 @@ public class UserController : BaseController
             try {
                 _userContext.Items.Update(item);
                 _userContext.SaveChanges();            
-                return RequestHelpers.Success(RequestHelpers.ToDict("username", item.Username!));
+                var dto = new UserDTOLight() {
+                    Username = item.Username
+                };
+                return Ok(dto);
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }

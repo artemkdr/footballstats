@@ -8,14 +8,25 @@ using NLog;
 
 namespace API.Controllers;
 
-public class TeamModel
+public class TeamDTOLight
 {
-    public string? Name { get; set; }
-    
-    public string[]? Players { get; set; }    
+    public int Id { get; set; }
 
+    public string? Name { get; set; }    
+    
     public string? Status { get; set; }
 }
+
+public class TeamDTO : TeamDTOLight
+{    
+    public string[]? Players { get; set; }    
+}
+
+public class TeamDTOExtended : TeamDTOLight
+{    
+    public UserDTO[]? Players { get; set; }    
+}
+
 
 [ApiController]
 public class TeamController : BaseController
@@ -34,7 +45,31 @@ public class TeamController : BaseController
             var item = _teamContext.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
-            return RequestHelpers.Success(RequestHelpers.ToDict("id", id, "name", item.Name ?? ""));
+
+            var players = new List<UserDTO>();
+            if (item.Players != null) {
+                players = _userContext.Items.Where(x => item.Players.Contains(x.Username)).Select(x => new UserDTO() {
+                    Username = x.Username,
+                    Vars = x.Vars,
+                    Status = x.Status.ToString()
+                }).ToList();
+                if (players.Count != item.Players.Length) { // complete players list with 'broken' user references
+                    foreach (var un in item.Players) {
+                        if (players.Find(x => x.Username == un) == null) {
+                            players.Add(new UserDTO() {
+                                Username = un
+                            });
+                        }
+                    }
+                }
+            }
+            var dto = new TeamDTOExtended() {
+                Id = item.Id,
+                Name = item.Name,
+                Players = players.ToArray(),
+                Status = item.Status.ToString()
+            };
+            return Ok(dto);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }        
@@ -64,6 +99,11 @@ public class TeamController : BaseController
             
             var items = query.OrderBy(x => x.Name)
                             .Take(LIST_LIMIT)
+                            .Select(x => new TeamDTOLight() {
+                                Id = x.Id,
+                                Name = x.Name,
+                                Status = x.Status.ToString()
+                            })
                             .ToList();
 
             return Ok(items);
@@ -74,7 +114,7 @@ public class TeamController : BaseController
 
     [Route("team")]
     [HttpPost]
-    public IActionResult CreateTeam(TeamModel data)
+    public IActionResult CreateTeam(TeamDTO data)
     {
         try {
             ValidateTeamData(data, true);
@@ -103,7 +143,7 @@ public class TeamController : BaseController
 
     [Route("team/{id}")]
     [HttpPost]
-    public IActionResult UpdateTeam(int id, TeamModel data)
+    public IActionResult UpdateTeam(int id, TeamDTO data)
     {
         var item = _teamContext.Items.Find(id);
         if (item == null)
@@ -132,7 +172,12 @@ public class TeamController : BaseController
             try {
                 _teamContext.Items.Update(item);
                 _teamContext.SaveChanges();            
-                return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
+                var dto = new TeamDTOLight() {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Status = item.Status.ToString()
+                };
+                return Ok(dto);
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }
@@ -141,7 +186,7 @@ public class TeamController : BaseController
         return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no team data provided"));
     }
 
-    private void ValidateTeamData(TeamModel data, bool create = false) {
+    private void ValidateTeamData(TeamDTO data, bool create = false) {
         if (data == null)
             throw new Exception("team data is empty");
                 

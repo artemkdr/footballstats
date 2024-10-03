@@ -1,3 +1,33 @@
 {
-    "Title": "Football Stats"
+    "Title": "Football Stats",
+    "Player": "Player",
+    "Game": "Game",
+    "Team": "Team",
+    "GameTitle": "{{team1}} vs {{team2}} ({{goals1}} : {{goals2}})",
+    "Navigation": {
+        "Home": "Dashboard",
+        "Teams": "Teams",
+        "Players": "Players",
+        "Games": "Games"
+    },
+    "Dashboard": {
+        "Title": "Dashboard",
+        "Team": "Team/Player Name",
+        "Games": "Games Played",
+        "Wins": "Wins",
+        "Losses": "Losses",
+        "WinRatio": "Win Ratio",
+        "GF": "GF",
+        "GA": "GA",
+        "GD": "GD"
+    },
+    "Players": {
+        "Title": "Players (users)"
+    },
+    "Games": {
+        "Title": "Games"
+    },
+    "Teams": {
+        "Title": "Teams"
+    }
 }
