@@ -11,20 +11,29 @@ using NLog;
 namespace API.Controllers;
 
 [ApiController]
-abstract public class BaseController<T> : ControllerBase where T : class
+abstract public class BaseController : ControllerBase
 {
     public static int LIST_LIMIT = 1000;
+
+    public static int MAX_TEAM_PLAYERS = 2;
+    public static int MIN_TEAM_PLAYERS = 1;
     
     protected readonly IConfiguration _configuration;
     
     protected readonly Logger _logger;
 
-    protected readonly BaseDBContext<T> _context;
+    protected readonly BaseDBContext<User> _userContext;
+
+    protected readonly BaseDBContext<Team> _teamContext;
+
+    protected readonly BaseDBContext<Game> _gameContext;
     
-    public BaseController(IConfiguration configuration, BaseDBContext<T> context)
+    public BaseController(IConfiguration configuration, BaseDBContext<User> userContext, BaseDBContext<Team> teamContext, BaseDBContext<Game> gameContext)
     {    
         _configuration = configuration;
         _logger = NLog.LogManager.GetCurrentClassLogger();
-        _context = context;
+        _userContext = userContext;
+        _teamContext = teamContext;
+        _gameContext = gameContext;
     }
 }

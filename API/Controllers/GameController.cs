@@ -27,10 +27,10 @@ public class GameModel
 }
 
 [ApiController]
-public class GameController : BaseController<Game>
+public class GameController : BaseController
 {
-    public GameController(IConfiguration configuration, BaseDBContext<Game> context) 
-        : base(configuration, context) 
+    public GameController(IConfiguration configuration, BaseDBContext<User> userContext, BaseDBContext<Team> teamContext, BaseDBContext<Game> gameContext) 
+        : base(configuration, userContext, teamContext, gameContext) 
     {
     }
 
@@ -39,7 +39,7 @@ public class GameController : BaseController<Game>
     public IActionResult GetGame(int id)
     {
         try {
-            var item = _context.Items.Find(id);
+            var item = _gameContext.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id));
@@ -53,7 +53,7 @@ public class GameController : BaseController<Game>
     public IActionResult GetGames(int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null) 
     {
         try {
-            var query = _context.Items.AsQueryable();
+            var query = _gameContext.Items.AsQueryable();
             if (!string.IsNullOrEmpty(status)) {
                 if (Enum.TryParse<GameStatus>(status, true, out var statusEnum))
                     query = query.Where(x => x.Status == statusEnum);
@@ -121,8 +121,8 @@ public class GameController : BaseController<Game>
             newItem.CompleteDate = (DateTime)data.CompleteDate;
 
         try {
-            _context.Items.Add(newItem);
-            _context.SaveChanges();
+            _gameContext.Items.Add(newItem);
+            _gameContext.SaveChanges();
             return CreatedAtAction(nameof(GetGame), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
@@ -133,7 +133,7 @@ public class GameController : BaseController<Game>
     [HttpPost]
     public IActionResult UpdateGame(int id, GameModel data)
     {
-        var item = _context.Items.Find(id);
+        var item = _gameContext.Items.Find(id);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
         
@@ -165,8 +165,8 @@ public class GameController : BaseController<Game>
             item.ModifyDate = DateTime.UtcNow; 
 
             try {
-                _context.Items.Update(item);
-                _context.SaveChanges();            
+                _gameContext.Items.Update(item);
+                _gameContext.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));

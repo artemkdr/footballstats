@@ -18,10 +18,10 @@ public class TeamModel
 }
 
 [ApiController]
-public class TeamController : BaseController<Team>
+public class TeamController : BaseController
 {
-    public TeamController(IConfiguration configuration, BaseDBContext<Team> context) 
-        : base(configuration, context) 
+    public TeamController(IConfiguration configuration, BaseDBContext<User> userContext, BaseDBContext<Team> teamContext, BaseDBContext<Game> gameContext) 
+        : base(configuration, userContext, teamContext, gameContext)
     {
     }    
     
@@ -31,7 +31,7 @@ public class TeamController : BaseController<Team>
     public IActionResult GetTeam(int id)
     {
         try {
-            var item = _context.Items.Find(id);
+            var item = _teamContext.Items.Find(id);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id, "name", item.Name ?? ""));
@@ -45,7 +45,7 @@ public class TeamController : BaseController<Team>
     public IActionResult GetTeams(string? name = null, string? status = null, string? players = null) 
     {
         try {
-            var query = _context.Items.AsQueryable();
+            var query = _teamContext.Items.AsQueryable();
 
             // case insensitive "like '%value%'" search by name
             if (!string.IsNullOrEmpty(name))
@@ -76,12 +76,11 @@ public class TeamController : BaseController<Team>
     [HttpPost]
     public IActionResult CreateTeam(TeamModel data)
     {
-        if (data == null || data.Name == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "team name is missing"));
-
-        // TODO: add data validation            
-        // TODO: check that the name is a valid name
-        // TODO: check that the players exist 
+        try {
+            ValidateTeamData(data, true);
+        } catch (Exception ex) {
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+        }
         
         var newItem = new Team {
             Name = data.Name,
@@ -94,8 +93,8 @@ public class TeamController : BaseController<Team>
             newItem.Status = status;
 
         try {
-            _context.Items.Add(newItem);
-            _context.SaveChanges();
+            _teamContext.Items.Add(newItem);
+            _teamContext.SaveChanges();
             return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
@@ -106,18 +105,19 @@ public class TeamController : BaseController<Team>
     [HttpPost]
     public IActionResult UpdateTeam(int id, TeamModel data)
     {
-        var item = _context.Items.Find(id);
+        var item = _teamContext.Items.Find(id);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
         
+        try {
+            ValidateTeamData(data);
+        } catch (Exception ex) {
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+        }
+        
         if (data != null) {
-            
-            // TODO: add data validation            
-            // TODO: check that the name is a valid name
-            // TODO: check that the players exist   
-
             if (data.Name != null && data.Name != item.Name) {                
-                if (_context.Items.FirstOrDefault(x => x.Name == data.Name) != null)
+                if (_teamContext.Items.FirstOrDefault(x => x.Name == data.Name) != null)
                     return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"team name {data.Name} is already used"));
                 item.Name = data.Name;
             }
@@ -130,8 +130,8 @@ public class TeamController : BaseController<Team>
                         
             item.ModifyDate = DateTime.UtcNow; 
             try {
-                _context.Items.Update(item);
-                _context.SaveChanges();            
+                _teamContext.Items.Update(item);
+                _teamContext.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
@@ -139,5 +139,29 @@ public class TeamController : BaseController<Team>
         }
 
         return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no team data provided"));
+    }
+
+    private void ValidateTeamData(TeamModel data, bool create = false) {
+        if (data == null)
+            throw new Exception("team data is empty");
+                
+        if (data != null) {
+            if (create && data.Name == null) 
+                throw new Exception("team name is missing");        
+
+            if (data.Players == null) 
+                throw new Exception("team players are missing");            
+            
+            if (data.Players.Length < MIN_TEAM_PLAYERS) 
+                throw new Exception($"team must have min {MIN_TEAM_PLAYERS} players");
+
+            if (data.Players.Length > MAX_TEAM_PLAYERS) 
+                throw new Exception($"team must have max {MAX_TEAM_PLAYERS} players");
+
+            foreach (var p in data.Players) {
+                if (_userContext.Items.Find(p) == null) 
+                    throw new Exception($"team player {p} doesn't exist");
+            }
+        }
     }
 }

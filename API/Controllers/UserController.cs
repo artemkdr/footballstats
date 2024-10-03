@@ -22,10 +22,10 @@ public class UserModel
 }
 
 [ApiController]
-public class UserController : BaseController<User>
+public class UserController : BaseController
 {
-    public UserController(IConfiguration configuration, BaseDBContext<User> context) 
-        : base(configuration, context) 
+    public UserController(IConfiguration configuration, BaseDBContext<User> userContext, BaseDBContext<Team> teamContext, BaseDBContext<Game> gameContext) 
+        : base(configuration, userContext, teamContext, gameContext)
     {
     }
 
@@ -34,7 +34,7 @@ public class UserController : BaseController<User>
     public IActionResult GetUser(string username)
     {
         try {
-            var item = _context.Items.Find(username);
+            var item = _userContext.Items.Find(username);
             if (item == null)
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("username", username));
@@ -48,7 +48,7 @@ public class UserController : BaseController<User>
     public IActionResult GetUsers(string? username = null, string? status = null) 
     {
         try {
-            var query = _context.Items.AsQueryable();
+            var query = _userContext.Items.AsQueryable();
 
             // case insensitive "like '%value%'" search by name
             if (!string.IsNullOrEmpty(username))
@@ -93,8 +93,8 @@ public class UserController : BaseController<User>
             newItem.Status = status;
 
         try {
-            _context.Items.Add(newItem);
-            _context.SaveChanges();
+            _userContext.Items.Add(newItem);
+            _userContext.SaveChanges();
             return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
@@ -105,7 +105,7 @@ public class UserController : BaseController<User>
     [HttpPost]
     public IActionResult UpdateUser(string username, UserModel userData)
     {        
-        var item = _context.Items.Find(username);
+        var item = _userContext.Items.Find(username);
         if (item == null)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
         
@@ -128,8 +128,8 @@ public class UserController : BaseController<User>
 
             item.ModifyDate = DateTime.UtcNow; 
             try {
-                _context.Items.Update(item);
-                _context.SaveChanges();            
+                _userContext.Items.Update(item);
+                _userContext.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("username", item.Username!));
             } catch (Exception ex) {
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
