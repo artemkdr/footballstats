@@ -1,5 +1,5 @@
 const config = {
-    API_URL: "https://localhost:7192",
+    API_URL: "https://localhost:7219",
     TOKEN_KEY: "authToken" // for localStorage
 }
 
