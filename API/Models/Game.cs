@@ -21,19 +21,28 @@ namespace API.Models
         [Column("goals2")]
         public int Goals2 { get; set; }
 
-        [Column("status")]
-        public string? Status { get; set; }
+        [Column("status", TypeName = "text")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public GameStatus Status { get; set; }
 
         [Column("vars")]
         public JsonDocument? Vars { get; set; } 
 
         [Column("createdate")]
-        public DateTime Createdate { get; set; }
+        public DateTime CreateDate { get; set; }
 
-        [Column("completeddate")]
-        public DateTime CompletedDate { get; set; }
+        [Column("completedate")]
+        public DateTime? CompleteDate { get; set; }
         
         [Column("modifydate")]
-        public DateTime Modifydate { get; set; }
+        public DateTime ModifyDate { get; set; }
+    }
+
+    public enum GameStatus 
+    {
+        NotStarted,
+        Playing,
+        Completed,
+        Cancelled
     }
 }

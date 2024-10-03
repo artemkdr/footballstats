@@ -13,23 +13,20 @@ namespace API.Controllers;
 public class UserModel
 {
     public string? Username { get; set; }
+    
     public string? Password { get; set; }
+    
     public JsonDocument? Vars { get; set;}
+    
+    public string? Status { get; set; }
 }
 
 [ApiController]
-public class UserController : ControllerBase
+public class UserController : BaseController<User>
 {
-    protected readonly IConfiguration _configuration;
-    private readonly Logger _logger;
-
-    private readonly BaseDBContext<User> _context;
-    
-    public UserController(IConfiguration configuration, BaseDBContext<User> context)
-    {    
-        _configuration = configuration;
-        _logger = NLog.LogManager.GetCurrentClassLogger();
-        _context = context;
+    public UserController(IConfiguration configuration, BaseDBContext<User> context) 
+        : base(configuration, context) 
+    {
     }
 
     [Route("user/{username}")]    
@@ -42,7 +39,34 @@ public class UserController : ControllerBase
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("username", username));
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+        }
+    }
+
+    [Route("user")]
+    [HttpGet]
+    public IActionResult GetUsers(string? username = null, string? status = null) 
+    {
+        try {
+            var query = _context.Items.AsQueryable();
+
+            // case insensitive "like '%value%'" search by name
+            if (!string.IsNullOrEmpty(username))
+                query = query.Where(x => x.Username != null && x.Username.ToLower().Contains(username.ToLower()));
+
+            if (!string.IsNullOrEmpty(status))
+                if (Enum.TryParse<UserStatus>(status, true, out var statusEnum))
+                    query = query.Where(x => x.Status == statusEnum);
+                else 
+                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
+            
+            var items = query.OrderBy(x => x.Username)
+                            .Take(LIST_LIMIT)
+                            .ToList();
+
+            return Ok(items);
+        } catch (Exception ex) {
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
     }
 
@@ -61,16 +85,19 @@ public class UserController : ControllerBase
             Username = userData.Username,
             Password = userData.Password, 
             Vars = userData.Vars,
-            Createdate = DateTime.UtcNow,            
-            Modifydate = DateTime.UtcNow
+            CreateDate = DateTime.UtcNow,            
+            ModifyDate = DateTime.UtcNow,
+            Status = UserStatus.Active            
         };
+        if (userData.Status != null && Enum.TryParse<UserStatus>(userData.Status, out var status))
+            newItem.Status = status;
 
         try {
             _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
     }
 
@@ -96,13 +123,16 @@ public class UserController : ControllerBase
             if (userData.Vars != null) 
                 item.Vars = userData.Vars;
             
-            item.Modifydate = DateTime.UtcNow; 
+            if (userData.Status != null && Enum.TryParse<UserStatus>(userData.Status, out var status))
+                item.Status = status;
+
+            item.ModifyDate = DateTime.UtcNow; 
             try {
                 _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("username", item.Username!));
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }
         }
 

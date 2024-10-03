@@ -12,27 +12,26 @@ namespace API.Controllers;
 public class GameModel
 {
     public string? Status { get; set; }
+    
     public int Team1 { get; set; }    
+    
     public int Team2 { get; set; }    
+    
     public int Goals1 { get; set; }    
+    
     public int Goals2 { get; set; }    
-    public DateTime? CompletedDate { get; set; }
+    
+    public DateTime? CompleteDate { get; set; }
+    
     public JsonDocument? Vars { get; set; }
 }
 
 [ApiController]
-public class GameController : ControllerBase
+public class GameController : BaseController<Game>
 {
-    protected readonly IConfiguration _configuration;
-    private readonly Logger _logger;
-
-    private readonly BaseDBContext<Game> _context;
-    
-    public GameController(IConfiguration configuration, BaseDBContext<Game> context)
-    {    
-        _configuration = configuration;
-        _logger = NLog.LogManager.GetCurrentClassLogger();
-        _context = context;
+    public GameController(IConfiguration configuration, BaseDBContext<Game> context) 
+        : base(configuration, context) 
+    {
     }
 
     [Route("game/{id}")]    
@@ -45,8 +44,48 @@ public class GameController : ControllerBase
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id));
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }          
+    }
+
+    [Route("game")]
+    [HttpGet]
+    public IActionResult GetGames(int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null) 
+    {
+        try {
+            var query = _context.Items.AsQueryable();
+            if (!string.IsNullOrEmpty(status)) {
+                if (Enum.TryParse<GameStatus>(status, true, out var statusEnum))
+                    query = query.Where(x => x.Status == statusEnum);
+                else 
+                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));
+            }
+
+            if (team1.HasValue)
+                query = query.Where(x => x.Team1 == team1.Value);
+
+            if (team2.HasValue)
+                query = query.Where(x => x.Team2 == team2.Value);
+
+            if (fromDate.HasValue)
+                query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date >= fromDate.Value.Date);
+
+            if (toDate.HasValue)
+                query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date <= toDate.Value.Date);
+
+            var items = query.
+                    OrderBy(x => x.Status == GameStatus.Playing ? 0 : 
+                                 x.Status == GameStatus.Completed ? 1 :
+                                 x.Status == GameStatus.NotStarted ? 2 : 3) // Order by Status priority
+                    .ThenByDescending(x => x.Status == GameStatus.Playing ? x.ModifyDate :
+                                         x.Status == GameStatus.Completed ? x.CompleteDate : x.ModifyDate)
+                    .Take(LIST_LIMIT)
+                    .ToList();
+
+            return Ok(items);
+        } catch (Exception ex) {
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+        }
     }
 
     [Route("game")]
@@ -54,13 +93,13 @@ public class GameController : ControllerBase
     public IActionResult CreateGame(GameModel data)
     {
         if (data == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game is missing"));
-        if (data.Status == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game status is missing"));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game is missing"));        
         if (data.Team1 <= 0)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team1 is missing"));
         if (data.Team2 <= 0)
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team2 is missing"));
+        if (data.Team1 == data.Team2)
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team1 and team2 must be different"));
 
         // TODO: add data validation
         // TODO: check goals are positive values
@@ -70,21 +109,23 @@ public class GameController : ControllerBase
             Team1 = data.Team1,
             Team2 = data.Team2,
             Goals1 = data.Goals1,
-            Goals2 = data.Goals2,
-            Status = data.Status,
+            Goals2 = data.Goals2,            
             Vars = data.Vars,            
-            Createdate = DateTime.UtcNow,            
-            Modifydate = DateTime.UtcNow
+            CreateDate = DateTime.UtcNow,            
+            ModifyDate = DateTime.UtcNow,
+            Status = GameStatus.NotStarted
         };
-        if (data.CompletedDate != null)
-            newItem.CompletedDate = (DateTime)data.CompletedDate;
+        if (data.Status != null && Enum.TryParse<GameStatus>(data.Status, out var status))
+            newItem.Status = status;
+        if (data.CompleteDate != null)
+            newItem.CompleteDate = (DateTime)data.CompleteDate;
 
         try {
             _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetGame), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
     }
 
@@ -109,19 +150,26 @@ public class GameController : ControllerBase
                 item.Team1 = data.Team1;
             if (data.Team2 > 0)
                 item.Team2 = data.Team2;                     
-            if (data.Status != null)
-                item.Status = data.Status;
-            if (data.CompletedDate != null)
-                item.CompletedDate = (DateTime)data.CompletedDate;
+            if (data.Status != null && Enum.TryParse<GameStatus>(data.Status, out var status)) {
+                // if the status is setting to Completed and there is no explicit CompleteDate received, 
+                // then set it automatically
+                if (status == GameStatus.Completed && item.Status < GameStatus.Completed && !data.CompleteDate.HasValue && !item.CompleteDate.HasValue) {
+                    item.CompleteDate = DateTime.UtcNow;
+                }
+                item.Status = status;
+            }
+            if (data.CompleteDate.HasValue) {                
+                item.CompleteDate = data.CompleteDate;                
+            }
             
-            item.Modifydate = DateTime.UtcNow; 
+            item.ModifyDate = DateTime.UtcNow; 
 
             try {
                 _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }
         }
         return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no game data provided"));

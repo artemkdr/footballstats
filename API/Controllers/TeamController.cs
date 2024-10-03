@@ -11,23 +11,20 @@ namespace API.Controllers;
 public class TeamModel
 {
     public string? Name { get; set; }
+    
     public string[]? Players { get; set; }    
+
+    public string? Status { get; set; }
 }
 
 [ApiController]
-public class TeamController : ControllerBase
+public class TeamController : BaseController<Team>
 {
-    protected readonly IConfiguration _configuration;
-    private readonly Logger _logger;
-
-    private readonly BaseDBContext<Team> _context;
+    public TeamController(IConfiguration configuration, BaseDBContext<Team> context) 
+        : base(configuration, context) 
+    {
+    }    
     
-    public TeamController(IConfiguration configuration, BaseDBContext<Team> context)
-    {    
-        _configuration = configuration;
-        _logger = NLog.LogManager.GetCurrentClassLogger();
-        _context = context;
-    }
 
     [Route("team/{id}")]    
     [HttpGet]
@@ -39,8 +36,40 @@ public class TeamController : ControllerBase
                 return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
             return RequestHelpers.Success(RequestHelpers.ToDict("id", id, "name", item.Name ?? ""));
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }        
+    }
+
+    [Route("team")]
+    [HttpGet]
+    public IActionResult GetTeams(string? name = null, string? status = null, string? players = null) 
+    {
+        try {
+            var query = _context.Items.AsQueryable();
+
+            // case insensitive "like '%value%'" search by name
+            if (!string.IsNullOrEmpty(name))
+                query = query.Where(x => x.Name != null && x.Name.ToLower().Contains(name.ToLower()));
+
+            if (!string.IsNullOrEmpty(status))
+                if (Enum.TryParse<TeamStatus>(status, true, out var statusEnum))
+                    query = query.Where(x => x.Status == statusEnum);
+                else 
+                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
+
+            if (players != null) {
+                string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                query = query.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p)));
+            }
+            
+            var items = query.OrderBy(x => x.Name)
+                            .Take(LIST_LIMIT)
+                            .ToList();
+
+            return Ok(items);
+        } catch (Exception ex) {
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+        }
     }
 
     [Route("team")]
@@ -57,16 +86,19 @@ public class TeamController : ControllerBase
         var newItem = new Team {
             Name = data.Name,
             Players = data.Players,
-            Createdate = DateTime.UtcNow,            
-            Modifydate = DateTime.UtcNow
+            CreateDate = DateTime.UtcNow,            
+            ModifyDate = DateTime.UtcNow,
+            Status = TeamStatus.Active
         };
+        if (data.Status != null && Enum.TryParse<TeamStatus>(data.Status, out var status))
+            newItem.Status = status;
 
         try {
             _context.Items.Add(newItem);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }
     }
 
@@ -92,14 +124,17 @@ public class TeamController : ControllerBase
 
             if (data.Players != null)
                 item.Players = data.Players;
+            
+            if (data.Status != null && Enum.TryParse<TeamStatus>(data.Status, out var status))
+                item.Status = status;
                         
-            item.Modifydate = DateTime.UtcNow; 
+            item.ModifyDate = DateTime.UtcNow; 
             try {
                 _context.Items.Update(item);
                 _context.SaveChanges();            
                 return RequestHelpers.Success(RequestHelpers.ToDict("id", item.Id));
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
             }
         }
 

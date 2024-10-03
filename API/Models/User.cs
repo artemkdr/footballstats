@@ -11,13 +11,28 @@ namespace API.Models
         [Key] 
         [Column("username")]
         public string? Username { get; set; }
+        
         [Column("password")]
+        [JsonIgnore]
         public string? Password { get; set; }
+        
         [Column("vars")]
         public JsonDocument? Vars { get; set; } 
+        
         [Column("createdate")]
-        public DateTime Createdate { get; set; }
+        public DateTime CreateDate { get; set; }
+        
         [Column("modifydate")]
-        public DateTime Modifydate { get; set; }
+        public DateTime ModifyDate { get; set; }
+
+        [Column("status", TypeName = "text")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public UserStatus Status { get; set; }
+    }
+
+    public enum UserStatus 
+    {
+        Active,
+        Deleted
     }
 }
