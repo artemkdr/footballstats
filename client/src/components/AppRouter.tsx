@@ -8,7 +8,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Teams } from "../pages/Teams";
 import { TeamPage } from "../pages/TeamPage";
 import { Players } from "../pages/Players";
-import { Player } from "../pages/Player";
+import { PlayerPage } from "../pages/PlayerPage";
 import { Games } from "../pages/Games";
 import { GamePage } from "../pages/GamePage";
 import callApi from "../net/api";
@@ -74,7 +74,7 @@ export const router: Router = createBrowserRouter([
 			},
 			{				
 				path: '/player/:id',
-				element: <Player />,
+				element: <PlayerPage />,
 				loader: async({ params }) => {											
 					const response = await callApi(`user/${params.id}`);
 					if (response.ok) {

@@ -1,12 +1,11 @@
 import { Link as ChakraLink, Heading, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, VStack } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as ReactRouterLink, useLoaderData } from 'react-router-dom';
 import { convertDataToTeamStatList, TeamStat } from '../models/TeamStat';
 
 export const Dashboard: FunctionComponent = (): ReactElement => {
-	const data : any = useLoaderData();    
-    const navigate = useNavigate();
+	const data : any = useLoaderData();        
     const { t } = useTranslation();
 	const [teamStats, setTeamStats] = useState<TeamStat[]>([]);
 

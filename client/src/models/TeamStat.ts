@@ -1,4 +1,3 @@
-import { convertDataToUserList, User } from "./User";
 
 export type TeamStat = {
     Id: number,   

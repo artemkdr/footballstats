@@ -10,8 +10,22 @@ export type Team = {
 }
 
 export enum TeamStatus {
-    Enabled = "Active",
+    Active = "Active",
     Deleted = "Deleted"
+}
+
+export const teamHasPlayer = (team: Team, username: string) : boolean => {
+    return team?.Players?.find(x => x.Username === username) != null;    
+}
+
+export const getTeamStatusColor = (status: TeamStatus) : string => {
+    switch (status) {        
+        case TeamStatus.Active:
+            return "green";        
+        case TeamStatus.Deleted:
+            return "gray";				
+    }
+    return "";
 }
 
 export const convertToTeam = (data : any) => {

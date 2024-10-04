@@ -7,7 +7,7 @@ export type User = {
 }
 
 export enum UserStatus {
-    Enabled = "Active",
+    Active = "Active",
     Deleted = "Deleted"
 }
 
@@ -19,6 +19,16 @@ export const convertToUser = (data : any) => {
     user.CreateDate = new Date(data.createDate);
     user.ModifyDate = new Date(data.modifyDate);
     return user;
+}
+
+export const getUserStatusColor = (status: UserStatus) : string => {
+    switch (status) {        
+        case UserStatus.Active:
+            return "green";        
+        case UserStatus.Deleted:
+            return "gray";				
+    }
+    return "";
 }
 
 export const convertDataToUserList = (listData : any) => {

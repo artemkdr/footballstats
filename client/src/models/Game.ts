@@ -1,5 +1,4 @@
-import { convertToTeam, Team } from "./Team";
-import { convertDataToUserList, User } from "./User";
+import { convertToTeam, Team, teamHasPlayer } from "./Team";
 
 export type Game = {
     Id: number;        
@@ -49,7 +48,65 @@ export const convertDataToGameList = (listData : any) => {
     return list;
 };
 
+export const getGameStatusColor = (status: GameStatus) : string => {
+    switch (status) {
+        case GameStatus.NotStarted:
+            return "yellow";				
+        case GameStatus.Playing:
+            return "green";
+        case GameStatus.Completed:
+            return "blue";
+        case GameStatus.Cancelled:
+            return "gray";				
+    }
+    return "";
+}
+
+export enum GameResult {
+    Win = "Win",
+    Loss = "Loss", 
+    Draw = "Draw",
+    None = "None"
+}
+
+export const getGameColorForResult = (result: GameResult) : string => {
+    switch (result) {
+        case GameResult.Win:
+            return "green";
+        case GameResult.Loss:
+            return "red";        
+    }
+    return "gray";
+}
+
+export const getGameResultFor = (game: Game, teamId: number) : GameResult => {
+    if (game.Status === GameStatus.Completed) {
+        if ((game.Team1?.Id === teamId && game.Goals1 > game.Goals2) || (game.Team2?.Id === teamId && game.Goals2 > game.Goals1))
+            return GameResult.Win;    
+        
+        if ((game.Team1?.Id === teamId && game.Goals1 < game.Goals2) || (game.Team2?.Id === teamId && game.Goals2 < game.Goals1)) 
+            return GameResult.Loss;    
+
+        return GameResult.Draw;
+    }
+    return GameResult.None;
+}
+
+export const getGameResultForUser = (game: Game, username: string) : GameResult => {
+    if (game.Status === GameStatus.Completed) {
+        if ((teamHasPlayer(game.Team1, username) && game.Goals1 > game.Goals2) || (teamHasPlayer(game.Team2, username) && game.Goals2 > game.Goals1))
+            return GameResult.Win;    
+        
+        if ((teamHasPlayer(game.Team1, username) && game.Goals1 < game.Goals2) || (teamHasPlayer(game.Team2, username) && game.Goals2 < game.Goals1)) 
+            return GameResult.Loss;    
+
+        return GameResult.Draw;
+    }
+    return GameResult.None;
+}
+
+
 export const isValidGame = (game: Game) => {    
-    if (game == null || game.Id == null || game.Team1 == null || game.Team2 == null) return false;    
+    if (game == null || game.Id == null || game.Team1 == null || game.Team2 == null || game.Team1?.Id === game.Team2?.Id) return false;    
     return true;
 }

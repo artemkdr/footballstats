@@ -23,6 +23,7 @@ export const NavBar: FunctionComponent = (): ReactElement => {
 			
 			<HStack overflow={"auto"} spacing={[2,4]}>
 				<ChakraLink as={ReactRouterLink} to="/dashboard" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Home')}</ChakraLink>								
+				<ChakraLink as={ReactRouterLink} to="/games" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Games')}</ChakraLink>								
 				<ChakraLink as={ReactRouterLink} to="/teams" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Teams')}</ChakraLink>								
 				<ChakraLink as={ReactRouterLink} to="/players" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Players')}</ChakraLink>								
 			</HStack>			

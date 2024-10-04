@@ -7,14 +7,14 @@ import {
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as ReactRouterLink, useLoaderData } from 'react-router-dom';
 import { convertDataToUserList } from '../models/User';
 
 
 export const Players: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
 	const data = useLoaderData();
-	const navigate = useNavigate();	
+	//const navigate = useNavigate();	
 	const usersList = convertDataToUserList(data);
 	
 	return (

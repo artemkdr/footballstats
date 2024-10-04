@@ -1,5 +1,7 @@
 {
     "Title": "Football Stats",
+    "Create": "Create",
+    "Cancel": "Cancel",
     "Player": "Player",
     "Game": "Game",
     "Team": "Team",
@@ -25,9 +27,43 @@
         "Title": "Players (users)"
     },
     "Games": {
-        "Title": "Games"
+        "Title": "Games",
+        "ScoreDelimiter": ":",
+        "TeamsDelimiter": "vs",
+        "Status": "Status",
+        "AddNewGame": "Add new game",
+        "NewGame": "New game",
+        "Placeholder": {
+            "Team1": "Choose the 1st team",
+            "Team2": "Choose the 2nd team",
+            "Goals1": "Goals (1st team)",
+            "Goals2": "Goals (2nd team)",
+            "Status": "Choose the game status"
+        },
+        "Win": "Win",
+        "Loss": "Loss", 
+        "Draw": "Draw"
     },
     "Teams": {
-        "Title": "Teams"
+        "Title": "Teams",
+        "Players": "Players"
+    },
+    "GameStatus": {
+        "NotStarted": "Not started",
+        "Playing": "Playing",
+        "Completed": "Completed",
+        "Cancelled": "Cancelled"
+    },
+    "UserStatus": {
+        "Active": "Active",
+        "Deleted": "Deleted"
+    },
+    "TeamStatus": {
+        "Active": "Active",
+        "Deleted": "Deleted"
+    },
+    "Message": {
+        "CreateGameSuccess": "Game successfully created",
+        "CreateGameError": "An error occured while creating the game"
     }
 }
