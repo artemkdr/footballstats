@@ -110,6 +110,17 @@ public class UserController : BaseController
         try {
             _userContext.Items.Add(newItem);
             _userContext.SaveChanges();
+
+            // create a team with a single user automatically
+            _teamContext.Items.Add(new Team {
+                Name = newItem.Username,
+                Players = new string[] { newItem.Username },
+                CreateDate = DateTime.UtcNow,            
+                ModifyDate = DateTime.UtcNow,
+                Status = TeamStatus.Active
+            });
+            _teamContext.SaveChanges();
+
             return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));

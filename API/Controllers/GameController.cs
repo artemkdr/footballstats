@@ -49,6 +49,14 @@ public class GameDTOFull : GameDTOBase
     public TeamDTO? Team2 { get; set; }    
 }
 
+
+public class GameDTOSpecial : GameDTOBase
+{   
+    public TeamDTOExtended? Team1 { get; set; }    
+    
+    public TeamDTOExtended? Team2 { get; set; }    
+}
+
 [ApiController]
 public class GameController : BaseController
 {
@@ -97,7 +105,7 @@ public class GameController : BaseController
 
     [Route("game")]
     [HttpGet]
-    public IActionResult GetGames(int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null) 
+    public IActionResult GetGames(int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null, string? players = null) 
     {
         try {
             var query = _gameContext.Items.AsQueryable();
@@ -108,11 +116,22 @@ public class GameController : BaseController
                     return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));
             }
 
-            if (team1.HasValue)
-                query = query.Where(x => x.Team1 == team1.Value);
-
-            if (team2.HasValue)
-                query = query.Where(x => x.Team2 == team2.Value);
+            if (players != null) {
+                string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                var playersTeams = _teamContext.Items.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p))).Select(x => x.Id).ToList();
+                if (playersTeams != null && playersTeams.Count > 0) {
+                    query = query.Where(x => playersTeams.Contains(x.Team1) || playersTeams.Contains(x.Team2));
+                }
+                //query = query.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p)));
+            } else {
+                if (team1.HasValue && team2.HasValue) {
+                    query = query.Where(x => x.Team1 == team1.Value && x.Team2 == team2.Value || x.Team1 == team2.Value && x.Team2 == team1.Value);
+                } else if (team1.HasValue) {
+                    query = query.Where(x => x.Team1 == team1.Value || x.Team2 == team1.Value);
+                } else if (team2.HasValue) {
+                    query = query.Where(x => x.Team1 == team2.Value || x.Team2 == team2.Value);
+                }
+            }
 
             if (fromDate.HasValue)
                 query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date >= fromDate.Value.Date);
@@ -131,19 +150,32 @@ public class GameController : BaseController
             
             var teamIds = items.SelectMany(x => new[] { x.Team1, x.Team2 }).Distinct().ToList();
             var teams = _teamContext.Items.Where(x => teamIds.Contains(x.Id)).ToList().ToDictionary(x => x.Id);
-            var itemsWithTeams = new List<GameDTOExtended>();
+            var itemsWithTeams = new List<GameDTOSpecial>();
             foreach (var t in items) {
                 var t1 = teams.ContainsKey(t.Team1) ? teams[t.Team1] : new Team() { Id = t.Team1 };
                 var t2 = teams.ContainsKey(t.Team2) ? teams[t.Team2] : new Team() { Id = t.Team2 };
-                itemsWithTeams.Add(new GameDTOExtended() {
+                var t1Players = new List<UserDTO>();
+                var t2Players = new List<UserDTO>();
+                if (t1.Players != null) 
+                    foreach (var u in t1.Players) 
+                        t1Players.Add(new UserDTO() { Username = u });
+                if (t2.Players != null) 
+                    foreach (var u in t2.Players) 
+                        t2Players.Add(new UserDTO() { Username = u });                    
+                
+                itemsWithTeams.Add(new GameDTOSpecial() {
                     Id = t.Id,
-                    Team1 = new TeamDTOLight() {
+                    Team1 = new TeamDTOExtended() {
                         Id = t1.Id,
-                        Name = t1.Name
+                        Name = t1.Name,
+                        Players = t1Players.ToArray(),
+                        Status = t1.Status.ToString()
                     },
-                    Team2 = new TeamDTOLight() {
+                    Team2 = new TeamDTOExtended() {
                         Id = t2.Id,
-                        Name = t2.Name
+                        Name = t2.Name,
+                        Players = t2Players.ToArray(),
+                        Status = t2.Status.ToString()
                     },
                     Status = t.Status.ToString(),
                     CompleteDate = t.CompleteDate,
