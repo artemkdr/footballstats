@@ -1,0 +1,104 @@
+{
+    "Title": "Football Stats",
+    "Create": "Créer",
+    "Update": "Modifier",
+    "Save": "Sauvegarder",
+    "Cancel": "Annuler",
+    "Player": "Joueur",
+    "Game": "Match",
+    "Team": "Équipe",
+    "GameTitle": "\"{{team1}}\" vs \"{{team2}}\" ({{goals1}} : {{goals2}})",
+    "Navigation": {
+        "Home": "Tableau de bord",
+        "Teams": "Équipes",
+        "Players": "Joueurs",
+        "Games": "Matchs"
+    },
+    "Dashboard": {
+        "Title": "Tableau de bord",
+        "Team": "Nom de l'équipe/joueur",
+        "Games": "Matchs joués",
+        "Wins": "Victoires",
+        "Losses": "Défaites",
+        "WinRatio": "Ratio de victoires",
+        "GF": "BP", 
+        "GA": "BC", 
+        "GD": "DB" 
+    },
+    "Players": {
+        "Title": "Joueurs (utilisateurs)",
+        "AddNewPlayer": "Ajouter un nouveau joueur",
+        "EditPlayer": "Modifier le joueur",
+        "NewPlayer": "Nouveau joueur (utilisateur)",
+        "DeletePlayer": "Supprimer le joueur",
+        "ActivatePlayer": "Activer le joueur",
+        "Username": "Nom d'utilisateur",
+        "Status": "Statut"
+    },
+    "Games": {
+        "Title": "Matchs",
+        "ScoreDelimiter": ":",
+        "TeamsDelimiter": "vs",
+        "Status": "Statut",
+        "AddNewGame": "Ajouter un nouveau match",
+        "SimulateGames": "Simuler des matchs entre les équipes",
+        "NewGame": "Nouveau match",
+        "Placeholder": {
+            "Team1": "Choisissez la 1ère équipe",
+            "Team2": "Choisissez la 2ème équipe",
+            "Goals1": "Buts (1ère équipe)",
+            "Goals2": "Buts (2ème équipe)",
+            "Status": "Choisissez le statut du match"
+        },
+        "Win": "Victoire",
+        "Loss": "Défaite",
+        "Draw": "Match nul",
+        "Cancel": "Supprimer le match",
+        "Start": "Commencer",
+        "Finish": "Terminer"
+    },
+    "Teams": {
+        "Title": "Équipes",
+        "Players": "Joueurs",
+        "NewTeam": "Nouvelle équipe",
+        "AddNewTeam": "Ajouter une nouvelle équipe",
+        "Stats": "Statistiques",
+        "Name": "Nom",
+        "Status": "Statut",
+        "Player1": "Joueur 1",
+        "Player2": "Joueur 2",
+        "Placeholder": {
+            "Player1": "1er joueur",
+            "Player2": "2ème joueur (facultatif)",
+            "Name": "Nom de l'équipe (unique)"
+        }
+    },
+    "GameStatus": {
+        "NotStarted": "Non commencé",
+        "Playing": "En cours",
+        "Completed": "Terminé",
+        "Cancelled": "Annulé"
+    },
+    "UserStatus": {
+        "Active": "Actif",
+        "Deleted": "Supprimé"
+    },
+    "TeamStatus": {
+        "Active": "Active",
+        "Deleted": "Supprimée"
+    },
+    "Message": {
+        "CreateGameSuccess": "Match créé avec succès",
+        "CreateGameError": "Une erreur s'est produite lors de la création du match",
+        "CreateUserSuccess": "Joueur créé avec succès",
+        "CreateUserError": "Une erreur s'est produite lors de la création du joueur",
+        "CreateTeamSuccess": "Équipe créée avec succès",
+        "CreateTeamError": "Une erreur s'est produite lors de la création de l'équipe",
+        "UpdateGameSuccess": "Match mis à jour",
+        "UpdateGameError": "Une erreur s'est produite lors de la mise à jour du match",
+        "UpdateUserSuccess": "Utilisateur mis à jour",
+        "UpdateUserError": "Une erreur s'est produite lors de la mise à jour de l'utilisateur",
+        "SimulatingGames": "Simulation de matchs en cours",
+        "SimulateSuccess": "Terminé !"
+    }
+}

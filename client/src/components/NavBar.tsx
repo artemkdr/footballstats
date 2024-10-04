@@ -1,12 +1,17 @@
-import { Link as ChakraLink, Flex, HStack, useColorMode } from '@chakra-ui/react'
+import { Link as ChakraLink, Flex, HStack, Select, useColorMode } from '@chakra-ui/react'
 import { FunctionComponent, ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink as ReactRouterLink } from 'react-router-dom'
+import { ColorModeSwitcher } from './ColorModeSwitcher'
 
 export const NavBar: FunctionComponent = (): ReactElement => {
 	const { colorMode } = useColorMode();		
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const activeStyle = {fontWeight: 'bold'};
+	
+	const changeLanguage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		i18n.changeLanguage(event.target.value);
+	};
 	
 	return (
 		<Flex
@@ -26,6 +31,18 @@ export const NavBar: FunctionComponent = (): ReactElement => {
 				<ChakraLink as={ReactRouterLink} to="/games" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Games')}</ChakraLink>								
 				<ChakraLink as={ReactRouterLink} to="/teams" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Teams')}</ChakraLink>								
 				<ChakraLink as={ReactRouterLink} to="/players" mr={[1,4,6,8]} _activeLink={activeStyle}>{t('Navigation.Players')}</ChakraLink>								
+			</HStack>
+
+			<HStack spacing={[0,2]}  overflow={"auto"}>
+				<Select
+					value={i18n.language} 
+					onChange={changeLanguage} width={["40px", "45px"]}
+					size={"inherit"} border={"none"} outline={"none"} >
+					{["en", "fr"].map((item, index) => {
+						return <option value={item} key={index}>{item?.toUpperCase()}</option>;
+					})}
+				</Select>				
+				<ColorModeSwitcher />								
 			</HStack>			
 		</Flex>
 	)

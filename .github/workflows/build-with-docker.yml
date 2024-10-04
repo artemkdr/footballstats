@@ -1,7 +1,7 @@
 # Build and pushes a docker image to Docker hub using Dockerfile in the root of project.
 # You have to pass "tags" parameter with a full path to repository and an image name.
 # For example,  bars/autosourcewebsites:latest, bcars/private:autosourcewebsites, ...
-name: Build with docker
+name: Build (w/docker)
 
 on: 
   workflow_dispatch:

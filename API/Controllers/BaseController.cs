@@ -13,7 +13,7 @@ namespace API.Controllers;
 [ApiController]
 abstract public class BaseController : ControllerBase
 {
-    public static int LIST_LIMIT = 1000;
+    public static int LIST_LIMIT = 500;
 
     public static int MAX_TEAM_PLAYERS = 2;
     public static int MIN_TEAM_PLAYERS = 1;
