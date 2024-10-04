@@ -4,6 +4,7 @@ import {
 	HStack,
 	IconButton,
 	Text,
+	useToast,
 	VStack
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ import callApi from '../net/api';
 export const Games: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
 	const data = useLoaderData();	
+	const toast = useToast();    
 	const [ games, setGames ] = useState<Game[]>([] as Game[]);
 	const [ isNewGameModalOpen, setIsNewGameModalOpen ] = useState(false);
 	const [ teams, setTeams ] = useState<Team[]>([] as Team[]);
@@ -82,11 +84,42 @@ export const Games: FunctionComponent = (): ReactElement => {
 				break;
 		}
 	};
+
+	const simulateGames = async () => {
+		const limit = 500;
+		let count = 0;
+		const loadingToast = toast({ title: t("Message.SimulatingGames"), status: "loading" });
+		for (let i = 0; i < teams.length; i++) {
+			const team1 = teams[i];			
+			for (let j = 0; j < teams.length; j++) {
+				if (i === j) continue;
+				const team2 = teams[j];				
+				let json : any = {           
+					Goals1: Math.floor(Math.random() * 11),
+					Goals2: Math.floor(Math.random() * 11),
+					Team1: team1.Id,
+					Team2: team2.Id,
+					Status: GameStatus.Completed,
+					CompleteDate: new Date()
+				};				
+				await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});				
+				count++;
+				if (count > limit) break;
+			}
+			if (count > limit) break;
+		}
+		toast.close(loadingToast);
+		toast({ title: t("Message.SimulateSuccess"), status: "success" });
+		window.location.reload();
+	};
 	
 	return (
 		<VStack spacing={5} align="start">
-			<Heading as="h2" size="md">{t("Games.Title")}</Heading>
-			<Button alignSelf={"start"} colorScheme="green" onClick={() => setIsNewGameModalOpen(true)}>{t('Games.AddNewGame')}</Button>				
+			<Heading as="h2" size="md">{t("Games.Title")} ({games.length})</Heading>
+			<HStack>
+				<Button colorScheme="green" onClick={() => setIsNewGameModalOpen(true)}>{t('Games.AddNewGame')}</Button>
+				<Button colorScheme="green" onClick={() => simulateGames()}>{t('Games.SimulateGames')}</Button>
+			</HStack>
 			<VStack spacing={2} align={"start"}>
 				<HStack width={"100%"}>
 					<SelectTeam

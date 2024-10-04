@@ -1,0 +1,15 @@
+name: "Build"
+
+on: 
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build-net:
+    uses: ./.github/workflows/build-net6.yml
+    with:
+      runner: "'ubuntu-latest'"
+  build-react:
+    uses: ./.github/workflows/build-react.yml
+    with:
+      working-directory: 'client'

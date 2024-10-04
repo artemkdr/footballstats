@@ -108,17 +108,17 @@ export const GamePage: FunctionComponent = (): ReactElement => {
 				{game.Status === GameStatus.Completed && moment(game.CompleteDate).isValid() ? " : " + moment(game.CompleteDate).format("DD.MM.YYYY") : ""}
 			</Badge>
 			<HStack>
-				<Card minWidth={100} maxWidth={"50%"}>
+				<Card flex={1} minWidth={100} maxWidth={"50%"}>
 					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team1?.Id))} fontWeight={"bold"}>						
-						<CustomLink link={`/team/${game.Team1?.Id}`} text={game.Team1?.Name} textDecoration={"underline"} />
+						<CustomLink link={`/team/${game.Team1?.Id}`} text={game.Team1?.Name} />
 					</CardHeader>
 					<CardBody textAlign={"center"} fontSize={"xl"}>
 						<Input type="number" name="Goals1" value={game.Goals1} width={14} textAlign={"center"} onChange={handleChange} />
 					</CardBody>
 				</Card>
-				<Card minWidth={100} maxWidth={"50%"}>
+				<Card flex={1} minWidth={100} maxWidth={"50%"}>
 					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team2?.Id))} fontWeight={"bold"}>						
-						<CustomLink link={`/team/${game.Team2?.Id}`} text={game.Team2?.Name} textDecoration={"underline"} />						
+						<CustomLink link={`/team/${game.Team2?.Id}`} text={game.Team2?.Name}  />
 					</CardHeader>
 					<CardBody textAlign={"center"} fontSize={"xl"}>
 						<Input type="number" name="Goals2" value={game.Goals2} width={14} textAlign={"center"} onChange={handleChange} />

@@ -7,7 +7,7 @@
     "Player": "Player",
     "Game": "Game",
     "Team": "Team",
-    "GameTitle": "{{team1}} vs {{team2}} ({{goals1}} : {{goals2}})",
+    "GameTitle": "\"{{team1}}\" vs \"{{team2}}\" ({{goals1}} : {{goals2}})",
     "Navigation": {
         "Home": "Dashboard",
         "Teams": "Teams",
@@ -41,6 +41,7 @@
         "TeamsDelimiter": "vs",
         "Status": "Status",
         "AddNewGame": "Add new game",        
+        "SimulateGames": "Simulate games between the teams",
         "NewGame": "New game",
         "Placeholder": {
             "Team1": "Choose the 1st team",
@@ -96,6 +97,8 @@
         "UpdateGameSuccess": "Game updated",
         "UpdateGameError": "An error occurred while updating the game",
         "UpdateUserSuccess": "User updated",
-        "UpdateUserError": "An error occurred while updating the user"
+        "UpdateUserError": "An error occurred while updating the user",
+        "SimulatingGames": "Simulating games",
+        "SimulateSuccess": "Done!"
     }
 }

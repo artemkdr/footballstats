@@ -1,0 +1,30 @@
+name: Build React App
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        type: string
+        default: "."
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4            # Check out the repository code
+      - uses: actions/setup-node@v4         # Set up Node.js environment
+        with:
+          node-version: '18'                 # Specify Node.js version
+          cache: 'npm'                       # Cache npm dependencies for speed
+          cache-dependency-path: '${{ inputs.working-directory }}/package-lock.json'
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '${{ inputs.working-directory }}/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('${{ inputs.working-directory }}/package-lock.json') }}
+      - run: npm ci                         # Install dependencies (faster than npm install)        
+      - run: npm run build                  # Build the React app        
+      - run: npm run test                   # Test React app

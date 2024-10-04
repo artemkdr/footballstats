@@ -47,7 +47,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 	return (
 		<VStack spacing={5} align="start">
 			<HStack spacing={5}>
-				<Heading as="h2" size="md">{t("Team")} {team.Name}</Heading>		
+				<Heading as="h2" size="md">{t("Team")} "{team.Name}"</Heading>		
 				{team.Status !== TeamStatus.Active ? <Badge colorScheme={getTeamStatusColor(team.Status)} padding={4}>{t("TeamStatus." + team.Status)}</Badge> : ""}
 			</HStack>
 			<VStack spacing={5} align="start" paddingLeft={2}>								
