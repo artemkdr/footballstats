@@ -52,7 +52,13 @@ export const convertDataToTeamList = (listData : any) => {
     return list;
 };
 
+export const TEAMNAME_PATTERN = /^[a-zA-Z0-9_\-\s]{3,20}$/;
+
 export const isValidTeam = (team: Team) => {    
     if (team == null || team.Id == null || team.Players == null || team.Name == null) return false;    
+    if (!TEAMNAME_PATTERN.test(team.Name)) return false;
     return true;
 }
+
+
+

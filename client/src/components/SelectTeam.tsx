@@ -8,7 +8,7 @@ interface SelectTeamProps extends SelectProps {
 export const SelectTeam: React.FC<SelectTeamProps> = (props) => {
     const { teams, ...rest } = props;
     return (
-        <Select {...rest}>
+        <Select {...rest}>            
             {teams.map((item, index) => (
                 <option key={item.Id} value={item.Id}>{item.Name}</option>
             ))}

@@ -44,7 +44,10 @@ export const convertDataToUserList = (listData : any) => {
     return list;
 };
 
+export const USERNAME_PATTERN = /^[a-zA-Z0-9_-]{3,20}$/;
+
 export const isValidUser = (user: User) => {    
     if (user == null || user.Username == null) return false;    
+    if (!USERNAME_PATTERN.test(user.Username)) return false;
     return true;
 }

@@ -1,6 +1,8 @@
 {
     "Title": "Football Stats",
     "Create": "Create",
+    "Update": "Update",
+    "Save": "Save",
     "Cancel": "Cancel",
     "Player": "Player",
     "Game": "Game",
@@ -24,14 +26,21 @@
         "GD": "GD"
     },
     "Players": {
-        "Title": "Players (users)"
+        "Title": "Players (users)",
+        "AddNewPlayer": "Add new player",
+        "EditPlayer": "Edit player",
+        "NewPlayer": "New player (user)",
+        "DeletePlayer": "Delete player",
+        "ActivatePlayer": "Activate player",
+        "Username": "Username",
+        "Status": "Status"
     },
     "Games": {
         "Title": "Games",
         "ScoreDelimiter": ":",
         "TeamsDelimiter": "vs",
         "Status": "Status",
-        "AddNewGame": "Add new game",
+        "AddNewGame": "Add new game",        
         "NewGame": "New game",
         "Placeholder": {
             "Team1": "Choose the 1st team",
@@ -42,12 +51,26 @@
         },
         "Win": "Win",
         "Loss": "Loss", 
-        "Draw": "Draw"
+        "Draw": "Draw",
+        "Cancel": "Delete game",
+        "Start": "Start",
+        "Finish": "Finish"
     },
     "Teams": {
         "Title": "Teams",
         "Players": "Players",
-        "Stats": "Stats"
+        "NewTeam": "New team",
+        "AddNewTeam": "Add new team",
+        "Stats": "Stats",
+        "Name": "Name",
+        "Status": "Status",
+        "Player1": "Player 1",
+        "Player2": "Player 2",
+        "Placeholder": {
+            "Player1": "1st player",
+            "Player2": "2nd player (optional)",
+            "Name": "Team name (unique)"            
+        }
     },
     "GameStatus": {
         "NotStarted": "Not started",
@@ -65,6 +88,14 @@
     },
     "Message": {
         "CreateGameSuccess": "Game successfully created",
-        "CreateGameError": "An error occured while creating the game"
+        "CreateGameError": "An error occurred while creating the game",
+        "CreateUserSuccess": "Player successfully created",
+        "CreateUserError": "An error occurred while creating the player",
+        "CreateTeamSuccess": "Team successfully created",
+        "CreateTeamError": "An error occurred while creating the team",
+        "UpdateGameSuccess": "Game updated",
+        "UpdateGameError": "An error occurred while updating the game",
+        "UpdateUserSuccess": "User updated",
+        "UpdateUserError": "An error occurred while updating the user"
     }
 }

@@ -117,8 +117,10 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, 
                                 {Object.values(GameStatus).map((type) => (
                                     <option key={type} value={type}>{t('GameStatus.' + type)}</option>
                                 ))}
-                            </Select>                                      
-                            <Input name={"CompleteDate"} type={"date"} value={game.CompleteDate ? moment(game.CompleteDate).toISOString(true).split('T')[0] : ""} onChange={handleChange} />
+                            </Select>                                  
+                            {game.Status === GameStatus.Completed ?
+                                <Input maxWidth={"50%"} name={"CompleteDate"} type={"date"} value={game.CompleteDate ? moment(game.CompleteDate).toISOString(true).split('T')[0] : ""} onChange={handleChange} />                                
+                                : ""}
                         </HStack>
                     </VStack>
                 </ModalBody>

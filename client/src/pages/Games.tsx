@@ -13,7 +13,7 @@ import { useLoaderData } from 'react-router-dom';
 import { CreateNewGameModal } from '../components/CreateNewGameModal';
 import { CustomLink } from '../components/CustomLink';
 import { SelectTeam } from '../components/SelectTeam';
-import { convertDataToGameList, Game } from '../models/Game';
+import { convertDataToGameList, Game, GameStatus } from '../models/Game';
 import { convertDataToRivalStats, RivalStats } from '../models/RivalStats';
 import { convertDataToTeamList, Team } from '../models/Team';
 import callApi from '../net/api';
@@ -97,8 +97,10 @@ export const Games: FunctionComponent = (): ReactElement => {
 					<SelectTeam
 						teams={teams} value={team2} name={"Team2"}
 						placeholder={t("Games.Placeholder.Team2")}
-						textAlign={"right"} onChange={handleChange} />
-					<IconButton icon={<MdClear />} aria-label="Clear teams" onClick={() => { setTeam1(-1); setTeam2(-1); }} />
+						textAlign={"left"} onChange={handleChange} />
+					{team1 > 0 || team2 > 0 ?
+						<IconButton icon={<MdClear />} aria-label="Clear teams" onClick={() => { setTeam1(-1); setTeam2(-1); }} />
+						: ""}
 				</HStack>
 				{
 					team1 > 0 && team2 > 0 ? 
@@ -115,7 +117,9 @@ export const Games: FunctionComponent = (): ReactElement => {
 				{games?.map((item, index) => (					
 					<HStack spacing={2} key={index}>						
 						<CustomLink link={`/game/${item.Id}`} text={t("GameTitle", { team1: item.Team1?.Name, team2: item.Team2?.Name, goals1: item.Goals1, goals2: item.Goals2 })} />
-						<Text>({item.Status})</Text>
+						{item.Status !== GameStatus.Completed ? 
+							<Text>({t("GameStatus." + item.Status)})</Text>
+							: ""}
 					</HStack>								
 				))}
 			</VStack>
