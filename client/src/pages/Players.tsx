@@ -1,20 +1,18 @@
 import {
-	Link as ChakraLink,
 	HStack,
 	Heading,
-	Text,
 	VStack
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink, useLoaderData } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
+import { CustomLink } from '../components/CustomLink';
 import { convertDataToUserList } from '../models/User';
 
 
 export const Players: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
-	const data = useLoaderData();
-	//const navigate = useNavigate();	
+	const data = useLoaderData();	
 	const usersList = convertDataToUserList(data);
 	
 	return (
@@ -22,10 +20,8 @@ export const Players: FunctionComponent = (): ReactElement => {
 			<Heading as="h2" size="md">{t("Players.Title")}</Heading>
 			<VStack spacing={5} align="left" paddingLeft={3}>
 				{usersList?.map((item, index) => (					
-					<HStack spacing={2} key={index}>
-						<ChakraLink as={ReactRouterLink} to={`/player/${item.Username}`}>														
-							<Text>{item.Username}</Text>																
-						</ChakraLink>
+					<HStack spacing={2} key={index}>						
+						<CustomLink link={`/player/${item.Username}`} text={item.Username} />
 					</HStack>								
 				))}
 			</VStack>

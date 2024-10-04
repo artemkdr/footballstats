@@ -46,7 +46,8 @@
     },
     "Teams": {
         "Title": "Teams",
-        "Players": "Players"
+        "Players": "Players",
+        "Stats": "Stats"
     },
     "GameStatus": {
         "NotStarted": "Not started",

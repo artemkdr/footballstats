@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Game, GameStatus, isValidGame } from "../models/Game";
-import { convertDataToTeamList, Team } from "../models/Team";
+import { Team } from "../models/Team";
 import callApi from "../net/api";
+import { SelectTeam } from "./SelectTeam";
 
 interface CreateNewGameModalProps {    
     isOpen: boolean;
     onClose: () => void;
     onCreate: () => void;
+    teams: Team[];
 }
 
-export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, onClose, onCreate }) => {
+export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, onClose, onCreate, teams }) => {
     const { t } = useTranslation();    
     const [game, setGame] = useState<Game>({        
         Id: -1, // needs not null value for validation
@@ -23,22 +25,9 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, 
         CompleteDate: new Date()
     } as Game);
 
-    const [teams, setTeams] = useState<Team[]>([] as Team[]);
-
     const nav = useNavigate();
     const toast = useToast();    
     const [isValid, setIsValid] = useState(false);
-    
-    useEffect(() => {		
-        const loadTeams = async() => {
-            const response = await callApi(`team?status=Active`);
-            if (response.ok) {
-                var json = await response.json();			
-                setTeams(convertDataToTeamList(json));
-            }
-        }
-        loadTeams();		
-    }, []);    
     
     useEffect(() => {
         setIsValid(isValidGame(game));        
@@ -108,17 +97,15 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, 
                 <ModalBody>                    
                     <VStack spacing={5}>
                         <HStack width={"100%"}>                            
-                            <Select name={"Team1"} placeholder={t("Games.Placeholder.Team1")} value={game.Team1?.Id} textAlign={"right"} onChange={handleChange}>
-                                {teams.map((item, index) => (
-                                    <option key={item.Id} value={item.Id}>{item.Name}</option>
-                                ))}
-                            </Select>                            
+                            <SelectTeam 
+                                teams={teams} name={"Team1"} 
+                                placeholder={t("Games.Placeholder.Team1")}
+                                value={game.Team1?.Id} textAlign={"right"} onChange={handleChange} />                            
                             <Text width={10} textAlign={"center"}>{t("Games.TeamsDelimiter")}</Text>                            
-                            <Select name={"Team2"} placeholder={t("Games.Placeholder.Team2")} value={game.Team2?.Id} onChange={handleChange}>
-                                {teams.map((item, index) => (
-                                    <option key={item.Id} value={item.Id}>{item.Name}</option>
-                                ))}
-                            </Select>                            
+                            <SelectTeam 
+                                teams={teams} name={"Team2"} 
+                                placeholder={t("Games.Placeholder.Team2")}
+                                value={game.Team2?.Id} textAlign={"left"} onChange={handleChange} />                                                        
                         </HStack>
                         <HStack width={"100%"}>                            
                             <Input name={"Goals1"} type={"number"} value={game.Goals1} placeholder={t("Games.Placeholder.Goals1")} textAlign={"right"} onChange={handleChange} />                            

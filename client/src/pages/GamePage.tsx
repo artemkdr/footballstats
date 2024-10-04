@@ -1,9 +1,10 @@
-import { Badge, Card, CardBody, CardHeader, Link as ChakraLink, HStack, VStack } from '@chakra-ui/react';
+import { Badge, Card, CardBody, CardHeader, HStack, VStack } from '@chakra-ui/react';
+import moment from 'moment';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink, useLoaderData } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
+import { CustomLink } from '../components/CustomLink';
 import { convertToGame, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor } from '../models/Game';
-import moment from 'moment';
 
 export const GamePage: FunctionComponent = (): ReactElement => {
 	const data : any = useLoaderData();
@@ -22,14 +23,14 @@ export const GamePage: FunctionComponent = (): ReactElement => {
 			</Badge>
 			<HStack>
 				<Card minWidth={100} maxWidth={"50%"}>
-					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team1?.Id))} fontWeight={"bold"}>
-						<ChakraLink as={ReactRouterLink} to={`/team/${game.Team1?.Id}`} textDecoration={"underline"}>{game.Team1?.Name}</ChakraLink>
+					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team1?.Id))} fontWeight={"bold"}>						
+						<CustomLink link={`/team/${game.Team1?.Id}`} text={game.Team1?.Name} textDecoration={"underline"} />
 					</CardHeader>
 					<CardBody textAlign={"center"} fontSize={"xl"}>{game.Goals1}</CardBody>
 				</Card>
 				<Card minWidth={100} maxWidth={"50%"}>
 					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team2?.Id))} fontWeight={"bold"}>						
-						<ChakraLink as={ReactRouterLink} to={`/team/${game.Team2?.Id}`} textDecoration={"underline"}>{game.Team2?.Name}</ChakraLink>
+						<CustomLink link={`/team/${game.Team2?.Id}`} text={game.Team2?.Name} textDecoration={"underline"} />						
 					</CardHeader>
 					<CardBody textAlign={"center"} fontSize={"xl"}>{game.Goals2}</CardBody>
 				</Card>

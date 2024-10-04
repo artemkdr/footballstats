@@ -1,9 +1,13 @@
-import { Badge, Link as ChakraLink, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { Badge, Heading, HStack, VStack } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink, useLoaderData } from 'react-router-dom';
-import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '../models/Team';
+import { useLoaderData } from 'react-router-dom';
+import { CustomLink } from '../components/CustomLink';
+import { StatsTable } from '../components/StatsTable';
+import { Subheader } from '../components/Subheader';
 import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor } from '../models/Game';
+import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '../models/Team';
+import { convertDataToTeamStatList, TeamStat } from '../models/TeamStat';
 import callApi from '../net/api';
 
 
@@ -12,13 +16,21 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 	const [team, setTeam] = useState<Team>({} as Team);
 	const { t } = useTranslation();	
 	const [games, setGames] = useState<Game[]>([] as Game[]);
+	const [stats, setStats] = useState<TeamStat[]>([] as TeamStat[]);
 
 	useEffect(() => {
 		setTeam(convertToTeam(data));		
 	}, [data]);
 
-	useEffect(() => {
-		
+	useEffect(() => {				
+		const loadStats = async() => {
+			const response = await callApi(`stats?team=${data.id}`);
+			if (response.ok) {
+				var json = await response.json();			
+				setStats(convertDataToTeamStatList(json));
+			}
+		}
+	
 		const loadGames = async() => {
 			const response = await callApi(`game?team1=${data.id}`);
 			if (response.ok) {
@@ -26,8 +38,9 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 				setGames(convertDataToGameList(json));
 			}
 		}
-		loadGames();
 		
+		loadGames();
+		loadStats();		
 	}, [data?.id])
 	
 
@@ -37,21 +50,21 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 				<Heading as="h2" size="md">{t("Team")} {team.Name}</Heading>		
 				{team.Status !== TeamStatus.Active ? <Badge colorScheme={getTeamStatusColor(team.Status)} padding={4}>{t("TeamStatus." + team.Status)}</Badge> : ""}
 			</HStack>
-			<VStack spacing={5} align="start" paddingLeft={2}>
-				<Heading as="h3" size="sm">{t("Teams.Players")}</Heading>		
+			<VStack spacing={5} align="start" paddingLeft={2}>								
+				<Subheader text={t("Teams.Players")} marginTop={0} />
 				{team.Players?.map((item, index) => (
 					<HStack spacing={2} key={index} paddingLeft={4}>
-						<ChakraLink as={ReactRouterLink} to={`/player/${item.Username}`}>														
-							<Text>{item.Username}</Text>																
-						</ChakraLink>
+						<CustomLink link={`/player/${item.Username}`} text={item.Username} />						
 					</HStack>
 				))}
-				<Heading as="h3" size="sm">{t("Games.Title")}</Heading>
+				
+				<Subheader text={t("Teams.Stats")} />
+				<StatsTable stats={stats} />				
+				
+				<Subheader text={t("Games.Title")} />
 				{games?.map((item, index) => (
-					<HStack spacing={2} key={index} paddingLeft={4}>
-						<ChakraLink as={ReactRouterLink} to={`/game/${item.Id}`}>
-							<Text>{t("GameTitle", { team1: item.Team1?.Name, team2: item.Team2?.Name, goals1: item.Goals1, goals2: item.Goals2 })}</Text>
-						</ChakraLink>
+					<HStack spacing={2} key={index} paddingLeft={4}>						
+						<CustomLink link={`/game/${item.Id}`} text={t("GameTitle", { team1: item.Team1?.Name, team2: item.Team2?.Name, goals1: item.Goals1, goals2: item.Goals2 })} />						
 						{
 							item.Status === GameStatus.Completed 
 								?
