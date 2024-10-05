@@ -145,7 +145,7 @@ public class GameController : BaseController
 
             var totalCount = query.Count();
             var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
-            if (page > totalPages) page = totalPages;
+            if (page > totalPages) page = Math.Max(1, totalPages);
 
             var items = query                    
                     .OrderBy(x => x.Status == GameStatus.Playing ? 0 : 

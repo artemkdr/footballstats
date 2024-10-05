@@ -104,7 +104,7 @@ public class TeamController : BaseController
 
             var totalCount = query.Count();
             var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
-            if (page > totalPages) page = totalPages;
+            if (page > totalPages) page = Math.Max(1, totalPages);
             
             var items = query.OrderBy(x => x.Name)
                             .Skip((page - 1) * LIST_LIMIT)

@@ -4,6 +4,7 @@ import {
 	HStack,
 	Text,
 	useToast,
+	UseToastOptions,
 	VStack
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useState } from 'react';
@@ -33,7 +34,8 @@ export const Players: FunctionComponent = (): ReactElement => {
 	const generateUsers = async () => {
 		const limit = config.SIMULATE_USERS_NUM;
 		let count = 0;
-		const loadingToast = toast({ title: t("Message.GeneratingUsers"), description: t("Message.GeneratingCount", {count: count}), status: "loading", isClosable: false, duration: 30000 });
+		const loadingToastProps = { status: "loading", isClosable: false, duration: 30000 } as UseToastOptions;		
+		const loadingToast = toast({ title: t("Message.GeneratingUsers"), description: t("Message.GeneratingCount", {count: count}), ...loadingToastProps });
 		for (let i = 0; i < limit; i++) {			
 			const uname = dict[randomN(dict.length - 1)] + "_" + dict[randomN(dict.length - 1)] + "_" + dict[randomN(dict.length - 1)] + "_" + randomN(100000);
 			let json : any = {           
@@ -42,7 +44,7 @@ export const Players: FunctionComponent = (): ReactElement => {
 			};				
 			await callApi(`user`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});				
 			count++;
-			if (count % 2 === 0) toast.update(loadingToast, { description: t("Message.GeneratingCount", {count: count}) });			
+			if (count % 2 === 0) toast.update(loadingToast, { description: t("Message.GeneratingCount", {count: count}), ...loadingToastProps });			
 			
 		}
 		toast.close(loadingToast);

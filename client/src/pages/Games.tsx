@@ -5,6 +5,7 @@ import {
 	IconButton,
 	Text,
 	useToast,
+	UseToastOptions,
 	VStack
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
@@ -96,11 +97,14 @@ export const Games: FunctionComponent = (): ReactElement => {
 	const simulateGames = async () => {
 		const limit = config.SIMULATE_GAMES_LIMIT;
 		let count = 0;
-		const loadingToast = toast({ title: t("Message.SimulatingGames"), description: t("Message.SimulatingCount", {count: count}), status: "loading", isClosable: false, duration: 30000 });
+		const loadingToastProps = { status: "loading", isClosable: false, duration: 300000 } as UseToastOptions;
+		const loadingToast = toast({ title: t("Message.SimulatingGames"), description: t("Message.SimulatingCount", {count: count}), ...loadingToastProps });
 		for (let i = 0; i < teams.length; i++) {
 			const team1 = teams[i];			
 			for (let j = 0; j < teams.length; j++) {
 				if (i === j) continue;
+				if (count > limit) break;
+
 				const team2 = teams[j];				
 				let json : any = {           
 					Goals1: Math.floor(Math.random() * 11),
@@ -110,10 +114,9 @@ export const Games: FunctionComponent = (): ReactElement => {
 					Status: GameStatus.Completed,
 					CompleteDate: new Date()
 				};				
-				await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});				
+				await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});								
 				count++;
-				if (count % 10 === 0) toast.update(loadingToast, { description: t("Message.SimulatingCount", {count: count}) });
-				if (count > limit) break;
+				if (count % 10 === 0) toast.update(loadingToast, { description: t("Message.SimulatingCount", {count: count}), ...loadingToastProps });				
 			}
 			if (count > limit) break;
 		}

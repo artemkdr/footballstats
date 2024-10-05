@@ -72,7 +72,7 @@ public class UserController : BaseController
                     return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
             var totalCount = query.Count();
             var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
-            if (page > totalPages) page = totalPages;
+            if (page > totalPages) page = Math.Max(1, totalPages);
             
             var items = query.OrderBy(x => x.Username)
                              .Skip((page - 1) * LIST_LIMIT)
