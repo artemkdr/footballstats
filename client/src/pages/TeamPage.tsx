@@ -9,6 +9,7 @@ import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGame
 import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '../models/Team';
 import { convertDataToTeamStatList, TeamStat } from '../models/TeamStat';
 import callApi from '../net/api';
+import { convertDataToList } from '../models/List';
 
 
 export const TeamPage: FunctionComponent = (): ReactElement => {
@@ -35,7 +36,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 			const response = await callApi(`game?team1=${data.id}`);
 			if (response.ok) {
 				var json = await response.json();			
-				setGames(convertDataToGameList(json));
+				setGames(convertDataToGameList(convertDataToList(json)?.List));
 			}
 		}
 		

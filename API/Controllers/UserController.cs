@@ -10,7 +10,7 @@ using NLog;
 
 namespace API.Controllers;
 
-public class UserDTOLight
+public class UserDTOLight : IBaseDTO
 {
     public string? Username { get; set; }
 }
@@ -55,8 +55,9 @@ public class UserController : BaseController
 
     [Route("user")]
     [HttpGet]
-    public IActionResult GetUsers(string? username = null, string? status = null) 
+    public IActionResult GetUsers(string? username = null, string? status = null, int page = 1) 
     {
+        if (page < 1) page = 1;
         try {
             var query = _userContext.Items.AsQueryable();
 
@@ -69,8 +70,12 @@ public class UserController : BaseController
                     query = query.Where(x => x.Status == statusEnum);
                 else 
                     return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            if (page > totalPages) page = totalPages;
             
             var items = query.OrderBy(x => x.Username)
+                             .Skip((page - 1) * LIST_LIMIT)
                             .Take(LIST_LIMIT)
                             .Select(x => new UserDTO() {
                                 Username = x.Username,
@@ -79,7 +84,13 @@ public class UserController : BaseController
                             })
                             .ToList();
 
-            return Ok(items);
+            return Ok(new ListDTO {
+                Page = page,
+                PageSize = LIST_LIMIT,
+                Total = totalCount,
+                TotalPages = totalPages,
+                List = items.ToArray()
+            });
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }

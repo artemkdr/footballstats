@@ -8,7 +8,7 @@ using NLog;
 
 namespace API.Controllers;
 
-public class TeamDTOLight
+public class TeamDTOLight : IBaseDTO
 {
     public int Id { get; set; }
 
@@ -27,6 +27,10 @@ public class TeamDTOExtended : TeamDTOLight
     public UserDTO[]? Players { get; set; }    
 }
 
+public class TeamDTOSpecial : TeamDTOLight
+{    
+    public UserDTOLight[]? Players { get; set; }    
+}
 
 [ApiController]
 public class TeamController : BaseController
@@ -77,8 +81,9 @@ public class TeamController : BaseController
 
     [Route("team")]
     [HttpGet]
-    public IActionResult GetTeams(string? name = null, string? status = null, string? players = null) 
+    public IActionResult GetTeams(string? name = null, string? status = null, string? players = null, int page = 1) 
     {
+        if (page < 1) page = 1;
         try {
             var query = _teamContext.Items.AsQueryable();
 
@@ -96,8 +101,13 @@ public class TeamController : BaseController
                 string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
                 query = query.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p)));
             }
+
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            if (page > totalPages) page = totalPages;
             
             var items = query.OrderBy(x => x.Name)
+                            .Skip((page - 1) * LIST_LIMIT)
                             .Take(LIST_LIMIT)
                             .Select(x => new TeamDTOLight() {
                                 Id = x.Id,
@@ -106,7 +116,13 @@ public class TeamController : BaseController
                             })
                             .ToList();
 
-            return Ok(items);
+            return Ok(new ListDTO {
+                Page = page,
+                PageSize = LIST_LIMIT,
+                Total = totalCount,
+                TotalPages = totalPages,
+                List = items.ToArray()
+            });
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }

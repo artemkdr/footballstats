@@ -1,8 +1,8 @@
 {
-    "Title": "Football Stats",
+    "Title": "Statistiques de Football",
     "Create": "Créer",
     "Update": "Modifier",
-    "Save": "Sauvegarder",
+    "Save": "Enregistrer",
     "Cancel": "Annuler",
     "Player": "Joueur",
     "Game": "Match",
@@ -21,9 +21,9 @@
         "Wins": "Victoires",
         "Losses": "Défaites",
         "WinRatio": "Ratio de victoires",
-        "GF": "BP", 
-        "GA": "BC", 
-        "GD": "DB" 
+        "GF": "BP",
+        "GA": "BC",
+        "GD": "DB"
     },
     "Players": {
         "Title": "Joueurs (utilisateurs)",

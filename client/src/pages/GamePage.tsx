@@ -105,23 +105,23 @@ export const GamePage: FunctionComponent = (): ReactElement => {
 		<VStack spacing={5}>
 			<Badge colorScheme={getGameStatusColor(game.Status)} padding={4}>
 				{t("GameStatus." + game.Status)}
-				{game.Status === GameStatus.Completed && moment(game.CompleteDate).isValid() ? " : " + moment(game.CompleteDate).format("DD.MM.YYYY") : ""}
+				{game.Status === GameStatus.Completed && moment(game.CompleteDate).isValid() ? " " + t("OnDate", {date: moment(game.CompleteDate).format("DD.MM.YYYY")}) : ""}
 			</Badge>
 			<HStack>
-				<Card flex={1} minWidth={100} maxWidth={"50%"}>
-					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team1?.Id))} fontWeight={"bold"}>						
+				<Card flex={1} minWidth={200} maxWidth={"50%"}>
+					<CardHeader height={"4em"} textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team1?.Id))} fontWeight={"bold"}>						
 						<CustomLink link={`/team/${game.Team1?.Id}`} text={game.Team1?.Name} />
 					</CardHeader>
-					<CardBody textAlign={"center"} fontSize={"xl"}>
-						<Input type="number" name="Goals1" value={game.Goals1} width={14} textAlign={"center"} onChange={handleChange} />
+					<CardBody textAlign={"center"}>
+						<Input type="number" name="Goals1" value={game.Goals1} width={"2em"} padding={"0.2em 0.2em"} textAlign={"center"} onChange={handleChange} fontSize={"2rem"} fontWeight={"bold"} />
 					</CardBody>
 				</Card>
-				<Card flex={1} minWidth={100} maxWidth={"50%"}>
-					<CardHeader textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team2?.Id))} fontWeight={"bold"}>						
+				<Card flex={1} minWidth={200} maxWidth={"50%"}>
+					<CardHeader height={"4em"} textAlign={"center"} color={getGameColorForResult(getGameResultFor(game, game.Team2?.Id))} fontWeight={"bold"}>						
 						<CustomLink link={`/team/${game.Team2?.Id}`} text={game.Team2?.Name}  />
 					</CardHeader>
-					<CardBody textAlign={"center"} fontSize={"xl"}>
-						<Input type="number" name="Goals2" value={game.Goals2} width={14} textAlign={"center"} onChange={handleChange} />
+					<CardBody textAlign={"center"}>
+						<Input type="number" name="Goals2" value={game.Goals2} width={"2em"} padding={"0.2em 0.2em"} textAlign={"center"} onChange={handleChange} fontSize={"2rem"} fontWeight={"bold"} />
 					</CardBody>
 				</Card>
 			</HStack>	

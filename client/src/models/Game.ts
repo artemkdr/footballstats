@@ -22,16 +22,16 @@ export enum GameStatus {
 
 export const convertToGame = (data : any) => {
     var game = {} as Game;    
-    game.Id = parseInt(data.id);
-    game.Team1 = data.team1 != null ? convertToTeam(data.team1) : {} as Team;
-    game.Team2 = data.team2 != null ? convertToTeam(data.team2) : {} as Team;
-    game.Goals1 = parseInt(data.goals1);
-    game.Goals2 = parseInt(data.goals2);
-    game.Vars = data.vars;    
-    game.CreateDate = new Date(data.createDate);
-    game.ModifyDate = new Date(data.modifyDate);
-    game.CompleteDate = new Date(data.completeDate);
-    game.Status = data.status as GameStatus;    
+    game.Id = parseInt(data?.id);
+    game.Team1 = data?.team1 != null ? convertToTeam(data?.team1) : {} as Team;
+    game.Team2 = data?.team2 != null ? convertToTeam(data?.team2) : {} as Team;
+    game.Goals1 = parseInt(data?.goals1);
+    game.Goals2 = parseInt(data?.goals2);
+    game.Vars = data?.vars;    
+    game.CreateDate = new Date(data?.createDate);
+    game.ModifyDate = new Date(data?.modifyDate);
+    game.CompleteDate = new Date(data?.completeDate);
+    game.Status = data?.status as GameStatus;    
     return game;
 }
 

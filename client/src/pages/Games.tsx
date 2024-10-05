@@ -18,6 +18,9 @@ import { convertDataToGameList, Game, GameStatus } from '../models/Game';
 import { convertDataToRivalStats, RivalStats } from '../models/RivalStats';
 import { convertDataToTeamList, Team } from '../models/Team';
 import callApi from '../net/api';
+import { Subheader } from '../components/Subheader';
+import config from '../config';
+import { convertDataToList, List } from '../models/List';
 
 export const Games: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
@@ -29,9 +32,12 @@ export const Games: FunctionComponent = (): ReactElement => {
 	const [ team1, setTeam1] = useState<number>(-1);
 	const [ team2, setTeam2] = useState<number>(-1);
 	const [ rivalStats, setRivalStats ] = useState<RivalStats>({} as RivalStats);
+	const [ list, setList] = useState<List>({} as List);
 
 	useEffect(() => {
-		setGames(convertDataToGameList(data));		
+		const list = convertDataToList(data);
+		setList(list);
+		setGames(convertDataToGameList(list.List));		
 	}, [data]);
 
 	useEffect(() => { 
@@ -39,7 +45,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 			const response = await callApi(`team?status=Active`);
 			if (response.ok) {
 				var json = await response.json();			
-				setTeams(convertDataToTeamList(json));
+				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
 			}
 		}
 
@@ -56,7 +62,9 @@ export const Games: FunctionComponent = (): ReactElement => {
 			const response = await callApi("game?" + params.join("&"));
 			if (response.ok) {
 				var json = await response.json();			
-				setGames(convertDataToGameList(json));
+				const list = convertDataToList(json);
+				setList(list);
+				setGames(convertDataToGameList(list.List));
 			}
 		}
 		loadGames();
@@ -86,9 +94,9 @@ export const Games: FunctionComponent = (): ReactElement => {
 	};
 
 	const simulateGames = async () => {
-		const limit = 500;
+		const limit = config.SIMULATE_GAMES_LIMIT;
 		let count = 0;
-		const loadingToast = toast({ title: t("Message.SimulatingGames"), status: "loading" });
+		const loadingToast = toast({ title: t("Message.SimulatingGames"), description: t("Message.SimulatingCount", {count: count}), status: "loading", isClosable: false, duration: 30000 });
 		for (let i = 0; i < teams.length; i++) {
 			const team1 = teams[i];			
 			for (let j = 0; j < teams.length; j++) {
@@ -104,23 +112,25 @@ export const Games: FunctionComponent = (): ReactElement => {
 				};				
 				await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});				
 				count++;
+				if (count % 10 === 0) toast.update(loadingToast, { description: t("Message.SimulatingCount", {count: count}) });
 				if (count > limit) break;
 			}
 			if (count > limit) break;
 		}
-		toast.close(loadingToast);
-		toast({ title: t("Message.SimulateSuccess"), status: "success" });
+		toast.close(loadingToast);		
+		toast({ title: t("Message.SimulateSuccess", {count: count}), status: "success" });
 		window.location.reload();
 	};
 	
 	return (
 		<VStack spacing={5} align="start">
-			<Heading as="h2" size="md">{t("Games.Title")} ({games.length})</Heading>
+			<Heading as="h2" size="md">{t("Games.Title")} ({list.Total})</Heading>
 			<HStack>
 				<Button colorScheme="green" onClick={() => setIsNewGameModalOpen(true)}>{t('Games.AddNewGame')}</Button>
-				<Button colorScheme="green" onClick={() => simulateGames()}>{t('Games.SimulateGames')}</Button>
+				{config.SIMULATE_MODE ? <Button colorScheme="gray" onClick={() => simulateGames()}>{t('Games.SimulateGames')}</Button> : ""}
 			</HStack>
 			<VStack spacing={2} align={"start"}>
+				<Subheader text={t("Games.Filter")} />
 				<HStack width={"100%"}>
 					<SelectTeam
 						teams={teams} value={team1} name={"Team1"}
@@ -138,9 +148,9 @@ export const Games: FunctionComponent = (): ReactElement => {
 				{
 					team1 > 0 && team2 > 0 ? 
 						<HStack width={"100%"}>
-							<Text textAlign={"right"} fontSize={"xl"} width={"50%"}>{rivalStats.Wins1}</Text>
+							<Text textAlign={"right"} fontSize={"2rem"} width={"50%"} fontWeight={"bold"}>{rivalStats.Wins1}</Text>
 							<Text width={10} textAlign={"center"}>{t("Games.ScoreDelimiter")}</Text>
-							<Text textAlign={"left"} fontSize={"xl"} width={"50%"} marginRight={12}>{rivalStats.Wins2}</Text>
+							<Text textAlign={"left"} fontSize={"2rem"} width={"50%"} marginRight={12} fontWeight={"bold"}>{rivalStats.Wins2}</Text>
 						</HStack>
 						:
 						""

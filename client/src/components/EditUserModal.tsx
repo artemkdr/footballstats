@@ -70,7 +70,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose, o
                         <InputInlineLabel 
                             label={t("Players.Username")} 
                             input={
-                                <Input name={"Username"} placeholder={t("Players.Username")} onChange={handleChange} />
+                                <Input name={"Username"} placeholder={t("Players.Placeholder.Username")} onChange={handleChange} />
                             }
                             />
                         <InputInlineLabel 

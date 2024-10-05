@@ -7,6 +7,7 @@
     "Player": "Player",
     "Game": "Game",
     "Team": "Team",
+    "OnDate": "on {{date}}",
     "GameTitle": "\"{{team1}}\" vs \"{{team2}}\" ({{goals1}} : {{goals2}})",
     "Navigation": {
         "Home": "Dashboard",
@@ -33,7 +34,11 @@
         "DeletePlayer": "Delete player",
         "ActivatePlayer": "Activate player",
         "Username": "Username",
-        "Status": "Status"
+        "Status": "Status",
+        "GenerateUsers": "Generate {{count}} new users",
+        "Placeholder": {
+            "Username": "Username (unique)"
+        }
     },
     "Games": {
         "Title": "Games",
@@ -43,6 +48,7 @@
         "AddNewGame": "Add new game",        
         "SimulateGames": "Simulate games between the teams",
         "NewGame": "New game",
+        "Filter": "Filter by team or select 2 teams to see their head-to-head wins",
         "Placeholder": {
             "Team1": "Choose the 1st team",
             "Team2": "Choose the 2nd team",
@@ -99,6 +105,10 @@
         "UpdateUserSuccess": "User updated",
         "UpdateUserError": "An error occurred while updating the user",
         "SimulatingGames": "Simulating games",
-        "SimulateSuccess": "Done!"
+        "SimulatingCount": "{{count}} new games have been added.",
+        "SimulateSuccess": "Done! {{count}} new games have been added.",
+        "GeneratingUsers": "Generating users",
+        "GeneratingCount": "{{count}} new users have been added.",
+        "GeneratingSuccess": "Done! {{count}} new users have been added."
     }
 }

@@ -37,3 +37,15 @@ abstract public class BaseController : ControllerBase
         _gameContext = gameContext;
     }
 }
+
+public interface IBaseDTO {
+
+}
+
+public class ListDTO : IBaseDTO {
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int Total { get; set; }
+    public int TotalPages { get; set; }
+    public object[]? List { get; set; }
+}

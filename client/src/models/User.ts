@@ -13,11 +13,11 @@ export enum UserStatus {
 
 export const convertToUser = (data : any) => {
     var user = {} as User;    
-    user.Username = data.username?.toString();
-    user.Status = data.status as UserStatus;    
-    user.Vars = data.vars;
-    user.CreateDate = new Date(data.createDate);
-    user.ModifyDate = new Date(data.modifyDate);
+    user.Username = data?.username?.toString();
+    user.Status = data?.status as UserStatus;    
+    user.Vars = data?.vars;
+    user.CreateDate = new Date(data?.createDate);
+    user.ModifyDate = new Date(data?.modifyDate);
     return user;
 }
 

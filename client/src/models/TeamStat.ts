@@ -11,13 +11,13 @@ export type TeamStat = {
 
 export const convertToTeamStat = (data : any) => {
     var stat = {} as TeamStat; 
-    stat.Id = parseInt(data.id);
-    stat.Name = data.name?.toString();
-    stat.Games = parseInt(data.games);
-    stat.Wins = parseInt(data.wins);
-    stat.Losses = parseInt(data.losses);
-    stat.GF = parseInt(data.gf);
-    stat.GA = parseInt(data.ga);
+    stat.Id = parseInt(data?.id);
+    stat.Name = data?.name?.toString();
+    stat.Games = parseInt(data?.games);
+    stat.Wins = parseInt(data?.wins);
+    stat.Losses = parseInt(data?.losses);
+    stat.GF = parseInt(data?.gf);
+    stat.GA = parseInt(data?.ga);
     return stat;
 }
 

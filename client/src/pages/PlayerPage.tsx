@@ -5,6 +5,7 @@ import { useLoaderData } from 'react-router-dom';
 import { CustomLink } from '../components/CustomLink';
 import { Subheader } from '../components/Subheader';
 import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultForUser, getGameStatusColor } from '../models/Game';
+import { convertDataToList } from '../models/List';
 import { convertDataToTeamList, Team } from '../models/Team';
 import { convertToUser, getUserStatusColor, User, UserStatus } from '../models/User';
 import callApi from '../net/api';
@@ -26,7 +27,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 			const response = await callApi(`team?players=${userData.username}`);
 			if (response.ok) {
 				var json = await response.json();			
-				setTeams(convertDataToTeamList(json));
+				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
 			}
 		}
 	
@@ -34,7 +35,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 			const response = await callApi(`game?players=${userData.username}`);
 			if (response.ok) {
 				var json = await response.json();			
-				setGames(convertDataToGameList(json));
+				setGames(convertDataToGameList(convertDataToList(json)?.List));
 			}
 		}
 		

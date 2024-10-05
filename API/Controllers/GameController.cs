@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Net;
 using System.Text.Json;
 using API.Data;
@@ -10,7 +11,7 @@ using NLog;
 
 namespace API.Controllers;
 
-abstract public class GameDTOBase {
+abstract public class GameDTOBase : IBaseDTO {
     public int Id { get; set; }    
 
     public string? Status { get; set; }
@@ -52,9 +53,9 @@ public class GameDTOFull : GameDTOBase
 
 public class GameDTOSpecial : GameDTOBase
 {   
-    public TeamDTOExtended? Team1 { get; set; }    
+    public TeamDTOSpecial? Team1 { get; set; }    
     
-    public TeamDTOExtended? Team2 { get; set; }    
+    public TeamDTOSpecial? Team2 { get; set; }    
 }
 
 [ApiController]
@@ -105,8 +106,11 @@ public class GameController : BaseController
 
     [Route("game")]
     [HttpGet]
-    public IActionResult GetGames(int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null, string? players = null) 
+    public IActionResult GetGames(
+        int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null, string? players = null,
+        int page = 1) 
     {
+        if (page < 1) page = 1;
         try {
             var query = _gameContext.Items.AsQueryable();
             if (!string.IsNullOrEmpty(status)) {
@@ -139,12 +143,17 @@ public class GameController : BaseController
             if (toDate.HasValue)
                 query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date <= toDate.Value.Date);
 
+            var totalCount = query.Count();
+            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            if (page > totalPages) page = totalPages;
+
             var items = query                    
                     .OrderBy(x => x.Status == GameStatus.Playing ? 0 : 
                                  x.Status == GameStatus.Completed ? 1 :
                                  x.Status == GameStatus.NotStarted ? 2 : 3) // Order by Status priority
                     .ThenByDescending(x => x.Status == GameStatus.Playing ? x.ModifyDate :
                                          x.Status == GameStatus.Completed ? x.CompleteDate : x.ModifyDate)
+                    .Skip((page - 1) * LIST_LIMIT)
                     .Take(LIST_LIMIT)                    
                     .ToList();
             
@@ -154,24 +163,24 @@ public class GameController : BaseController
             foreach (var t in items) {
                 var t1 = teams.ContainsKey(t.Team1) ? teams[t.Team1] : new Team() { Id = t.Team1 };
                 var t2 = teams.ContainsKey(t.Team2) ? teams[t.Team2] : new Team() { Id = t.Team2 };
-                var t1Players = new List<UserDTO>();
-                var t2Players = new List<UserDTO>();
+                var t1Players = new List<UserDTOLight>();
+                var t2Players = new List<UserDTOLight>();
                 if (t1.Players != null) 
                     foreach (var u in t1.Players) 
-                        t1Players.Add(new UserDTO() { Username = u });
+                        t1Players.Add(new UserDTOLight() { Username = u });
                 if (t2.Players != null) 
                     foreach (var u in t2.Players) 
-                        t2Players.Add(new UserDTO() { Username = u });                    
+                        t2Players.Add(new UserDTOLight() { Username = u });                    
                 
                 itemsWithTeams.Add(new GameDTOSpecial() {
                     Id = t.Id,
-                    Team1 = new TeamDTOExtended() {
+                    Team1 = new TeamDTOSpecial() {
                         Id = t1.Id,
                         Name = t1.Name,
                         Players = t1Players.ToArray(),
                         Status = t1.Status.ToString()
                     },
-                    Team2 = new TeamDTOExtended() {
+                    Team2 = new TeamDTOSpecial() {
                         Id = t2.Id,
                         Name = t2.Name,
                         Players = t2Players.ToArray(),
@@ -183,7 +192,13 @@ public class GameController : BaseController
                     Goals2 = t.Goals2                        
                 });
             }
-            return Ok(itemsWithTeams);
+            return Ok(new ListDTO {
+                Page = page,
+                PageSize = LIST_LIMIT,
+                Total = totalCount,
+                TotalPages = totalPages,
+                List = itemsWithTeams.ToArray()
+            });
         } catch (Exception ex) {
             return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
         }

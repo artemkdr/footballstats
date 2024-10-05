@@ -13,11 +13,12 @@ import { convertDataToTeamList, TeamStatus } from '../models/Team';
 import { EditTeamModal } from '../components/EditTeamModal';
 import { convertDataToUserList, User } from '../models/User';
 import callApi from '../net/api';
+import { convertDataToList } from '../models/List';
 
 export const Teams: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
 	const data = useLoaderData();	
-	const teamsList = convertDataToTeamList(data);
+	const teamsList = convertDataToTeamList(convertDataToList(data)?.List);
 	const [ isTeamModalOpen, setIsTeamModalOpen ] = useState(false);
 	const [ players, setPlayers ] = useState<User[]>([] as User[]);
 	
@@ -26,7 +27,7 @@ export const Teams: FunctionComponent = (): ReactElement => {
 			const response = await callApi(`user?status=Active`);
 			if (response.ok) {
 				var json = await response.json();			
-				setPlayers(convertDataToUserList(json));
+				setPlayers(convertDataToUserList(convertDataToList(json)?.List));
 			}
 		}
 
