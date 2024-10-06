@@ -15,6 +15,7 @@ export const NavBar: FunctionComponent = (): ReactElement => {
 	
 	return (
 		<Flex
+			data-testid="navbar"
 			alignItems={'center'}
 			justifyContent={'space-between'}
 			borderBottom={1}

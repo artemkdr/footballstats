@@ -4,37 +4,6 @@ This project is a coding challenge that implements a service for storing and dis
 
 The service uses a PostgreSQL database to store information about teams, players, and games. [See the database creation script here](psqlinit/init.sql).
 
-The default **dev** connection string is set up for a test database Docker container (see below):
-```
-Host=localhost;Port=5442;Database=footballstats;Username=postgres;Password=postgres;
-```
-
-### Populating the Database
-
-When you first run the service, the database will be empty. You have two ways to populate it:
-
-**1. Manually via the UI:**
-
-* **Create Players:** This automatically creates a team with the same name, containing the newly created player.
-* **Create Games:** Once you have teams, you can create games between them.
-
-**2. Automatic Generation:**
-
-* **Players Page:** Use the "Generate Players" button to create 10 random players.
-* **Games Page:** Use the "Simulate Games" button to automatically generate two matches for every possible team pairing, one with each team playing as the host.
-
-
-## API
-
-A .NET 6.0 Web API application.
-
-Interactive API documentation, powered by Swagger UI, can be found on `/api/swagger/index.html` after starting the service using `docker-compose up -d --build`. This allows you to explore and test the API endpoints. 
-If you run the service on your local machine, then you can access the Swagger UI at http://localhost/api/swagger/index.html.
-
-## Client
-
-A React (TypeScript) application built with [Chakra UI](https://github.com/chakra-ui/chakra-ui/).
-
 ## How to build
 
 The project uses Docker for containerization and provides a [docker-compose.yml](docker-compose.yml) file to simplify building and running the service. 
@@ -50,9 +19,9 @@ docker-compose up -d --build
 This command will:
 
 * Build three Docker containers:
-    * **Client:**  An nginx-based container ([nginx.conf](nginx.conf)) that serves the React frontend application and acts as a reverse proxy for the API.
+    * **Client:**  An nginx-based container ([nginx.conf](nginx.conf)) that serves the React frontend application at **80 port** and acts as a reverse proxy for the API.
     * **API:**  An ASP.NET 6.0 container ([Dockerfile.api](Dockerfile.api)) that hosts the .NET API application. The API runs on port 5000 within the container and is accessible through the client container's nginx server on `/api/...`.
-    * **Database:** A PostgreSQL 15 container ([Dockerfile.psql](Dockerfile.psql)) with the `footballstats` database. The database server is exposed on port 5432: `
+    * **Database:** A PostgreSQL 15 container ([Dockerfile.psql](Dockerfile.psql)) with the `footballstats` database. The database server is running on port 5432: `
 Host=db;Port=5432;Database=footballstats;Username=postgres;Password=postgres;
 `
 * Start the containers in detached mode.
@@ -61,6 +30,13 @@ Host=db;Port=5432;Database=footballstats;Username=postgres;Password=postgres;
 
 * The client application will be available at http://localhost.
 * The API documentation will be available at http://localhost/api/swagger/index.html.
+
+**IMPORTANT:**
+**The service is running on port 80 by default**, create your proper .env file in the project root directory to run it on another port (8081 f.e.):
+```
+echo APP_PORT=8081 > .env
+```
+
 
 **Docker Compose Network:**
 
@@ -71,30 +47,35 @@ This application uses a Docker Compose defined network to facilitate communicati
     * frontend - For the frontend service.
     * backend - For the backend service.
     * db - For the database service.
-
+---
 ### Stopping the service
 
 To stop the containers:
 ```bash
+docker-compose stop
+```
+To shut down the containers:
+```bash
 docker-compose down
 ```
 
-To stop the containers and remove the associated volumes (the database data):
-
-```
-docker-compose down --volumes
-```
-
+---
 ### Running individual components
 ***Database only:***
 #### to run the container
 ```
 docker-compose -f .\docker-compose-db.yml up -d --build
 ```
+**The database is exposed on 5442 port** (using a non-standard port to avoid interfering with the local PostgreSQL server if any).
 #### to stop the container
+```
+docker-compose -f .\docker-compose-db.yml stop
+```
+#### to shut down the container
 ```
 docker-compose -f .\docker-compose-db.yml down
 ```
+
 
 ***API only:***
 #### to run from Visual Studio Code project folder
@@ -136,6 +117,52 @@ docker run -p 80:80 footballstats-client
 ```
 docker stop footballstats-client
 ```
+
+## API
+
+A .NET 6.0 Web API application.
+
+Interactive API documentation, powered by Swagger UI, can be found on `/api/swagger/index.html` after starting the service using `docker-compose up -d --build`. This allows you to explore and test the API endpoints. 
+If you run the service on your local machine, then you can access the Swagger UI at http://localhost/api/swagger/index.html.
+
+All the nuget packages can be found in [API.csproj](api/API.csproj) file.
+
+## Client
+
+A React (TypeScript) application built with [Chakra UI](https://github.com/chakra-ui/chakra-ui/).
+
+All the dependencies can be found in [package.json](client/package.json) file.
+
+## Database
+
+The default **dev** connection string is set up for a test database Docker container (see below) in [appsettings.Development.json](api/appsettings.Development.json):
+```
+Host=localhost;Port=5442;Database=footballstats;Username=postgres;Password=postgres;
+```
+It's used when you run the API service via `dotnet run` on your dev machine.
+
+### Populating the Database
+
+When you first run the service, the database tables will be empty. You have two ways to populate it:
+
+**1. Manually via the UI:**
+
+* **Create Players:** This automatically creates a team with the same name, containing the newly created player.
+* **Create Games:** Once you have the teams, you can create games between them.
+
+**2. Automatic Generation:**
+
+By default 'simulating mode' is on in the [client config](client/src/config.ts): 
+```
+SIMULATE_MODE: true,
+SIMULATE_USERS_NUM: 10,
+SIMULATE_GAMES_LIMIT: 1000
+```
+So you can do the following:
+
+* **Players Page:** Use the "Generate Players" button to create 10 random players.
+* **Games Page:** Use the "Simulate Games" button to automatically generate two matches for every possible team pairing, one with each team playing as the host.
+
 
 
 ## Github Actions

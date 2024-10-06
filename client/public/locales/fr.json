@@ -4,10 +4,11 @@
     "Update": "Modifier",
     "Save": "Enregistrer",
     "Cancel": "Annuler",
-    "Loading": "chargement...",
+    "Loading": "Chargement...",
     "Player": "Joueur",
     "Game": "Match",
     "Team": "Équipe",
+    "OnDate": "le {{date}}", 
     "GameTitle": "\"{{team1}}\" vs \"{{team2}}\" ({{goals1}} : {{goals2}})",
     "Navigation": {
         "Home": "Tableau de bord",
@@ -22,9 +23,9 @@
         "Wins": "Victoires",
         "Losses": "Défaites",
         "WinRatio": "Ratio de victoires",
-        "GF": "BP",
-        "GA": "BC",
-        "GD": "DB"
+        "GF": "BP", 
+        "GA": "BC", 
+        "GD": "DB" 
     },
     "Players": {
         "Title": "Joueurs (utilisateurs)",
@@ -34,7 +35,11 @@
         "DeletePlayer": "Supprimer le joueur",
         "ActivatePlayer": "Activer le joueur",
         "Username": "Nom d'utilisateur",
-        "Status": "Statut"
+        "Status": "Statut",
+        "GenerateUsers": "Générer {{count}} nouveaux utilisateurs",
+        "Placeholder": {
+            "Username": "Nom d'utilisateur (unique)"
+        }
     },
     "Games": {
         "Title": "Matchs",
@@ -44,6 +49,7 @@
         "AddNewGame": "Ajouter un nouveau match",
         "SimulateGames": "Simuler des matchs entre les équipes",
         "NewGame": "Nouveau match",
+        "Filter": "Filtrer par équipe ou sélectionner 2 équipes pour voir leurs face-à-face", 
         "Placeholder": {
             "Team1": "Choisissez la 1ère équipe",
             "Team2": "Choisissez la 2ème équipe",
@@ -86,7 +92,7 @@
     },
     "TeamStatus": {
         "Active": "Active",
-        "Deleted": "Supprimée"
+        "Deleted": "Supprimée" 
     },
     "Message": {
         "CreateGameSuccess": "Match créé avec succès",
@@ -100,6 +106,10 @@
         "UpdateUserSuccess": "Utilisateur mis à jour",
         "UpdateUserError": "Une erreur s'est produite lors de la mise à jour de l'utilisateur",
         "SimulatingGames": "Simulation de matchs en cours",
-        "SimulateSuccess": "Terminé !"
+        "SimulatingCount": "{{count}} nouveaux matchs ont été ajoutés.",
+        "SimulateSuccess": "Terminé ! {{count}} nouveaux matchs ont été ajoutés.",
+        "GeneratingUsers": "Génération d'utilisateurs en cours",
+        "GeneratingCount": "{{count}} nouveaux utilisateurs ont été ajoutés.",
+        "GeneratingSuccess": "Terminé ! {{count}} nouveaux utilisateurs ont été ajoutés."
     }
 }

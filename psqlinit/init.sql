@@ -12,7 +12,6 @@ CREATE TABLE users (
 	createdate timestamp with time zone,
 	modifydate timestamp with time zone
 );
-CREATE INDEX users_status_index ON users USING btree ("status");
 
 CREATE TABLE teams (
 	id serial PRIMARY KEY,
@@ -23,7 +22,6 @@ CREATE TABLE teams (
 	modifydate timestamp with time zone
 );
 CREATE INDEX teams_name_index ON teams USING btree ("name");
-CREATE INDEX teams_status_index ON teams USING btree ("status");
 
 CREATE TABLE games (
 	id serial PRIMARY KEY,
