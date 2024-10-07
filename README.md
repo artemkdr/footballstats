@@ -34,9 +34,8 @@ Host=db;Port=5432;Database=footballstats;Username=postgres;Password=postgres;
 **IMPORTANT:**
 **The service is running on port 80 by default**, create your proper .env file in the project root directory to run it on another port (8081 f.e.):
 ```
-echo APP_PORT=8081 > .env
+APP_PORT=8081
 ```
-
 
 **Docker Compose Network:**
 
@@ -58,6 +57,28 @@ To shut down the containers:
 ```bash
 docker-compose down
 ```
+
+### Populating the Database
+
+When you first run the service, the database tables will be empty. You have two ways to populate it:
+
+**1. Manually via the UI:**
+
+* **Create Players:** This automatically creates a team with the same name, containing the newly created player.
+* **Create Games:** Once you have the teams, you can create games between them.
+
+**2. Automatic Generation:**
+
+By default 'simulating mode' is on in the [client config](client/src/config.ts): 
+``` javascript
+SIMULATE_MODE: true,
+SIMULATE_USERS_NUM: 10,
+SIMULATE_GAMES_LIMIT: 1000
+```
+So you can do the following:
+
+* **Players Page:** Use the "Generate Players" button to create 10 random players.
+* **Games Page:** Use the "Simulate Games" button to automatically generate two matches for every possible team pairing, one with each team playing as the host.
 
 ---
 ### Running individual components
@@ -84,10 +105,16 @@ cd api
 dotnet run
 ```
 #### to run the container
+You have to inject the database connection string using docker arguments.
 ```
-docker -f Dockerfile.api build -t footballstats-client .
-docker run -p 5000:5000 footballstats-api 
+docker build --build-arg DB_CONNECTION_STRING="Host=YOUR_DB_HOST;Port=YOUR_DB_PORT;Database=YOUR_DB_NAME;Username=YOUR_DB_USERNAME;Password=YOUR_DB_PASSWORD" -f Dockerfile.api -t footballstats-api .
 ```
+Run on port 5000:
+```
+docker run -d -p 5000:5000 footballstats-api 
+```
+Check http://localhost:5000/health then
+
 #### to stop the container
 ```
 # to stop the container
@@ -97,8 +124,17 @@ docker stop footballstats-api
 ***Client only:***
 
 (Assuming you have the API running separately or want to connect to an external API)
+
+If you need to adjust a root API url you can do it in [client config](client/src/config.ts): 
+``` javascript
+// dev
+const config = {
+    API_URL: "https://localhost:7219"
+}
+```
+
 #### to run from Visual Studio Code project folder
-The first time: install the packages:
+The first time, install the packages:
 ```
 cd client
 npm ci
@@ -109,61 +145,53 @@ cd client
 npm run start
 ```
 #### to run as a container
+In this case you have to setup your API location for the React app [config.docker.ts](client/src/config.docker.ts):
+``` javascript
+const config = {
+    API_URL: "http://localhost:5000"
+}
 ```
-docker -f Dockerfile.client build -t footballstats-client .
-docker run -p 80:80 footballstats-client
+And then using docker arguments API_HOST and API_PORT for nginx configuration:
 ```
+docker build --build-arg API_HOST=localhost --build-arg API_PORT=5000 -f Dockerfile.client -t footballstats-client .
+```
+Run on port 80:
+```
+docker run -d -p 80:80 footballstats-client
+```
+Check http://localhost then
 #### to stop the container
 ```
 docker stop footballstats-client
 ```
 
-## API
+
+## Tech stack details
+
+### API
 
 A .NET 6.0 Web API application.
 
 Interactive API documentation, powered by Swagger UI, can be found on `/api/swagger/index.html` after starting the service using `docker-compose up -d --build`. This allows you to explore and test the API endpoints. 
 If you run the service on your local machine, then you can access the Swagger UI at http://localhost/api/swagger/index.html.
 
-All the nuget packages can be found in [API.csproj](api/API.csproj) file.
+All the nuget packages can be found in [API.csproj](API/API.csproj) file.
 
-## Client
+### Client
 
 A React (TypeScript) application built with [Chakra UI](https://github.com/chakra-ui/chakra-ui/).
 
 All the dependencies can be found in [package.json](client/package.json) file.
 
-## Database
+### Database
 
-The default **dev** connection string is set up for a test database Docker container (see below) in [appsettings.Development.json](api/appsettings.Development.json):
+A Postgres database.
+
+The default **dev** connection string is set up for a test database Docker container (see below) in [appsettings.Development.json](API/appsettings.Development.json):
 ```
 Host=localhost;Port=5442;Database=footballstats;Username=postgres;Password=postgres;
 ```
 It's used when you run the API service via `dotnet run` on your dev machine.
-
-### Populating the Database
-
-When you first run the service, the database tables will be empty. You have two ways to populate it:
-
-**1. Manually via the UI:**
-
-* **Create Players:** This automatically creates a team with the same name, containing the newly created player.
-* **Create Games:** Once you have the teams, you can create games between them.
-
-**2. Automatic Generation:**
-
-By default 'simulating mode' is on in the [client config](client/src/config.ts): 
-```
-SIMULATE_MODE: true,
-SIMULATE_USERS_NUM: 10,
-SIMULATE_GAMES_LIMIT: 1000
-```
-So you can do the following:
-
-* **Players Page:** Use the "Generate Players" button to create 10 random players.
-* **Games Page:** Use the "Simulate Games" button to automatically generate two matches for every possible team pairing, one with each team playing as the host.
-
-
 
 ## Github Actions
 The project uses Github Actions for continuous integration. The workflows are defined in the .github/workflows directory:

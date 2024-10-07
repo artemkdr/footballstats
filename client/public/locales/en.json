@@ -18,6 +18,10 @@
     },
     "Dashboard": {
         "Title": "Dashboard",
+        "Empty": "Looks like there are no games yet.",                
+        "GotoPlayers": "Add players",
+        "GotoTeams": "Add teams",
+        "GotoGames": "Add games",
         "Team": "Team/Player Name",
         "Games": "Games Played",
         "Wins": "Wins",
@@ -95,6 +99,8 @@
         "Deleted": "Deleted"
     },
     "Message": {
+        "RouterError": "Error",
+        "LoaderError": "Oups! An error occurred while loading data.",
         "CreateGameSuccess": "Game successfully created",
         "CreateGameError": "An error occurred while creating the game",
         "CreateUserSuccess": "Player successfully created",

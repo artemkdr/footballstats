@@ -18,6 +18,10 @@
     },
     "Dashboard": {
         "Title": "Tableau de bord",
+        "Empty": "Il n'y pas encore de matchs.",
+        "GotoPlayers": "Ajouter des joueurs",
+        "GotoTeams": "Ajouter des équipes",
+        "GotoGames": "Ajouter des matchs",
         "Team": "Nom de l'équipe/joueur",
         "Games": "Matchs joués",
         "Wins": "Victoires",
@@ -95,6 +99,8 @@
         "Deleted": "Supprimée" 
     },
     "Message": {
+        "RouterError": "Erreur",
+        "LoaderError": "Oups! Une erreur s'est produite lors du chargement des données.",
         "CreateGameSuccess": "Match créé avec succès",
         "CreateGameError": "Une erreur s'est produite lors de la création du match",
         "CreateUserSuccess": "Joueur créé avec succès",
