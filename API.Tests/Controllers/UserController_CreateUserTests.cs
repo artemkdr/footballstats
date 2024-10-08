@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace API.Tests.Controllers
-{
+{    
     public class UserController_CreateUserTests
     {
         private readonly BaseDBContext<User> _userContext;
@@ -31,7 +31,7 @@ namespace API.Tests.Controllers
             _controller = new UserController(_configurationMock.Object, _userContext, _teamContext, _gameContext);
         }
 
-        [Fact]
+        [DockerRequiredFact]        
         public void CreatesUser_ReturnsCreatedAtActionResult() {
             string username = Guid.NewGuid().ToString();
 
@@ -47,7 +47,7 @@ namespace API.Tests.Controllers
             Assert.Equal(username, returnedUser.Username);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void CreatesUser_CreatesTeamWithUser() {
             string username = Guid.NewGuid().ToString();
 
@@ -63,7 +63,7 @@ namespace API.Tests.Controllers
             Assert.True(team!.Players?.Length == 1 && team!.Players?[0] == username);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void CreateUser_EmptyUsername_ReturnsInternalServerErrorResult()
         {
             // Arrange 
@@ -88,7 +88,7 @@ namespace API.Tests.Controllers
             Assert.NotNull(errorValue);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void CreateUser_ExistingUsername_ReturnsInternalServerErrorResult()
         {
             // Act

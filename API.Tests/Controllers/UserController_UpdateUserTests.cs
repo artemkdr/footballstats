@@ -31,7 +31,7 @@ namespace API.Tests.Controllers
             _controller = new UserController(_configurationMock.Object, _userContext, _teamContext, _gameContext);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void UpdateUser_ExistingUser_ReturnsOkResult()
         {            
             // Arrange
@@ -58,7 +58,7 @@ namespace API.Tests.Controllers
             Assert.Equal(2, el.GetInt16());
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void UpdateUser_NonExistingUser_ReturnsNotFoundResult()
         {
             // Arrange
@@ -76,7 +76,7 @@ namespace API.Tests.Controllers
             Assert.NotNull(errorValue);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void UpdateUser_UpdateUsername_ReturnsInternalServerErrorResult()
         {
             // Arrange

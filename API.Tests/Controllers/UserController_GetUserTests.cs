@@ -31,7 +31,7 @@ namespace API.Tests.Controllers
             _controller = new UserController(_configurationMock.Object, _userContext, _teamContext, _gameContext);
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void GetUser_ExistingUser_ReturnsOkResultWithUserData()
         {
             // Arrange
@@ -56,7 +56,7 @@ namespace API.Tests.Controllers
             Assert.Equal(user.Vars, returnedUser.Vars); 
         }
 
-        [Fact]
+        [DockerRequiredFact]
         public void GetUser_NonExistingUser_ReturnsNotFoundResult()
         {
             // Arrange

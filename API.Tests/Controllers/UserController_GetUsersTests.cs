@@ -32,7 +32,7 @@ namespace API.Tests.Controllers
         }
 
         
-        [Fact]
+        [DockerRequiredFact]
         public void GetUsers_NoParameters_ReturnsOkResultWithAllUsers()
         {     
             _userContext.Database.BeginTransaction();
@@ -63,7 +63,7 @@ namespace API.Tests.Controllers
         }
 
 
-        [Fact]
+        [DockerRequiredFact]
         public void GetUsers_WithParameters_ReturnsOkResultWithFilteredUsers()
         {    
             _userContext.Database.BeginTransaction();
@@ -138,7 +138,7 @@ namespace API.Tests.Controllers
             Assert.Equal(0, listDto.List?.Count());    
         }  
 
-        [Fact]
+        [DockerRequiredFact]
         public void GetUsers_Pagination_ReturnsOkResultNUsersByPage()
         {         
             _userContext.Database.BeginTransaction();
