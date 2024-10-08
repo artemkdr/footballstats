@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
-namespace API.Tests;
+namespace API.Tests.Controllers;
 
 public class HealthControllerTests
 {
