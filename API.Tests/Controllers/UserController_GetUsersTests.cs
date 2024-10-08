@@ -34,7 +34,9 @@ namespace API.Tests.Controllers
         
         [Fact]
         public void GetUsers_NoParameters_ReturnsOkResultWithAllUsers()
-        {         
+        {     
+            _userContext.Database.BeginTransaction();
+
             EFUtils.ClearTable(_userContext, EFUtils.GetTableName(typeof(User)));
             EFUtils.ClearTable(_teamContext, EFUtils.GetTableName(typeof(Team)));
 
@@ -49,6 +51,8 @@ namespace API.Tests.Controllers
             // Act
             var result = _controller.GetUsers(); // No parameters
 
+            _userContext.Database.RollbackTransaction();
+
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var listDto = Assert.IsType<ListDTO>(okResult.Value);
@@ -61,7 +65,9 @@ namespace API.Tests.Controllers
 
         [Fact]
         public void GetUsers_WithParameters_ReturnsOkResultWithFilteredUsers()
-        {         
+        {    
+            _userContext.Database.BeginTransaction();
+
             EFUtils.ClearTable(_userContext, EFUtils.GetTableName(typeof(User)));
             EFUtils.ClearTable(_teamContext, EFUtils.GetTableName(typeof(Team)));
 
@@ -122,6 +128,8 @@ namespace API.Tests.Controllers
             // Act - returns empty list if nothing found
             result = _controller.GetUsers("yyyyyyyy"); // search by part of username
 
+            _userContext.Database.RollbackTransaction();
+
             // Assert - returns 0 users with 'yyyyyyyy' in username
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
@@ -133,6 +141,8 @@ namespace API.Tests.Controllers
         [Fact]
         public void GetUsers_Pagination_ReturnsOkResultNUsersByPage()
         {         
+            _userContext.Database.BeginTransaction();
+
             EFUtils.ClearTable(_userContext, EFUtils.GetTableName(typeof(User)));
             EFUtils.ClearTable(_teamContext, EFUtils.GetTableName(typeof(Team)));
 
@@ -215,6 +225,8 @@ namespace API.Tests.Controllers
             UserController.LIST_LIMIT = 4;
             result = _controller.GetUsers(null, null, 2); 
 
+            _userContext.Database.RollbackTransaction();
+            
             // Assert - returns last page if the page index exceeds 
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);

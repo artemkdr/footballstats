@@ -18,8 +18,11 @@ namespace API.Tests
             lock (_lock) {
                 if (postgresContainer == null)
                 {
-                    postgresContainer = new PostgreSqlBuilder().WithImage("postgres:15-alpine").WithResourceMapping(new FileInfo("../../../init.sql"), "/docker-entrypoint-initdb.d").Build();
-                    postgresContainer.StartAsync().Wait();
+                    postgresContainer = new PostgreSqlBuilder().
+                        WithImage("postgres:15-alpine").
+                        WithResourceMapping(new FileInfo("init.sql"), "/docker-entrypoint-initdb.d").                        
+                        Build();
+                    postgresContainer.StartAsync().Wait(new TimeSpan(0, 1, 0));
                 }
             }
             return postgresContainer;
