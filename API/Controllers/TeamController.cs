@@ -209,19 +209,21 @@ public class TeamController : BaseController
         if (data != null) {
             if (create && data.Name == null) 
                 throw new Exception("team name is missing");        
-
-            if (data.Players == null) 
+            
+            if (create && data.Players == null) 
                 throw new Exception("team players are missing");            
             
-            if (data.Players.Length < MIN_TEAM_PLAYERS) 
-                throw new Exception($"team must have min {MIN_TEAM_PLAYERS} players");
+            if (data.Players != null) {
+                if (data.Players.Length < MIN_TEAM_PLAYERS) 
+                    throw new Exception($"team must have min {MIN_TEAM_PLAYERS} players");
 
-            if (data.Players.Length > MAX_TEAM_PLAYERS) 
-                throw new Exception($"team must have max {MAX_TEAM_PLAYERS} players");
+                if (data.Players.Length > MAX_TEAM_PLAYERS) 
+                    throw new Exception($"team must have max {MAX_TEAM_PLAYERS} players");
 
-            foreach (var p in data.Players) {
-                if (_userContext.Items.Find(p) == null) 
-                    throw new Exception($"team player {p} doesn't exist");
+                foreach (var p in data.Players) {
+                    if (_userContext.Items.Find(p) == null) 
+                        throw new Exception($"team player {p} doesn't exist");
+                }
             }
         }
     }

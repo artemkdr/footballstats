@@ -34,6 +34,8 @@ namespace API.Tests.Controllers
         public TeamController TeamController { get; }
 
         public GameController GameController { get; }
+
+        public StatsController StatsController { get; }
         
         public ControllersTests()
         {  
@@ -45,6 +47,7 @@ namespace API.Tests.Controllers
             UserController = new UserController(_configurationMock.Object, UserContext, TeamContext, GameContext);
             TeamController = new TeamController(_configurationMock.Object, UserContext, TeamContext, GameContext);
             GameController = new GameController(_configurationMock.Object, UserContext, TeamContext, GameContext);
+            StatsController = new StatsController(_configurationMock.Object, UserContext, TeamContext, GameContext);
         }                
     }
 }

@@ -12,11 +12,13 @@ namespace API.Tests.Controllers
         public UserController_CreateUserTests()
         {
             controllerTests = new ControllersTests();            
-            controllerTests.UserContext.Database.BeginTransaction();
+            controllerTests.UserContext.Database.BeginTransaction(); 
+            controllerTests.TeamContext.Database.BeginTransaction(); // as UserController.CreateUser will also affect TeamContext
         }
 
         public void Dispose() {
-            controllerTests.UserContext.Database.RollbackTransaction();            
+            controllerTests.UserContext.Database.RollbackTransaction();
+            controllerTests.TeamContext.Database.RollbackTransaction();  // as UserController.CreateUser also affected TeamContext
         }
 
         [DockerRequiredFact]        
@@ -61,7 +63,7 @@ namespace API.Tests.Controllers
                 new User { Username = username, Status = UserStatus.Active }
             );
             controllerTests.UserContext.SaveChanges();
-            
+
             // Act
             var result = controllerTests.UserController.CreateUser(new UserDTOFull {
                 Username = username,

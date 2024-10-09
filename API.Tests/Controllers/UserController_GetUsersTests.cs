@@ -20,15 +20,12 @@ namespace API.Tests.Controllers
 
         [DockerRequiredFact]
         public void GetUsers_NoParameters_ReturnsOkResultWithAllUsers()
-        {     
-            EFUtils.ClearTable(controllerTests.UserContext, EFUtils.GetTableName(typeof(User)));
-            EFUtils.ClearTable(controllerTests.TeamContext, EFUtils.GetTableName(typeof(Team)));
-
+        {   
             // Arrange
             controllerTests.UserContext.Items.AddRange(
-                new User { Username = "user1", Status = UserStatus.Active },
-                new User { Username = "user2", Status = UserStatus.Deleted },
-                new User { Username = "user3", Status = UserStatus.Active }
+                new User { Username = Guid.NewGuid().ToString(), Status = UserStatus.Active },
+                new User { Username = Guid.NewGuid().ToString(), Status = UserStatus.Deleted },
+                new User { Username = Guid.NewGuid().ToString(), Status = UserStatus.Active }
             );
             controllerTests.UserContext.SaveChanges();
             
@@ -47,10 +44,7 @@ namespace API.Tests.Controllers
 
         [DockerRequiredFact]
         public void GetUsers_WithParameters_ReturnsOkResultWithFilteredUsers()
-        {    
-            EFUtils.ClearTable(controllerTests.UserContext, EFUtils.GetTableName(typeof(User)));
-            EFUtils.ClearTable(controllerTests.TeamContext, EFUtils.GetTableName(typeof(Team)));
-
+        {  
             // Arrange
             controllerTests.UserContext.Items.AddRange(
                 new User { Username = "user1", Status = UserStatus.Active },
@@ -118,10 +112,7 @@ namespace API.Tests.Controllers
 
         [DockerRequiredFact]
         public void GetUsers_Pagination_ReturnsOkResultNUsersByPage()
-        {         
-            EFUtils.ClearTable(controllerTests.UserContext, EFUtils.GetTableName(typeof(User)));
-            EFUtils.ClearTable(controllerTests.TeamContext, EFUtils.GetTableName(typeof(Team)));
-
+        {   
             // Arrange
             controllerTests.UserContext.Items.AddRange(
                 new User { Username = "user1", Status = UserStatus.Active },

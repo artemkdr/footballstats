@@ -13,10 +13,12 @@ namespace API.Tests.Controllers
         {
             controllerTests = new ControllersTests();            
             controllerTests.TeamContext.Database.BeginTransaction();
+            controllerTests.UserContext.Database.BeginTransaction(); // as we will create Users for the team creation
         }
 
         public void Dispose() {
             controllerTests.TeamContext.Database.RollbackTransaction();            
+            controllerTests.UserContext.Database.RollbackTransaction(); // as we will created Users for the team creation
         }
 
         [DockerRequiredFact]        
