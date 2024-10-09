@@ -19,7 +19,6 @@ public class HealthControllerTests
         var result = controller.Get();
 
         // Assert
-        var jsonResult = Assert.IsType<JsonResult>(result);
-        Assert.Equal((int)HttpStatusCode.OK, jsonResult.StatusCode);        
+        Assert.IsType<OkObjectResult>(result);        
     }
 }

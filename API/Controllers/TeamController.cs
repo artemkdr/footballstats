@@ -1,10 +1,7 @@
 using System.Net;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NLog;
 
 namespace API.Controllers;
 
@@ -48,7 +45,7 @@ public class TeamController : BaseController
         try {
             var item = _teamContext.Items.Find(id);
             if (item == null)
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
+                return NotFound(new ErrorDTO($"Team '{id}' not found"));
 
             var players = new List<UserDTO>();
             if (item.Players != null) {
@@ -75,15 +72,17 @@ public class TeamController : BaseController
             };
             return Ok(dto);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }        
     }
 
     [Route("team")]
     [HttpGet]
-    public IActionResult GetTeams(string? name = null, string? status = null, string? players = null, int page = 1) 
+    public IActionResult GetTeams(string? name = null, string? status = null, string? players = null, int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
+        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+
         try {
             var query = _teamContext.Items.AsQueryable();
 
@@ -95,7 +94,7 @@ public class TeamController : BaseController
                 if (Enum.TryParse<TeamStatus>(status, true, out var statusEnum))
                     query = query.Where(x => x.Status == statusEnum);
                 else 
-                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
+                    return BadRequest(new ErrorDTO($"status '{status}' doesn't exist"));
 
             if (players != null) {
                 string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
@@ -103,12 +102,12 @@ public class TeamController : BaseController
             }
 
             var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            var totalPages = (int)Math.Ceiling((double)totalCount / limit);
             if (page > totalPages) page = Math.Max(1, totalPages);
             
             var items = query.OrderBy(x => x.Name)
-                            .Skip((page - 1) * LIST_LIMIT)
-                            .Take(LIST_LIMIT)
+                            .Skip((page - 1) * limit)
+                            .Take(limit)
                             .Select(x => new TeamDTOLight() {
                                 Id = x.Id,
                                 Name = x.Name,
@@ -118,13 +117,13 @@ public class TeamController : BaseController
 
             return Ok(new ListDTO {
                 Page = page,
-                PageSize = LIST_LIMIT,
+                PageSize = limit,
                 Total = totalCount,
                 TotalPages = totalPages,
                 List = items.ToArray()
             });
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -135,7 +134,7 @@ public class TeamController : BaseController
         try {
             ValidateTeamData(data, true);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return BadRequest(new ErrorDTO(ex.Message));
         }
         
         var newItem = new Team {
@@ -153,7 +152,7 @@ public class TeamController : BaseController
             _teamContext.SaveChanges();
             return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -163,18 +162,18 @@ public class TeamController : BaseController
     {
         var item = _teamContext.Items.Find(id);
         if (item == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Team '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
+            return NotFound(new ErrorDTO($"Team '{id}' not found"));
         
         try {
             ValidateTeamData(data);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.Message));
+            return BadRequest(new ErrorDTO(ex.Message));
         }
         
         if (data != null) {
             if (data.Name != null && data.Name != item.Name) {                
                 if (_teamContext.Items.FirstOrDefault(x => x.Name == data.Name) != null)
-                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"team name {data.Name} is already used"));
+                    return Problem($"team name {data.Name} is already used");
                 item.Name = data.Name;
             }
 
@@ -195,11 +194,11 @@ public class TeamController : BaseController
                 };
                 return Ok(dto);
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+                return Problem(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
-        return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no team data provided"));
+        return BadRequest(new ErrorDTO("no team data provided"));
     }
 
     private void ValidateTeamData(TeamDTO data, bool create = false) {

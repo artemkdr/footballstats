@@ -1,13 +1,6 @@
 using API.Controllers;
-using API.Data;
 using API.Models;
-using Common;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 
 namespace API.Tests.Controllers
 {

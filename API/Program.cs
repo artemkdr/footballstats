@@ -1,7 +1,6 @@
 using Microsoft.OpenApi.Models;
 using NLog.Web;
 using NLog.Extensions.Logging;
-using NLog;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using API.Models;

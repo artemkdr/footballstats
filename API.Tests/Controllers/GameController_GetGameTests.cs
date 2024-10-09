@@ -60,12 +60,9 @@ namespace API.Tests.Controllers
             var result = controllerTests.GameController.GetGame(id);
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.NotFound, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);            
+            var typedResult = Assert.IsType<NotFoundObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }
            
     }

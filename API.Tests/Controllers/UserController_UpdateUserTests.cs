@@ -37,7 +37,7 @@ namespace API.Tests.Controllers
             }); 
 
             // Assert
-            var jsonResult = Assert.IsType<OkObjectResult>(result);
+            var typedResult = Assert.IsType<OkObjectResult>(result);
             
             var updatedUser = controllerTests.UserContext.Items.Single(x => x.Username == username);
             Assert.Equal(UserStatus.Deleted, updatedUser.Status);
@@ -57,12 +57,8 @@ namespace API.Tests.Controllers
             var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull()); 
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.NotFound, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }
 
         [DockerRequiredFact]
@@ -79,12 +75,10 @@ namespace API.Tests.Controllers
             var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull { Username = "newusername" }); 
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);       
+            Assert.Equal((int)HttpStatusCode.InternalServerError, objectResult.StatusCode);                     
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
            
     }

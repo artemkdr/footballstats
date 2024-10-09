@@ -1,11 +1,6 @@
-using System.Net;
-using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NLog;
 
 namespace API.Controllers;
@@ -13,7 +8,7 @@ namespace API.Controllers;
 [ApiController]
 abstract public class BaseController : ControllerBase
 {
-    public static int LIST_LIMIT = 500;
+    public static readonly int LIST_LIMIT = 500;
 
     public static int MAX_TEAM_PLAYERS = 2;
     public static int MIN_TEAM_PLAYERS = 1;
@@ -48,4 +43,17 @@ public class ListDTO : IBaseDTO {
     public int Total { get; set; }
     public int TotalPages { get; set; }
     public object[]? List { get; set; }
+}
+
+public class ErrorDTO: IBaseDTO {
+    public string Error { get; set; }
+
+    public int? ErrorCode { get; set; }
+
+    public string? Detail { get; set; }
+
+    public ErrorDTO(string text, int? errorCode = null) {
+        this.Error = text;
+        this.ErrorCode = errorCode;
+    }
 }

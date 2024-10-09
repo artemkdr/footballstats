@@ -1,13 +1,9 @@
-using System.Drawing;
 using System.Net;
 using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NLog;
 
 namespace API.Controllers;
 
@@ -73,12 +69,12 @@ public class GameController : BaseController
         try {
             var item = _gameContext.Items.Find(id);
             if (item == null)
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
+                return NotFound(new ErrorDTO($"Game '{id}' not found"));
             
             var team1 = _teamContext.Items.Find(item.Team1);
             var team2 = _teamContext.Items.Find(item.Team2);
 
-            var dto = new GameDTOFull() {
+            return Ok(new GameDTOFull() {
                 Id = item.Id,
                 Team1 = new TeamDTO() {
                     Id = item.Team1,
@@ -98,9 +94,8 @@ public class GameController : BaseController
                 Goals2 = item.Goals2,
                 Vars = item.Vars
             };
-            return Ok(dto);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);            
         }          
     }
 
@@ -108,16 +103,18 @@ public class GameController : BaseController
     [HttpGet]
     public IActionResult GetGames(
         int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null, string? players = null,
-        int page = 1) 
+        int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
+        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+
         try {
             var query = _gameContext.Items.AsQueryable();
             if (!string.IsNullOrEmpty(status)) {
                 if (Enum.TryParse<GameStatus>(status, true, out var statusEnum))
                     query = query.Where(x => x.Status == statusEnum);
                 else 
-                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));
+                    return BadRequest(new ErrorDTO($"status '{status}' doesn't exist"));
             }
 
             if (players != null) {
@@ -144,7 +141,7 @@ public class GameController : BaseController
                 query = query.Where(x => x.CompleteDate != null && x.CompleteDate.Value.Date <= toDate.Value.Date);
 
             var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            var totalPages = (int)Math.Ceiling((double)totalCount / limit);
             if (page > totalPages) page = Math.Max(1, totalPages);
 
             var items = query                    
@@ -153,8 +150,8 @@ public class GameController : BaseController
                                  x.Status == GameStatus.NotStarted ? 2 : 3) // Order by Status priority
                     .ThenByDescending(x => x.Status == GameStatus.Playing ? x.ModifyDate :
                                          x.Status == GameStatus.Completed ? x.CompleteDate : x.ModifyDate)
-                    .Skip((page - 1) * LIST_LIMIT)
-                    .Take(LIST_LIMIT)                    
+                    .Skip((page - 1) * limit)
+                    .Take(limit)                    
                     .ToList();
             
             var teamIds = items.SelectMany(x => new[] { x.Team1, x.Team2 }).Distinct().ToList();
@@ -194,13 +191,13 @@ public class GameController : BaseController
             }
             return Ok(new ListDTO {
                 Page = page,
-                PageSize = LIST_LIMIT,
+                PageSize = limit,
                 Total = totalCount,
                 TotalPages = totalPages,
                 List = itemsWithTeams.ToArray()
             });
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -209,13 +206,13 @@ public class GameController : BaseController
     public IActionResult CreateGame(GameDTO data)
     {
         if (data == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game is missing"));        
+            return BadRequest(new ErrorDTO("game is missing"));        
         if (data.Team1 <= 0)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team1 is missing"));
+            return BadRequest(new ErrorDTO("game team1 is missing"));
         if (data.Team2 <= 0)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team2 is missing"));
+            return BadRequest(new ErrorDTO("game team2 is missing"));
         if (data.Team1 == data.Team2)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "game team1 and team2 must be different"));
+            return BadRequest(new ErrorDTO("game team1 and team2 must be different"));
 
         // TODO: add data validation
         // TODO: check goals are positive values
@@ -241,7 +238,7 @@ public class GameController : BaseController
             _gameContext.SaveChanges();
             return CreatedAtAction(nameof(GetGame), new { id = newItem.Id }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -251,7 +248,7 @@ public class GameController : BaseController
     {
         var item = _gameContext.Items.Find(id);
         if (item == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"Game '{id}' not found"), Response, (int)HttpStatusCode.NotFound);
+            return NotFound(new ErrorDTO($"Game '{id}' not found"));
         
         // TODO: add data validation
         // TODO: check goals are positive values
@@ -288,9 +285,9 @@ public class GameController : BaseController
                 };
                 return Ok(dto);
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+                return Problem(ex.InnerException?.Message ?? ex.Message);
             }
         }
-        return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no game data provided"));
+        return BadRequest(new ErrorDTO("no game data provided"));
     }
 }

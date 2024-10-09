@@ -48,7 +48,7 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreateTeam_EmptyName_ReturnsInternalServerErrorResult()
+        public void CreateTeam_EmptyName_ReturnsBadRequestResult()
         {
             // Arrange            
             // create players
@@ -64,12 +64,9 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }
 
         [DockerRequiredFact]
@@ -95,16 +92,14 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.InternalServerError, objectResult.StatusCode);       
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
 
         [DockerRequiredFact]
-        public void CreateTeam_NoPlayers_ReturnsInternalServerErrorResult()
+        public void CreateTeam_NoPlayers_ReturnsBadRequestResult()
         {
             // Act
             // send invalid TeamDTO - no name            
@@ -113,17 +108,14 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }
 
 
         [DockerRequiredFact]
-        public void CreateTeam_NonExistingPlayers_ReturnsInternalServerErrorResult()
+        public void CreateTeam_NonExistingPlayers_ReturnsBadRequestResult()
         {
             // Act
             // send valid TeamDTO, but players don't exist in the database
@@ -133,16 +125,13 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }  
 
         [DockerRequiredFact]
-        public void CreateTeam_WrongMaxPlayersNumber_ReturnsInternalServerErrorResult()
+        public void CreateTeam_WrongMaxPlayersNumber_ReturnsBadRequestResult()
         {
             // Arrange
             // create players
@@ -161,16 +150,13 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         } 
 
         [DockerRequiredFact]
-        public void CreateTeam_WrongMinPlayersNumber_ReturnsInternalServerErrorResult()
+        public void CreateTeam_WrongMinPlayersNumber_ReturnsBadRequestResult()
         {
             // Arrange
             // create players
@@ -189,12 +175,9 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
+            Assert.NotNull(typedResult.Value);                        
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }
     }
 

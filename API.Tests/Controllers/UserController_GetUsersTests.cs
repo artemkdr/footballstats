@@ -56,7 +56,7 @@ namespace API.Tests.Controllers
             controllerTests.UserContext.SaveChanges();
             
             // Act - filter by Status=Deleted
-            var result = controllerTests.UserController.GetUsers(null, "Deleted"); // filter by status
+            var result = controllerTests.UserController.GetUsers(status: "Deleted"); // filter by status
 
             // Assert - returns 1 user
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -124,12 +124,8 @@ namespace API.Tests.Controllers
             );
             controllerTests.UserContext.SaveChanges();
 
-            int initialLImit = UserController.LIST_LIMIT;
-
-            UserController.LIST_LIMIT = 2;
-            
             // Act - get all users, page 1
-            var result = controllerTests.UserController.GetUsers(null, null, 1); 
+            var result = controllerTests.UserController.GetUsers(page: 1, limit: 2); 
 
             // Assert - returns 1st page
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -144,7 +140,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user2", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 2
-            result = controllerTests.UserController.GetUsers(null, null, 2); 
+            result = controllerTests.UserController.GetUsers(page: 2, limit: 2); 
 
             // Assert - returns 2nd page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -159,7 +155,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user4", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 3
-            result = controllerTests.UserController.GetUsers(null, null, 3); 
+            result = controllerTests.UserController.GetUsers(page: 3, limit: 2); 
 
             // Assert - returns the last page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -174,7 +170,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user6", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 4
-            result = controllerTests.UserController.GetUsers(null, null, 4); 
+            result = controllerTests.UserController.GetUsers(page: 4, limit: 2); 
 
             // Assert - returns last page if the page index exceeds 
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -188,9 +184,8 @@ namespace API.Tests.Controllers
             Assert.Equal("user5", (listDto.List?[0] as UserDTO)?.Username);
             Assert.Equal("user6", (listDto.List?[1] as UserDTO)?.Username);
 
-            // Act - get all users, page 2 with 4 users per page
-            UserController.LIST_LIMIT = 4;
-            result = controllerTests.UserController.GetUsers(null, null, 2); 
+            // Act - get all users, page 2 with 4 users per page            
+            result = controllerTests.UserController.GetUsers(page: 2, limit: 4); 
 
             // Assert - returns last page if the page index exceeds 
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -203,9 +198,6 @@ namespace API.Tests.Controllers
             Assert.Equal(2, listDto.List?.Count());
             Assert.Equal("user5", (listDto.List?[0] as UserDTO)?.Username);
             Assert.Equal("user6", (listDto.List?[1] as UserDTO)?.Username);
-
-
-            UserController.LIST_LIMIT = initialLImit;
         }  
     }
 

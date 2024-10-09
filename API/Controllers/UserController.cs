@@ -2,11 +2,7 @@ using System.Net;
 using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NLog;
 
 namespace API.Controllers;
 
@@ -42,22 +38,24 @@ public class UserController : BaseController
         try {
             var item = _userContext.Items.Find(username);
             if (item == null)
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
+                return NotFound(new ErrorDTO($"User '{username}' not found"));
             return Ok(new UserDTO() {
                Username = item.Username,
                Vars = item.Vars,
                Status = item.Status.ToString()
             });
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
     [Route("user")]
     [HttpGet]
-    public IActionResult GetUsers(string? username = null, string? status = null, int page = 1) 
+    public IActionResult GetUsers(string? username = null, string? status = null, int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
+        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+
         try {
             var query = _userContext.Items.AsQueryable();
 
@@ -69,14 +67,14 @@ public class UserController : BaseController
                 if (Enum.TryParse<UserStatus>(status, true, out var statusEnum))
                     query = query.Where(x => x.Status == statusEnum);
                 else 
-                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
+                    return BadRequest(new ErrorDTO($"status '{status}' doesn't exist"));
             var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
+            var totalPages = (int)Math.Ceiling((double)totalCount / limit);
             if (page > totalPages) page = Math.Max(1, totalPages);
             
             var items = query.OrderBy(x => x.Username)
-                             .Skip((page - 1) * LIST_LIMIT)
-                            .Take(LIST_LIMIT)
+                             .Skip((page - 1) * limit)
+                            .Take(limit)
                             .Select(x => new UserDTO() {
                                 Username = x.Username,
                                 Vars = x.Vars,                                
@@ -86,13 +84,13 @@ public class UserController : BaseController
 
             return Ok(new ListDTO {
                 Page = page,
-                PageSize = LIST_LIMIT,
+                PageSize = limit,
                 Total = totalCount,
                 TotalPages = totalPages,
                 List = items.ToArray()
             });
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -101,7 +99,7 @@ public class UserController : BaseController
     public IActionResult CreateUser(UserDTOFull userData)
     {
         if (userData == null || userData.Username == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "username is missing"));
+            return BadRequest(new ErrorDTO("username is missing"));
         
         // TODO: add data validation            
         // TODO: check that the username is a valid name
@@ -134,7 +132,7 @@ public class UserController : BaseController
 
             return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -144,7 +142,7 @@ public class UserController : BaseController
     {        
         var item = _userContext.Items.Find(username);
         if (item == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
+            return NotFound(new ErrorDTO($"User '{username}' not found"));
         
         if (userData != null) {
             // TODO: add data validation            
@@ -152,7 +150,7 @@ public class UserController : BaseController
             // TODO: check the password is valid and hash password
             
             if (userData.Username != null && userData.Username != item.Username) {                
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", "username cannot be updated"));                
+                return Problem("username cannot be updated");
             }
 
             if (userData.Password != null)
@@ -172,10 +170,10 @@ public class UserController : BaseController
                 };
                 return Ok(dto);
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+                return Problem(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
-        return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no user data provided"));
+        return BadRequest(new ErrorDTO("no user data provided"));
     }
 }

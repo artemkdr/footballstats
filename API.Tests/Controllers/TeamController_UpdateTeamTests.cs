@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text.Json;
 using API.Controllers;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +44,7 @@ namespace API.Tests.Controllers
             var updatedTeam = controllerTests.TeamContext.Items.Find(id);
 
             // Assert
-            var jsonResult = Assert.IsType<OkObjectResult>(result);
+            var typedResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal(TeamStatus.Deleted, updatedTeam?.Status);            
         }
 
@@ -56,12 +55,9 @@ namespace API.Tests.Controllers
             var result = controllerTests.TeamController.UpdateTeam(Guid.NewGuid().ToString().GetHashCode(), new TeamDTO()); 
 
             // Assert
-            var jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.Equal((int)HttpStatusCode.NotFound, jsonResult.StatusCode);            
-            Assert.NotNull(jsonResult.Value);
-            object? errorValue = null;
-            (jsonResult.Value as Dictionary<string,object>)?.TryGetValue("error", out errorValue);
-            Assert.NotNull(errorValue);
+            var typedResult = Assert.IsType<NotFoundObjectResult>(result);
+            Assert.NotNull(typedResult.Value);
+            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
         }  
     }
 

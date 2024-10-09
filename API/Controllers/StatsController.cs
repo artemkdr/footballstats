@@ -1,12 +1,7 @@
-using System.Net;
-using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NLog;
 
 namespace API.Controllers;
 
@@ -109,7 +104,7 @@ public class StatsController : BaseController
         
             return Ok(stats);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
@@ -134,7 +129,7 @@ public class StatsController : BaseController
             }
             return Ok(stats);
         } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+            return Problem(ex.InnerException?.Message ?? ex.Message);
         }
     }
 
