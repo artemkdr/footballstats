@@ -93,7 +93,7 @@ public class GameController : BaseController
                 Goals1 = item.Goals1,
                 Goals2 = item.Goals2,
                 Vars = item.Vars
-            };
+            });
         } catch (Exception ex) {
             return Problem(ex.InnerException?.Message ?? ex.Message);            
         }          
