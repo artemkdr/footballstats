@@ -1,35 +1,26 @@
 using System.Net;
 using System.Text.Json;
 using API.Controllers;
-using API.Data;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Moq;
 
 namespace API.Tests.Controllers
 {
-    public class UserController_GetUserTests
+    public class UserController_GetUserTests : IDisposable
     {
-        private readonly BaseDBContext<User> _userContext;
-        private readonly BaseDBContext<Team> _teamContext;
-        private readonly BaseDBContext<Game> _gameContext;
-        private readonly Mock<IConfiguration> _configurationMock;
-        private readonly UserController _controller;
+        private ControllersTests controllerTests;
         
         public UserController_GetUserTests()
-        {  
-            var optionsUser = new DbContextOptionsBuilder<BaseDBContext<User>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
-            var optionsTeam = new DbContextOptionsBuilder<BaseDBContext<Team>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
-            var optionsGame = new DbContextOptionsBuilder<BaseDBContext<Game>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
-
-            _userContext = new BaseDBContext<User>(optionsUser); 
-            _teamContext = new BaseDBContext<Team>(optionsTeam); 
-            _gameContext = new BaseDBContext<Game>(optionsGame); 
-            _configurationMock = new Mock<IConfiguration>();
-            _controller = new UserController(_configurationMock.Object, _userContext, _teamContext, _gameContext);
+        {
+            controllerTests = new ControllersTests();            
+            controllerTests.UserContext.Database.BeginTransaction();
         }
+
+        public void Dispose() {
+            controllerTests.UserContext.Database.RollbackTransaction();            
+        }
+
+            
 
         [DockerRequiredFact]
         public void GetUser_ExistingUser_ReturnsOkResultWithUserData()
@@ -41,11 +32,11 @@ namespace API.Tests.Controllers
                 Status = UserStatus.Active, 
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }") 
             };
-            _userContext.Items.Add(user);
-            _userContext.SaveChanges();
+            controllerTests.UserContext.Items.Add(user);
+            controllerTests.UserContext.SaveChanges();
 
             // Act
-            var result = _controller.GetUser(username);
+            var result = controllerTests.UserController.GetUser(username);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -64,7 +55,7 @@ namespace API.Tests.Controllers
             var user = new User { Username = username };
             
             // Act
-            var result = _controller.GetUser(username);
+            var result = controllerTests.UserController.GetUser(username);
 
             // Assert
             var jsonResult = Assert.IsType<JsonResult>(result);

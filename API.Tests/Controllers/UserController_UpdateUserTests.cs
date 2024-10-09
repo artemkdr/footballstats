@@ -1,34 +1,23 @@
 using System.Net;
 using System.Text.Json;
 using API.Controllers;
-using API.Data;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Moq;
 
 namespace API.Tests.Controllers
 {
-    public class UserController_UpdateUserTests
+    public class UserController_UpdateUserTests : IDisposable
     {
-        private readonly BaseDBContext<User> _userContext;
-        private readonly BaseDBContext<Team> _teamContext;
-        private readonly BaseDBContext<Game> _gameContext;
-        private readonly Mock<IConfiguration> _configurationMock;
-        private readonly UserController _controller;
-        
-        public UserController_UpdateUserTests()
-        {  
-            var optionsUser = new DbContextOptionsBuilder<BaseDBContext<User>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
-            var optionsTeam = new DbContextOptionsBuilder<BaseDBContext<Team>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
-            var optionsGame = new DbContextOptionsBuilder<BaseDBContext<Game>>().UseNpgsql(TestContainers.GetConnectionString()).Options;
+        private ControllersTests controllerTests;
 
-            _userContext = new BaseDBContext<User>(optionsUser); 
-            _teamContext = new BaseDBContext<Team>(optionsTeam); 
-            _gameContext = new BaseDBContext<Game>(optionsGame); 
-            _configurationMock = new Mock<IConfiguration>();
-            _controller = new UserController(_configurationMock.Object, _userContext, _teamContext, _gameContext);
+        public UserController_UpdateUserTests()
+        {
+            controllerTests = new ControllersTests();
+            controllerTests.UserContext.Database.BeginTransaction();
+        }
+
+        public void Dispose() {
+            controllerTests.UserContext.Database.RollbackTransaction();            
         }
 
         [DockerRequiredFact]
@@ -36,13 +25,13 @@ namespace API.Tests.Controllers
         {            
             // Arrange
             var username = Guid.NewGuid().ToString();
-            _userContext.Items.AddRange(
+            controllerTests.UserContext.Items.AddRange(
                 new User { Username = username, Status = UserStatus.Active }
             );
-            _userContext.SaveChanges();
+            controllerTests.UserContext.SaveChanges();
 
             // Act
-            var result = _controller.UpdateUser(username, new UserDTOFull() {
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull() {
                 Status = UserStatus.Deleted.ToString(),
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }") 
             }); 
@@ -50,7 +39,7 @@ namespace API.Tests.Controllers
             // Assert
             var jsonResult = Assert.IsType<OkObjectResult>(result);
             
-            var updatedUser = _userContext.Items.Single(x => x.Username == username);
+            var updatedUser = controllerTests.UserContext.Items.Single(x => x.Username == username);
             Assert.Equal(UserStatus.Deleted, updatedUser.Status);
             Assert.NotNull(updatedUser.Vars);            
             JsonElement el = new JsonElement();
@@ -65,7 +54,7 @@ namespace API.Tests.Controllers
             var username = Guid.NewGuid().ToString();
 
             // Act
-            var result = _controller.UpdateUser(username, new UserDTOFull()); 
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull()); 
 
             // Assert
             var jsonResult = Assert.IsType<JsonResult>(result);
@@ -81,13 +70,13 @@ namespace API.Tests.Controllers
         {
             // Arrange
             var username = Guid.NewGuid().ToString();
-            _userContext.Items.AddRange(
+            controllerTests.UserContext.Items.AddRange(
                 new User { Username = username, Status = UserStatus.Active }
             );
-            _userContext.SaveChanges();
+            controllerTests.UserContext.SaveChanges();
 
             // Act
-            var result = _controller.UpdateUser(username, new UserDTOFull { Username = "newusername" }); 
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull { Username = "newusername" }); 
 
             // Assert
             var jsonResult = Assert.IsType<JsonResult>(result);

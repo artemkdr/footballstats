@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using API.Data;
-using API.Models;
 using API.Tests;
 using Microsoft.EntityFrameworkCore;
 
