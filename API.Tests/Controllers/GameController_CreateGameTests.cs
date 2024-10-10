@@ -52,9 +52,10 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
-            Assert.NotNull(typedResult.Value);                        
-            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.BadRequest, objectResult.StatusCode);   
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
 
             result = controllerTests.GameController.CreateGame(new GameDTO {
                 Team2 = 1,                
@@ -63,9 +64,10 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            typedResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.NotNull(typedResult.Value);                        
-            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
+            objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.BadRequest, objectResult.StatusCode);   
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
 
         [DockerRequiredFact]
@@ -79,9 +81,10 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
-            Assert.NotNull(typedResult.Value);                        
-            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.BadRequest, objectResult.StatusCode);   
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
 
         [DockerRequiredFact]
@@ -93,9 +96,10 @@ namespace API.Tests.Controllers
             });
 
             // Assert
-            var typedResult = Assert.IsType<BadRequestObjectResult>(result);                    
-            Assert.NotNull(typedResult.Value);                        
-            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.BadRequest, objectResult.StatusCode);   
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
         
     }

@@ -31,6 +31,26 @@ abstract public class BaseController : ControllerBase
         _teamContext = teamContext;
         _gameContext = gameContext;
     }
+
+    [NonAction]
+    public virtual ObjectResult NotFoundProblem(string? detail = null) {
+        return Problem(
+            detail: detail, 
+            title: "Not Found", 
+            statusCode: StatusCodes.Status404NotFound, 
+            type: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+        );
+    }
+
+    [NonAction]
+    public virtual ObjectResult BadRequestProblem(string? detail = null) {
+        return Problem(
+            detail: detail, 
+            title: "Bad Request", 
+            statusCode: StatusCodes.Status400BadRequest, 
+            type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        );
+    } 
 }
 
 public interface IBaseDTO {
@@ -43,17 +63,4 @@ public class ListDTO : IBaseDTO {
     public int Total { get; set; }
     public int TotalPages { get; set; }
     public object[]? List { get; set; }
-}
-
-public class ErrorDTO: IBaseDTO {
-    public string Error { get; set; }
-
-    public int? ErrorCode { get; set; }
-
-    public string? Detail { get; set; }
-
-    public ErrorDTO(string text, int? errorCode = null) {
-        this.Error = text;
-        this.ErrorCode = errorCode;
-    }
 }

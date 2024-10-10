@@ -58,9 +58,10 @@ namespace API.Tests.Controllers
             var result = controllerTests.TeamController.GetTeam(id);
 
             // Assert
-            var typedResult = Assert.IsType<NotFoundObjectResult>(result);                    
-            Assert.NotNull(typedResult.Value);                        
-            Assert.NotNull((typedResult.Value as ErrorDTO)?.Error ?? (typedResult.Value as ErrorDTO)?.Detail);
+            var objectResult = Assert.IsType<ObjectResult>(result);                    
+            Assert.NotNull(objectResult.Value);                      
+            Assert.Equal((int)HttpStatusCode.NotFound, objectResult.StatusCode);   
+            Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
         }
            
     }

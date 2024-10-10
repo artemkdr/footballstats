@@ -8,15 +8,17 @@ namespace API.Tests
 
         private static object _lock = new();
 
-        public static PostgreSqlContainer GetPostgresContainer()
+        public static PostgreSqlContainer GetPostgresContainer(string? initSqlFile = "init.sql")
         {
             lock (_lock) {
                 if (postgresContainer == null)
                 {
-                    postgresContainer = new PostgreSqlBuilder().
-                        WithImage("postgres:15-alpine").
-                        WithResourceMapping(new FileInfo("init.sql"), "/docker-entrypoint-initdb.d").                        
-                        Build();
+                    var builder = new PostgreSqlBuilder().
+                        WithImage("postgres:15-alpine");
+                    if (File.Exists(initSqlFile)) {
+                        builder = builder.WithResourceMapping(new FileInfo(initSqlFile), "/docker-entrypoint-initdb.d");
+                    }
+                    postgresContainer = builder.Build();
                     postgresContainer.StartAsync().Wait(new TimeSpan(0, 1, 0));
                 }
             }

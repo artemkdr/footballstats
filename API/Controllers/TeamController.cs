@@ -45,7 +45,7 @@ public class TeamController : BaseController
         try {
             var item = _teamContext.Items.Find(id);
             if (item == null)
-                return NotFound(new ErrorDTO($"Team '{id}' not found"));
+                return NotFoundProblem($"Team '{id}' not found");
 
             var players = new List<UserDTO>();
             if (item.Players != null) {
@@ -82,49 +82,45 @@ public class TeamController : BaseController
     {
         if (page < 1) page = 1;
         if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+        
+        var query = _teamContext.Items.AsQueryable();
 
-        try {
-            var query = _teamContext.Items.AsQueryable();
+        // case insensitive "like '%value%'" search by name
+        if (!string.IsNullOrEmpty(name))
+            query = query.Where(x => x.Name != null && x.Name.ToLower().Contains(name.ToLower()));
 
-            // case insensitive "like '%value%'" search by name
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(x => x.Name != null && x.Name.ToLower().Contains(name.ToLower()));
+        if (!string.IsNullOrEmpty(status))
+            if (Enum.TryParse<TeamStatus>(status, true, out var statusEnum))
+                query = query.Where(x => x.Status == statusEnum);
+            else 
+                return BadRequestProblem($"status '{status}' doesn't exist");
 
-            if (!string.IsNullOrEmpty(status))
-                if (Enum.TryParse<TeamStatus>(status, true, out var statusEnum))
-                    query = query.Where(x => x.Status == statusEnum);
-                else 
-                    return BadRequest(new ErrorDTO($"status '{status}' doesn't exist"));
-
-            if (players != null) {
-                string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                query = query.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p)));
-            }
-
-            var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / limit);
-            if (page > totalPages) page = Math.Max(1, totalPages);
-            
-            var items = query.OrderBy(x => x.Name)
-                            .Skip((page - 1) * limit)
-                            .Take(limit)
-                            .Select(x => new TeamDTOLight() {
-                                Id = x.Id,
-                                Name = x.Name,
-                                Status = x.Status.ToString()
-                            })
-                            .ToList();
-
-            return Ok(new ListDTO {
-                Page = page,
-                PageSize = limit,
-                Total = totalCount,
-                TotalPages = totalPages,
-                List = items.ToArray()
-            });
-        } catch (Exception ex) {
-            return Problem(ex.InnerException?.Message ?? ex.Message);
+        if (players != null) {
+            string[] playersArray = players.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            query = query.Where(x => x.Players != null && playersArray.All(p => x.Players.Contains(p)));
         }
+
+        var totalCount = query.Count();
+        var totalPages = (int)Math.Ceiling((double)totalCount / limit);
+        if (page > totalPages) page = Math.Max(1, totalPages);
+        
+        var items = query.OrderBy(x => x.Name)
+                        .Skip((page - 1) * limit)
+                        .Take(limit)
+                        .Select(x => new TeamDTOLight() {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Status = x.Status.ToString()
+                        })
+                        .ToList();
+
+        return Ok(new ListDTO {
+            Page = page,
+            PageSize = limit,
+            Total = totalCount,
+            TotalPages = totalPages,
+            List = items.ToArray()
+        });        
     }
 
     [Route("team")]
@@ -134,7 +130,7 @@ public class TeamController : BaseController
         try {
             ValidateTeamData(data, true);
         } catch (Exception ex) {
-            return BadRequest(new ErrorDTO(ex.Message));
+            return BadRequestProblem(ex.Message);
         }
         
         var newItem = new Team {
@@ -146,14 +142,10 @@ public class TeamController : BaseController
         };
         if (data.Status != null && Enum.TryParse<TeamStatus>(data.Status, out var status))
             newItem.Status = status;
-
-        try {
-            _teamContext.Items.Add(newItem);
-            _teamContext.SaveChanges();
-            return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);
-        } catch (Exception ex) {
-            return Problem(ex.InnerException?.Message ?? ex.Message);
-        }
+        
+        _teamContext.Items.Add(newItem);
+        _teamContext.SaveChanges();
+        return CreatedAtAction(nameof(GetTeam), new { id = newItem.Id }, newItem);        
     }
 
     [Route("team/{id}")]
@@ -162,12 +154,12 @@ public class TeamController : BaseController
     {
         var item = _teamContext.Items.Find(id);
         if (item == null)
-            return NotFound(new ErrorDTO($"Team '{id}' not found"));
+            return NotFoundProblem($"Team '{id}' not found");
         
         try {
             ValidateTeamData(data);
         } catch (Exception ex) {
-            return BadRequest(new ErrorDTO(ex.Message));
+            return BadRequestProblem(ex.Message);
         }
         
         if (data != null) {
@@ -184,21 +176,18 @@ public class TeamController : BaseController
                 item.Status = status;
                         
             item.ModifyDate = DateTime.UtcNow; 
-            try {
-                _teamContext.Items.Update(item);
-                _teamContext.SaveChanges();            
-                var dto = new TeamDTOLight() {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Status = item.Status.ToString()
-                };
-                return Ok(dto);
-            } catch (Exception ex) {
-                return Problem(ex.InnerException?.Message ?? ex.Message);
-            }
+            
+            _teamContext.Items.Update(item);
+            _teamContext.SaveChanges();            
+            var dto = new TeamDTOLight() {
+                Id = item.Id,
+                Name = item.Name,
+                Status = item.Status.ToString()
+            };
+            return Ok(dto);            
         }
 
-        return BadRequest(new ErrorDTO("no team data provided"));
+        return BadRequestProblem("no team data provided");
     }
 
     private void ValidateTeamData(TeamDTO data, bool create = false) {

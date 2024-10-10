@@ -4,6 +4,8 @@ using NLog.Extensions.Logging;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using API.Models;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,5 +62,32 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseCors();
 app.MapControllers();
+
+// exceptions handler
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandlerPathFeature?.Error;
+        var problemDetails = new ProblemDetails() {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "An unexpected error occurred.",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+        };
+
+        if (app.Environment.IsDevelopment()) {
+            problemDetails.Detail = exception?.Message;
+            problemDetails.Extensions["stackTrace"] = exception?.StackTrace;
+        }
+
+        NLog.LogManager.GetCurrentClassLogger().Error(exception);
+
+        context.Response.StatusCode = problemDetails.Status.Value;
+        context.Response.ContentType = "application/problem+json";   
+
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    });
+});
 
 app.Run();
