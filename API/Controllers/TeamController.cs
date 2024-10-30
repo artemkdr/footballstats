@@ -1,33 +1,24 @@
 using System.Net;
 using API.Data;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class TeamDTOLight : IBaseDTO
+public class TeamDTO : IBaseDTO
 {
     public int Id { get; set; }
 
     public string? Name { get; set; }    
     
     public string? Status { get; set; }
-}
 
-public class TeamDTO : TeamDTOLight
-{    
     public string[]? Players { get; set; }    
+
+    public UserDTO[]? PlayerDetails { get; set; }    
 }
 
-public class TeamDTOExtended : TeamDTOLight
-{    
-    public UserDTO[]? Players { get; set; }    
-}
-
-public class TeamDTOSpecial : TeamDTOLight
-{    
-    public UserDTOLight[]? Players { get; set; }    
-}
 
 [ApiController]
 public class TeamController : BaseController
@@ -64,10 +55,11 @@ public class TeamController : BaseController
                     }
                 }
             }
-            var dto = new TeamDTOExtended() {
+            var dto = new TeamDTO() {
                 Id = item.Id,
                 Name = item.Name,
-                Players = players.ToArray(),
+                Players = players.Select(x => x.Username!).ToArray(),
+                PlayerDetails = players.ToArray(),
                 Status = item.Status.ToString()
             };
             return Ok(dto);
@@ -81,7 +73,7 @@ public class TeamController : BaseController
     public IActionResult GetTeams(string? name = null, string? status = null, string? players = null, int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
-        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+        if (limit < 1) limit = Math.Max(limit, UserService.LIST_LIMIT);
         
         var query = _teamContext.Items.AsQueryable();
 
@@ -107,7 +99,7 @@ public class TeamController : BaseController
         var items = query.OrderBy(x => x.Name)
                         .Skip((page - 1) * limit)
                         .Take(limit)
-                        .Select(x => new TeamDTOLight() {
+                        .Select(x => new TeamDTO() {
                             Id = x.Id,
                             Name = x.Name,
                             Status = x.Status.ToString()
@@ -179,7 +171,7 @@ public class TeamController : BaseController
             
             _teamContext.Items.Update(item);
             _teamContext.SaveChanges();            
-            var dto = new TeamDTOLight() {
+            var dto = new TeamDTO() {
                 Id = item.Id,
                 Name = item.Name,
                 Status = item.Status.ToString()

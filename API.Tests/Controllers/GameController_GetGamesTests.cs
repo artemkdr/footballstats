@@ -1,5 +1,6 @@
 using API.Controllers;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Tests.Controllers
@@ -46,7 +47,7 @@ namespace API.Tests.Controllers
 
             Assert.Equal(3, listDto.Total);
             Assert.Equal(1, listDto.Page);
-            Assert.Equal(GameController.LIST_LIMIT, listDto.PageSize);
+            Assert.Equal(UserService.LIST_LIMIT, listDto.PageSize);
         }
 
         [DockerRequiredFact]
@@ -74,7 +75,7 @@ namespace API.Tests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             var listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(2, listDto.Total);
-            Assert.True(listDto.List?.All(x => (x as GameDTOSpecial)?.Status == GameStatus.Completed.ToString()));
+            Assert.True(listDto.List?.All(x => (x as GameDTO)?.Status == GameStatus.Completed.ToString()));
 
             // Act - filter by team1
             result = controllerTests.GameController.GetGames(team1: team1.Id);
@@ -83,7 +84,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(3, listDto.Total);
-            Assert.True(listDto.List?.All(x => (x as GameDTOSpecial)?.Team1?.Id == team1.Id || (x as GameDTOSpecial)?.Team2?.Id == team1.Id));
+            Assert.True(listDto.List?.All(x => (x as GameDTO)?.Team1Detail?.Id == team1.Id || (x as GameDTO)?.Team2Detail?.Id == team1.Id));
 
             // Act - filter by team1 and team2
             result = controllerTests.GameController.GetGames(team1: team1.Id, team2: team2.Id);
@@ -109,7 +110,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(1, listDto.Total);
-            Assert.True(listDto.List?.All(x => (x as GameDTOSpecial)?.CompleteDate?.Date >= fromDate.Date));
+            Assert.True(listDto.List?.All(x => (x as GameDTO)?.CompleteDate?.Date >= fromDate.Date));
 
             // Act - filter by toDate
             var toDate = DateTime.Now.AddDays(-3).ToUniversalTime();
@@ -119,7 +120,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(1, listDto.Total);
-            Assert.True(listDto.List?.All(x => (x as GameDTOSpecial)?.CompleteDate?.Date <= toDate.Date));
+            Assert.True(listDto.List?.All(x => (x as GameDTO)?.CompleteDate?.Date <= toDate.Date));
         }
 
         [DockerRequiredFact]

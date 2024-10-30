@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,10 @@ builder.Services
     .AddDbContext<BaseDBContext<User>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))  
     .AddDbContext<BaseDBContext<Game>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
     .AddDbContext<BaseDBContext<Team>>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));   
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 
 var app = builder.Build();

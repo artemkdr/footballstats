@@ -25,7 +25,7 @@ namespace API.Tests.Controllers
         public void CreatesUser_ReturnsCreatedAtActionResult() {
             string username = Guid.NewGuid().ToString();
 
-            var result = controllerTests.UserController.CreateUser(new UserDTOFull {
+            var result = controllerTests.UserController.CreateUser(new UserDTO {
                 Username = username                
             });
             
@@ -41,7 +41,7 @@ namespace API.Tests.Controllers
         public void CreatesUser_CreatesTeamWithUser() {
             string username = Guid.NewGuid().ToString();
 
-            var result = controllerTests.UserController.CreateUser(new UserDTOFull {
+            var result = controllerTests.UserController.CreateUser(new UserDTO {
                 Username = username                
             });
             
@@ -66,7 +66,7 @@ namespace API.Tests.Controllers
 
             // Act
             Assert.Throws<InvalidOperationException>(() => {
-                controllerTests.UserController.CreateUser(new UserDTOFull {
+                controllerTests.UserController.CreateUser(new UserDTO {
                     Username = username,
                     Status = UserStatus.Active.ToString()
                 });
@@ -77,7 +77,7 @@ namespace API.Tests.Controllers
         public void CreateUser_EmptyUsername_ReturnsBadRequestResult()
         {
             // Act
-            var result = controllerTests.UserController.CreateUser(new UserDTOFull {
+            var result = controllerTests.UserController.CreateUser(new UserDTO {
                 Status = UserStatus.Active.ToString()
             });
 

@@ -7,9 +7,7 @@ namespace API.Controllers;
 
 [ApiController]
 abstract public class BaseController : ControllerBase
-{
-    public static readonly int LIST_LIMIT = 500;
-
+{    
     public static int MAX_TEAM_PLAYERS = 2;
     public static int MIN_TEAM_PLAYERS = 1;
     
@@ -58,6 +56,7 @@ public interface IBaseDTO {
 }
 
 public class ListDTO : IBaseDTO {
+
     public int Page { get; set; }
     public int PageSize { get; set; }
     public int Total { get; set; }

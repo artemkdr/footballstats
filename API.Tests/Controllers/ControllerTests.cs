@@ -1,6 +1,7 @@
 using API.Controllers;
 using API.Data;
 using API.Models;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
@@ -26,6 +27,8 @@ namespace API.Tests.Controllers
         public BaseDBContext<Team> TeamContext { get; }
         
         public BaseDBContext<Game> GameContext { get; }
+
+        public IUserService UserService { get; }
         
         private readonly Mock<IConfiguration> _configurationMock;
         
@@ -42,9 +45,11 @@ namespace API.Tests.Controllers
             UserContext = new BaseDBContext<User>(optionsUser); 
             TeamContext = new BaseDBContext<Team>(optionsTeam); 
             GameContext = new BaseDBContext<Game>(optionsGame); 
+            UserService = new UserService(UserContext, TeamContext);
+
             _configurationMock = new Mock<IConfiguration>();
             
-            UserController = new UserController(_configurationMock.Object, UserContext, TeamContext, GameContext);
+            UserController = new UserController(_configurationMock.Object, UserContext, TeamContext, GameContext, UserService);
             TeamController = new TeamController(_configurationMock.Object, UserContext, TeamContext, GameContext);
             GameController = new GameController(_configurationMock.Object, UserContext, TeamContext, GameContext);
             StatsController = new StatsController(_configurationMock.Object, UserContext, TeamContext, GameContext);

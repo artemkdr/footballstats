@@ -32,7 +32,7 @@ export const convertToTeam = (data : any) => {
     var team = {} as Team;    
     team.Id = parseInt(data?.id);
     team.Name = data?.name?.toString();
-    team.Players = convertDataToUserList(data?.players);
+    team.Players = convertDataToUserList(data?.playerDetails ?? data?.players);
     team.CreateDate = new Date(data?.createDate);
     team.ModifyDate = new Date(data?.modifyDate);
     team.Status = data?.status as TeamStatus;    

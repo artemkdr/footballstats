@@ -31,7 +31,7 @@ namespace API.Tests.Controllers
             controllerTests.UserContext.SaveChanges();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull() {
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTO() {
                 Status = UserStatus.Deleted.ToString(),
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }") 
             }); 
@@ -54,7 +54,7 @@ namespace API.Tests.Controllers
             var username = Guid.NewGuid().ToString();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull()); 
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTO()); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    
@@ -74,7 +74,7 @@ namespace API.Tests.Controllers
             controllerTests.UserContext.SaveChanges();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTOFull { Username = "newusername" }); 
+            var result = controllerTests.UserController.UpdateUser(username, new UserDTO { Username = "newusername" }); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    
