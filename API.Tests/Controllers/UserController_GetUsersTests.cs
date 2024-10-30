@@ -1,5 +1,6 @@
 using API.Controllers;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Tests.Controllers
@@ -38,7 +39,7 @@ namespace API.Tests.Controllers
 
             Assert.Equal(3, listDto.Total);
             Assert.Equal(1, listDto.Page);
-            Assert.Equal(UserController.LIST_LIMIT, listDto.PageSize);             
+            Assert.Equal(UserService.LIST_LIMIT, listDto.PageSize);             
         }
 
 

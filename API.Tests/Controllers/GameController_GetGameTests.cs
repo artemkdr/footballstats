@@ -41,12 +41,12 @@ namespace API.Tests.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedGame = Assert.IsType<GameDTOFull>(okResult.Value);
+            var returnedGame = Assert.IsType<GameDTO>(okResult.Value);
             
             Assert.Equal(1, returnedGame.Goals1);
             Assert.Equal(5, returnedGame.Goals2);
-            Assert.Equal(1, returnedGame.Team1?.Id);
-            Assert.Equal(2, returnedGame.Team2?.Id);
+            Assert.Equal(1, returnedGame.Team1Detail?.Id);
+            Assert.Equal(2, returnedGame.Team2Detail?.Id);
             Assert.Equal(game.Vars, returnedGame.Vars); 
         }
 

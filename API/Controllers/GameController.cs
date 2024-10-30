@@ -2,12 +2,14 @@ using System.Net;
 using System.Text.Json;
 using API.Data;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-abstract public class GameDTOBase : IBaseDTO {
+public class GameDTO : IBaseDTO
+{    
     public int Id { get; set; }    
 
     public string? Status { get; set; }
@@ -15,43 +17,20 @@ abstract public class GameDTOBase : IBaseDTO {
     public int Goals1 { get; set; }    
     
     public int Goals2 { get; set; }    
+
+    public int Team1 { get; set; }    
+    
+    public int Team2 { get; set; }    
+
+    public TeamDTO? Team1Detail { get; set; }    
+    
+    public TeamDTO? Team2Detail { get; set; }    
     
     public DateTime? CompleteDate { get; set; }
     
     public JsonDocument? Vars { get; set; }
-}
 
-public class GameDTOLight {
-    public int Id { get; set; }
-}
-
-public class GameDTO : GameDTOBase
-{    
-    public int Team1 { get; set; }    
     
-    public int Team2 { get; set; }    
-}
-
-public class GameDTOExtended : GameDTOBase
-{   
-    public TeamDTOLight? Team1 { get; set; }    
-    
-    public TeamDTOLight? Team2 { get; set; }    
-}
-
-public class GameDTOFull : GameDTOBase
-{   
-    public TeamDTO? Team1 { get; set; }    
-    
-    public TeamDTO? Team2 { get; set; }    
-}
-
-
-public class GameDTOSpecial : GameDTOBase
-{   
-    public TeamDTOSpecial? Team1 { get; set; }    
-    
-    public TeamDTOSpecial? Team2 { get; set; }    
 }
 
 [ApiController]
@@ -73,15 +52,17 @@ public class GameController : BaseController
         var team1 = _teamContext.Items.Find(item.Team1);
         var team2 = _teamContext.Items.Find(item.Team2);
 
-        return Ok(new GameDTOFull() {
+        return Ok(new GameDTO() {
             Id = item.Id,
-            Team1 = new TeamDTO() {
+            Team1 = item.Team1,
+            Team1Detail = new TeamDTO() {
                 Id = item.Team1,
                 Name = team1?.Name,
                 Players = team1?.Players,
                 Status = team1?.Status.ToString()
             },
-            Team2 = new TeamDTO() {
+            Team2 = item.Team2,
+            Team2Detail = new TeamDTO() {
                 Id = item.Team2,
                 Name = team2?.Name,
                 Players = team2?.Players,
@@ -102,7 +83,7 @@ public class GameController : BaseController
         int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
-        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
+        if (limit < 1) limit = Math.Max(limit, UserService.LIST_LIMIT);
         
         var query = _gameContext.Items.AsQueryable();
         if (!string.IsNullOrEmpty(status)) {
@@ -151,31 +132,35 @@ public class GameController : BaseController
         
         var teamIds = items.SelectMany(x => new[] { x.Team1, x.Team2 }).Distinct().ToList();
         var teams = _teamContext.Items.Where(x => teamIds.Contains(x.Id)).ToList().ToDictionary(x => x.Id);
-        var itemsWithTeams = new List<GameDTOSpecial>();
+        var itemsWithTeams = new List<GameDTO>();
         foreach (var t in items) {
             var t1 = teams.ContainsKey(t.Team1) ? teams[t.Team1] : new Team() { Id = t.Team1 };
             var t2 = teams.ContainsKey(t.Team2) ? teams[t.Team2] : new Team() { Id = t.Team2 };
-            var t1Players = new List<UserDTOLight>();
-            var t2Players = new List<UserDTOLight>();
+            var t1Players = new List<UserDTO>();
+            var t2Players = new List<UserDTO>();
             if (t1.Players != null) 
                 foreach (var u in t1.Players) 
-                    t1Players.Add(new UserDTOLight() { Username = u });
+                    t1Players.Add(new UserDTO() { Username = u });
             if (t2.Players != null) 
                 foreach (var u in t2.Players) 
-                    t2Players.Add(new UserDTOLight() { Username = u });                    
+                    t2Players.Add(new UserDTO() { Username = u });                    
             
-            itemsWithTeams.Add(new GameDTOSpecial() {
+            itemsWithTeams.Add(new GameDTO() {
                 Id = t.Id,
-                Team1 = new TeamDTOSpecial() {
+                Team1 = t1.Id,
+                Team1Detail = new TeamDTO() {
                     Id = t1.Id,
                     Name = t1.Name,
-                    Players = t1Players.ToArray(),
+                    Players = t1Players.Select(x => x.Username!).ToArray(),
+                    PlayerDetails = t1Players.ToArray(),
                     Status = t1.Status.ToString()
                 },
-                Team2 = new TeamDTOSpecial() {
+                Team2 = t2.Id,
+                Team2Detail = new TeamDTO() {
                     Id = t2.Id,
                     Name = t2.Name,
-                    Players = t2Players.ToArray(),
+                    Players = t2Players.Select(x => x.Username!).ToArray(),
+                    PlayerDetails = t2Players.ToArray(),
                     Status = t2.Status.ToString()
                 },
                 Status = t.Status.ToString(),
@@ -267,7 +252,7 @@ public class GameController : BaseController
             
             _gameContext.Items.Update(item);
             _gameContext.SaveChanges();            
-            var dto = new GameDTOLight() {
+            var dto = new GameDTO() {
                 Id = item.Id
             };
             return Ok(dto);            

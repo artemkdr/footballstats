@@ -1,5 +1,6 @@
 using API.Controllers;
 using API.Models;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Tests.Controllers
@@ -39,7 +40,7 @@ namespace API.Tests.Controllers
 
             Assert.Equal(3, listDto.Total); // Check if the total number of teams is correct
             Assert.Equal(1, listDto.Page); // Check if the page number is correct (default should be 1)
-            Assert.Equal(TeamController.LIST_LIMIT, listDto.PageSize); // Check if the page size is correct
+            Assert.Equal(UserService.LIST_LIMIT, listDto.PageSize); // Check if the page size is correct
         }
 
         [DockerRequiredFact]
@@ -61,7 +62,7 @@ namespace API.Tests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             var listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(1, listDto.Total);
-            Assert.Equal("Team Alpha", (listDto.List?.FirstOrDefault(x => true) as TeamDTOLight)?.Name);
+            Assert.Equal("Team Alpha", (listDto.List?.FirstOrDefault(x => true) as TeamDTO)?.Name);
 
             // Act - filter by status
             result = controllerTests.TeamController.GetTeams(status: "Deleted");
@@ -70,7 +71,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(2, listDto.Total);
-            Assert.Equal("Team Beta", (listDto.List?.FirstOrDefault(x => true) as TeamDTOLight)?.Name);
+            Assert.Equal("Team Beta", (listDto.List?.FirstOrDefault(x => true) as TeamDTO)?.Name);
 
             // Act - filter by players
             result = controllerTests.TeamController.GetTeams(players: "Player1");
@@ -79,7 +80,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(2, listDto.Total);
-            Assert.True(listDto.List?.All(x => ((TeamDTOLight)x).Name == "Team Alpha" || ((TeamDTOLight)x).Name == "Team Gamma"));
+            Assert.True(listDto.List?.All(x => ((TeamDTO)x).Name == "Team Alpha" || ((TeamDTO)x).Name == "Team Gamma"));
 
             // Act - filter by multiple players
             result = controllerTests.TeamController.GetTeams(players: "Player1, Player2");
@@ -88,7 +89,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(1, listDto.Total);
-            Assert.Equal("Team Alpha", (listDto.List?.FirstOrDefault(x => true) as TeamDTOLight)?.Name);
+            Assert.Equal("Team Alpha", (listDto.List?.FirstOrDefault(x => true) as TeamDTO)?.Name);
 
             // Act - combine filters (name and status)
             result = controllerTests.TeamController.GetTeams(name: "a", status: "Active");
@@ -97,7 +98,7 @@ namespace API.Tests.Controllers
             okResult = Assert.IsType<OkObjectResult>(result);
             listDto = Assert.IsType<ListDTO>(okResult.Value);
             Assert.Equal(2, listDto.Total); 
-            Assert.True(listDto.List?.All(x => (((TeamDTOLight)x).Name == "Team Alpha" || ((TeamDTOLight)x).Name == "Team Gamma") && ((TeamDTOLight)x).Status == TeamStatus.Active.ToString()));
+            Assert.True(listDto.List?.All(x => (((TeamDTO)x).Name == "Team Alpha" || ((TeamDTO)x).Name == "Team Gamma") && ((TeamDTO)x).Status == TeamStatus.Active.ToString()));
         }
 
         [DockerRequiredFact]

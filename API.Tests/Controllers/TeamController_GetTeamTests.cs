@@ -40,12 +40,12 @@ namespace API.Tests.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnedTeam = Assert.IsType<TeamDTOExtended>(okResult.Value);
+            var returnedTeam = Assert.IsType<TeamDTO>(okResult.Value);
 
             Assert.Equal(teamname, returnedTeam.Name);
             Assert.Equal(TeamStatus.Active.ToString(), returnedTeam.Status);
-            Assert.IsType<UserDTO[]>(returnedTeam.Players);
-            Assert.Equal(returnedTeam.Players?.Select(x => x.Username), new string[] { p1.Username, p2.Username }); 
+            Assert.IsType<UserDTO[]>(returnedTeam.PlayerDetails);
+            Assert.Equal(returnedTeam.PlayerDetails?.Select(x => x.Username), new string[] { p1.Username, p2.Username }); 
         }
 
         [DockerRequiredFact]
