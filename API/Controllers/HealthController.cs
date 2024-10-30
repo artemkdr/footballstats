@@ -1,5 +1,3 @@
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 
@@ -21,6 +19,6 @@ public class HealthController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        return RequestHelpers.Success();
+        return Ok(new { success = true });
     }
 }

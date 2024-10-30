@@ -2,11 +2,7 @@ using System.Net;
 using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NLog;
 
 namespace API.Controllers;
 
@@ -38,62 +34,58 @@ public class UserController : BaseController
     [Route("user/{username}")]    
     [HttpGet]
     public IActionResult GetUser(string username)
-    {
-        try {
-            var item = _userContext.Items.Find(username);
-            if (item == null)
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
-            return Ok(new UserDTO() {
-               Username = item.Username,
-               Vars = item.Vars,
-               Status = item.Status.ToString()
-            });
-        } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
-        }
+    {        
+        var item = _userContext.Items.Find(username);
+        if (item == null)
+            return NotFoundProblem($"User '{username}' not found");
+        return Ok(new UserDTO() {
+            Username = item.Username,
+            Vars = item.Vars,
+            Status = item.Status.ToString()
+        });        
     }
+    
 
     [Route("user")]
     [HttpGet]
-    public IActionResult GetUsers(string? username = null, string? status = null, int page = 1) 
+    public IActionResult GetUsers(string? username = null, string? status = null, int page = 1, int limit = 0) 
     {
         if (page < 1) page = 1;
-        try {
-            var query = _userContext.Items.AsQueryable();
+        if (limit < 1) limit = Math.Max(limit, LIST_LIMIT);
 
-            // case insensitive "like '%value%'" search by name
-            if (!string.IsNullOrEmpty(username))
-                query = query.Where(x => x.Username != null && x.Username.ToLower().Contains(username.ToLower()));
+        
+        var query = _userContext.Items.AsQueryable();
 
-            if (!string.IsNullOrEmpty(status))
-                if (Enum.TryParse<UserStatus>(status, true, out var statusEnum))
-                    query = query.Where(x => x.Status == statusEnum);
-                else 
-                    return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"status '{status}' doesn't exist"));                
-            var totalCount = query.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / LIST_LIMIT);
-            if (page > totalPages) page = Math.Max(1, totalPages);
-            
-            var items = query.OrderBy(x => x.Username)
-                             .Skip((page - 1) * LIST_LIMIT)
-                            .Take(LIST_LIMIT)
-                            .Select(x => new UserDTO() {
-                                Username = x.Username,
-                                Vars = x.Vars,                                
-                                Status = x.Status.ToString()
-                            })
-                            .ToList();
+        // case insensitive "like '%value%'" search by name
+        if (!string.IsNullOrEmpty(username))
+            query = query.Where(x => x.Username != null && x.Username.ToLower().Contains(username.ToLower()));
 
-            return Ok(new ListDTO {
-                Page = page,
-                PageSize = LIST_LIMIT,
-                Total = totalCount,
-                TotalPages = totalPages,
-                List = items.ToArray()
-            });
-        } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
-        }
+        if (!string.IsNullOrEmpty(status))
+            if (Enum.TryParse<UserStatus>(status, true, out var statusEnum))
+                query = query.Where(x => x.Status == statusEnum);
+            else 
+                return BadRequestProblem($"status '{status}' doesn't exist");
+        var totalCount = query.Count();
+        var totalPages = (int)Math.Ceiling((double)totalCount / limit);
+        if (page > totalPages) page = Math.Max(1, totalPages);
+        
+        var items = query.OrderBy(x => x.Username)
+                            .Skip((page - 1) * limit)
+                        .Take(limit)
+                        .Select(x => new UserDTO() {
+                            Username = x.Username,
+                            Vars = x.Vars,                                
+                            Status = x.Status.ToString()
+                        })
+                        .ToList();
+
+        return Ok(new ListDTO {
+            Page = page,
+            PageSize = limit,
+            Total = totalCount,
+            TotalPages = totalPages,
+            List = items.ToArray()
+        });        
     }
 
     [Route("user")]
@@ -101,7 +93,7 @@ public class UserController : BaseController
     public IActionResult CreateUser(UserDTOFull userData)
     {
         if (userData == null || userData.Username == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", "username is missing"));
+            return BadRequestProblem("username is missing");
         
         // TODO: add data validation            
         // TODO: check that the username is a valid name
@@ -117,25 +109,21 @@ public class UserController : BaseController
         };
         if (userData.Status != null && Enum.TryParse<UserStatus>(userData.Status, out var status))
             newItem.Status = status;
+        
+        _userContext.Items.Add(newItem);
+        _userContext.SaveChanges();
 
-        try {
-            _userContext.Items.Add(newItem);
-            _userContext.SaveChanges();
+        // create a team with a single user automatically
+        _teamContext.Items.Add(new Team {
+            Name = newItem.Username,
+            Players = new string[] { newItem.Username },
+            CreateDate = DateTime.UtcNow,            
+            ModifyDate = DateTime.UtcNow,
+            Status = TeamStatus.Active
+        });
+        _teamContext.SaveChanges();
 
-            // create a team with a single user automatically
-            _teamContext.Items.Add(new Team {
-                Name = newItem.Username,
-                Players = new string[] { newItem.Username },
-                CreateDate = DateTime.UtcNow,            
-                ModifyDate = DateTime.UtcNow,
-                Status = TeamStatus.Active
-            });
-            _teamContext.SaveChanges();
-
-            return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);
-        } catch (Exception ex) {
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
-        }
+        return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);        
     }
 
     [Route("user/{username}")]
@@ -143,8 +131,8 @@ public class UserController : BaseController
     public IActionResult UpdateUser(string username, UserDTOFull userData)
     {        
         var item = _userContext.Items.Find(username);
-        if (item == null)
-            return RequestHelpers.Failure(RequestHelpers.ToDict("error", $"User '{username}' not found"), Response, (int)HttpStatusCode.NotFound);
+        if (item == null)            
+            return NotFoundProblem($"User '{username}' not found");            
         
         if (userData != null) {
             // TODO: add data validation            
@@ -152,7 +140,7 @@ public class UserController : BaseController
             // TODO: check the password is valid and hash password
             
             if (userData.Username != null && userData.Username != item.Username) {                
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", "username cannot be updated"));                
+                return Problem("username cannot be updated");
             }
 
             if (userData.Password != null)
@@ -172,10 +160,10 @@ public class UserController : BaseController
                 };
                 return Ok(dto);
             } catch (Exception ex) {
-                return RequestHelpers.Failure(RequestHelpers.ToDict("error", ex.InnerException?.Message ?? ex.Message));
+                return Problem(ex.InnerException?.Message ?? ex.Message);
             }
         }
 
-        return RequestHelpers.Failure(RequestHelpers.ToDict("error", "no user data provided"));
+        return BadRequestProblem("no user data provided");
     }
 }

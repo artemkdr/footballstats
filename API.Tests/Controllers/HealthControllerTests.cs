@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
-namespace API.Tests;
+namespace API.Tests.Controllers;
 
 public class HealthControllerTests
 {
@@ -19,7 +19,6 @@ public class HealthControllerTests
         var result = controller.Get();
 
         // Assert
-        var jsonResult = Assert.IsType<JsonResult>(result);
-        Assert.Equal((int)HttpStatusCode.OK, jsonResult.StatusCode);        
+        Assert.IsType<OkObjectResult>(result);        
     }
 }

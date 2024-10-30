@@ -1,11 +1,6 @@
-using System.Net;
-using System.Text.Json;
 using API.Data;
 using API.Models;
-using Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NLog;
 
 namespace API.Controllers;
@@ -13,7 +8,7 @@ namespace API.Controllers;
 [ApiController]
 abstract public class BaseController : ControllerBase
 {
-    public static int LIST_LIMIT = 500;
+    public static readonly int LIST_LIMIT = 500;
 
     public static int MAX_TEAM_PLAYERS = 2;
     public static int MIN_TEAM_PLAYERS = 1;
@@ -36,6 +31,26 @@ abstract public class BaseController : ControllerBase
         _teamContext = teamContext;
         _gameContext = gameContext;
     }
+
+    [NonAction]
+    public virtual ObjectResult NotFoundProblem(string? detail = null) {
+        return Problem(
+            detail: detail, 
+            title: "Not Found", 
+            statusCode: StatusCodes.Status404NotFound, 
+            type: "https://tools.ietf.org/html/rfc7231#section-6.5.4"
+        );
+    }
+
+    [NonAction]
+    public virtual ObjectResult BadRequestProblem(string? detail = null) {
+        return Problem(
+            detail: detail, 
+            title: "Bad Request", 
+            statusCode: StatusCodes.Status400BadRequest, 
+            type: "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        );
+    } 
 }
 
 public interface IBaseDTO {
