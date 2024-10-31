@@ -20,8 +20,8 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]        
-        public void CreatesGame_ReturnsCreatedAtActionResult() {                        
-            var result = controllerTests.GameController.CreateGame(new GameDTO {
+        public async void CreatesGame_ReturnsCreatedAtActionResult() {                        
+            var result = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = 1,
                 Team2 = 2,
                 Goals1 = 2,
@@ -43,9 +43,9 @@ namespace API.Tests.Controllers
         }
        
         [DockerRequiredFact]
-        public void CreateGame_EmptyTeam_BadRequestResult()
+        public async void CreateGame_EmptyTeam_BadRequestResult()
         {
-             var result = controllerTests.GameController.CreateGame(new GameDTO {
+             var result = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = 1,                
                 Goals1 = 2,
                 Goals2 = 5
@@ -57,7 +57,7 @@ namespace API.Tests.Controllers
             Assert.Equal((int)HttpStatusCode.BadRequest, objectResult.StatusCode);   
             Assert.NotNull((objectResult.Value as ProblemDetails)?.Detail);
 
-            result = controllerTests.GameController.CreateGame(new GameDTO {
+            result = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team2 = 1,                
                 Goals1 = 2,
                 Goals2 = 5
@@ -71,9 +71,9 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreateGame_SameTeams_ReturnsBadRequestResult()
+        public async void CreateGame_SameTeams_ReturnsBadRequestResult()
         {
-             var result = controllerTests.GameController.CreateGame(new GameDTO {
+             var result = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = 1,              
                 Team2 = 1,  
                 Goals1 = 2,
@@ -88,9 +88,9 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreateGame_NegativeTeam_ReturnsBadRequestResult()
+        public async void CreateGame_NegativeTeam_ReturnsBadRequestResult()
         {
-             var result = controllerTests.GameController.CreateGame(new GameDTO {
+             var result = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = -1,              
                 Team2 = 1                
             });

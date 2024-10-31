@@ -1,15 +1,17 @@
 using API.Controllers;
 using API.Data;
 using API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
 public interface IUserService 
 {
-    User? GetUser(string username);
-    ListDTO GetUsers(string? username, string? status, int page, int limit);
-    User CreateUser(UserDTO userData);
-    User? UpdateUser(string username, UserDTO userData);
+    Task<User?> GetUserAsync(string username);
+    Task<PagedList<User>> GetUsersAsync(string? username, string? status, int page, int limit);
+    Task<List<User>> GetUsersAsync(string[] usernames);
+    Task<User> CreateUserAsync(UserDTO userData);
+    Task<User?> UpdateUserAsync(string username, UserDTO userData);
 }
 
 public class UserService : IUserService {
@@ -24,12 +26,12 @@ public class UserService : IUserService {
         _teamContext = teamContext;
     }
 
-    public User? GetUser(string username)
+    public async Task<User?> GetUserAsync(string username)
     {
-        return _userContext.Items.Find(username);
+        return await _userContext.Items.FindAsync(username);
     }
 
-    public ListDTO GetUsers(string? username, string? status, int page = 1, int limit = 0)
+    public async Task<PagedList<User>> GetUsersAsync(string? username, string? status, int page = 1, int limit = 0)
     {
         if (page < 1) page = 1;
         if (limit < 1) limit = Math.Max(limit, UserService.LIST_LIMIT);
@@ -47,26 +49,27 @@ public class UserService : IUserService {
         var totalPages = (int)Math.Ceiling((double)totalCount / limit);
         if (page > totalPages) page = Math.Max(1, totalPages);
         
-        var items = query.OrderBy(x => x.Username)
+        var items = await query.OrderBy(x => x.Username)
                             .Skip((page - 1) * limit)
-                        .Take(limit)
-                        .Select(x => new UserDTO() {
-                            Username = x.Username,
-                            Vars = x.Vars,                                
-                            Status = x.Status.ToString()
-                        })
-                        .ToList();
+                        .Take(limit)                        
+                        .ToListAsync();
 
-        return new ListDTO {
+        return new PagedList<User> {
             Page = page,
             PageSize = limit,
             Total = totalCount,
             TotalPages = totalPages,
-            List = items.ToArray()
+            List = items
         };
     }
 
-    public User CreateUser(UserDTO userData)
+    public async Task<List<User>> GetUsersAsync(string[] usernames) {
+        var query = _userContext.Items.AsQueryable();
+        query = query.Where(x => usernames.Contains(x.Username));
+        return await query.ToListAsync(); 
+    }
+
+    public async Task<User> CreateUserAsync(UserDTO userData)
     {
         if (userData == null || userData.Username == null) {
             throw new ArgumentNullException("userData or userData.Username is missing");
@@ -87,7 +90,7 @@ public class UserService : IUserService {
             newItem.Status = status;
         
         _userContext.Items.Add(newItem);
-        _userContext.SaveChanges();
+        await _userContext.SaveChangesAsync();
 
         // create a team with a single user automatically
         _teamContext.Items.Add(new Team {
@@ -97,14 +100,13 @@ public class UserService : IUserService {
             ModifyDate = DateTime.UtcNow,
             Status = TeamStatus.Active
         });
-        _teamContext.SaveChanges();
-
+        await _teamContext.SaveChangesAsync();
         return newItem;  
     }
 
-    public User? UpdateUser(string username, UserDTO userData)
+    public async Task<User?> UpdateUserAsync(string username, UserDTO userData)
     {
-        var item = _userContext.Items.Find(username);
+        var item = await _userContext.Items.FindAsync(username);
         if (item == null)            
             return null;
         
@@ -128,7 +130,7 @@ public class UserService : IUserService {
             item.ModifyDate = DateTime.UtcNow; 
             
             _userContext.Items.Update(item);
-            _userContext.SaveChanges();            
+            await _userContext.SaveChangesAsync();            
             return item;            
         }
 

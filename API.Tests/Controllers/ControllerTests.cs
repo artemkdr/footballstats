@@ -29,6 +29,12 @@ namespace API.Tests.Controllers
         public BaseDBContext<Game> GameContext { get; }
 
         public IUserService UserService { get; }
+
+        public ITeamService TeamService { get; }
+
+        public IGameService GameService { get; }
+
+        public IStatsService StatsService { get; }
         
         private readonly Mock<IConfiguration> _configurationMock;
         
@@ -46,13 +52,16 @@ namespace API.Tests.Controllers
             TeamContext = new BaseDBContext<Team>(optionsTeam); 
             GameContext = new BaseDBContext<Game>(optionsGame); 
             UserService = new UserService(UserContext, TeamContext);
+            TeamService = new TeamService(UserContext, TeamContext);
+            GameService = new GameService(GameContext, UserContext, TeamContext);
+            StatsService = new StatsService(GameContext, TeamContext);
 
             _configurationMock = new Mock<IConfiguration>();
             
             UserController = new UserController(_configurationMock.Object, UserContext, TeamContext, GameContext, UserService);
-            TeamController = new TeamController(_configurationMock.Object, UserContext, TeamContext, GameContext);
-            GameController = new GameController(_configurationMock.Object, UserContext, TeamContext, GameContext);
-            StatsController = new StatsController(_configurationMock.Object, UserContext, TeamContext, GameContext);
+            TeamController = new TeamController(_configurationMock.Object, UserContext, TeamContext, GameContext, UserService, TeamService);
+            GameController = new GameController(_configurationMock.Object, UserContext, TeamContext, GameContext, GameService, TeamService, UserService);
+            StatsController = new StatsController(_configurationMock.Object, UserContext, TeamContext, GameContext, StatsService);
         }                
     }
 }

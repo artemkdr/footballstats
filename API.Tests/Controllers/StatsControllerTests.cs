@@ -22,7 +22,7 @@ namespace API.Tests.Controllers
         
 
         [Fact]
-        public void GetStats_NoTeam_ReturnsAllStats()
+        public async void GetStats_NoTeam_ReturnsAllStats()
         {
             // Arrange
             var teams = new List<Team>
@@ -32,7 +32,7 @@ namespace API.Tests.Controllers
                 new Team { Name = "Team C", Players = new string[] { "Player 4" } },                
             };            
             controllerTests.TeamContext.Items.AddRange(teams);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             var games = new List<Game>
             {
@@ -53,10 +53,10 @@ namespace API.Tests.Controllers
             
 
             controllerTests.GameContext.Items.AddRange(games);
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
             
             // Act
-            var result = controllerTests.StatsController.GetStats() as OkObjectResult;
+            var result = await controllerTests.StatsController.GetStats() as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -92,7 +92,7 @@ namespace API.Tests.Controllers
         }
 
         [Fact]
-        public void GetStats_NoTeam_ReturnsAllStats_CheckSort()
+        public async void GetStats_NoTeam_ReturnsAllStats_CheckSort()
         {
             // Arrange
             var teams = new List<Team>
@@ -101,7 +101,7 @@ namespace API.Tests.Controllers
                 new Team { Name = "Team B", Players = new string[] { "Player 3" } }                
             };            
             controllerTests.TeamContext.Items.AddRange(teams);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             var games = new List<Game>
             {
@@ -114,10 +114,10 @@ namespace API.Tests.Controllers
             // team 2 (Team B) has 1 win, 1 loss, 2 total, ratio 0.5, GA = 6, GF = 4 - goals diff -2 
                         
             controllerTests.GameContext.Items.AddRange(games);
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
             
             // Act
-            var result = controllerTests.StatsController.GetStats() as OkObjectResult;
+            var result = await controllerTests.StatsController.GetStats() as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -142,7 +142,7 @@ namespace API.Tests.Controllers
         }
 
         [Fact]
-        public void GetStats_WithTeam_ReturnsStatsForTeam()
+        public async void GetStats_WithTeam_ReturnsStatsForTeam()
         {
             // Arrange
             var teams = new List<Team>
@@ -152,7 +152,7 @@ namespace API.Tests.Controllers
                 new Team { Name = "Team C", Players = new string[] { "Player 4" } },                
             };            
             controllerTests.TeamContext.Items.AddRange(teams);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             var games = new List<Game>
             {
@@ -170,10 +170,10 @@ namespace API.Tests.Controllers
             // team 2 (Team B) has 2 wins, 2 loss, 1 draw, 5 total, ratio 0.4, GA = 19, GF = 17
             
             controllerTests.GameContext.Items.AddRange(games);
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
             
             // Act
-            var result = controllerTests.StatsController.GetStats(2) as OkObjectResult;
+            var result = await controllerTests.StatsController.GetStats(2) as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -191,7 +191,7 @@ namespace API.Tests.Controllers
         
 
         [Fact]
-        public void GetStatsRivals_ReturnsRivalsStats()
+        public async void GetStatsRivals_ReturnsRivalsStats()
         {
             // Arrange
             var teams = new List<Team>
@@ -201,7 +201,7 @@ namespace API.Tests.Controllers
                 new Team { Id = 3, Name = "Team C", Players = new string[] { "Player 4" } }
             };            
             controllerTests.TeamContext.Items.AddRange(teams);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
             
             var games = new List<Game>
             {
@@ -216,10 +216,10 @@ namespace API.Tests.Controllers
                 new Game { Team1 = 3, Team2 = 2, Goals1 = 10, Goals2 = 0, Status = GameStatus.Completed },                
             };
             controllerTests.GameContext.Items.AddRange(games);
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
             
             // Act
-            var result = controllerTests.StatsController.GetStatsRivals(1, 2) as OkObjectResult;
+            var result = await controllerTests.StatsController.GetStatsRivals(1, 2) as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);
@@ -230,10 +230,10 @@ namespace API.Tests.Controllers
         }
 
         [Fact]
-        public void GetStats_NoGames_ReturnsEmptyStats()
+        public async void GetStats_NoGames_ReturnsEmptyStats()
         {
             // Act
-            var result = controllerTests.StatsController.GetStats() as OkObjectResult;
+            var result = await controllerTests.StatsController.GetStats() as OkObjectResult;
 
             // Assert
             Assert.NotNull(result);

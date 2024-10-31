@@ -23,23 +23,23 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetGames_NoParameters_ReturnsOkResultWithAllGames()
+        public async void GetGames_NoParameters_ReturnsOkResultWithAllGames()
         {
             // Arrange
             var team1 = new Team { Name = "Team 1", Players = new[] { "Player1", "Player2" } };
             var team2 = new Team { Name = "Team 2", Players = new[] { "Player3", "Player4" } };
             controllerTests.TeamContext.Items.AddRange(team1, team2);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             controllerTests.GameContext.Items.AddRange(
                 new Game { Team1 = team1.Id, Team2 = team2.Id, Status = GameStatus.Playing, ModifyDate = DateTime.Now.AddDays(-2).ToUniversalTime() },
                 new Game { Team1 = team2.Id, Team2 = team1.Id, Status = GameStatus.Completed, CompleteDate = DateTime.Now.AddDays(-3).ToUniversalTime(), ModifyDate = DateTime.Now.AddDays(-4).ToUniversalTime() },
                 new Game { Team1 = team1.Id, Team2 = team2.Id, Status = GameStatus.NotStarted, ModifyDate = DateTime.Now.AddDays(-5).ToUniversalTime() }
             );
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
 
             // Act
-            var result = controllerTests.GameController.GetGames(); // No parameters
+            var result = await controllerTests.GameController.GetGames(); // No parameters
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -51,14 +51,14 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetGames_WithParameters_ReturnsOkResultWithFilteredGames()
+        public async void GetGames_WithParameters_ReturnsOkResultWithFilteredGames()
         {
             // Arrange
             var team1 = new Team { Name = "Team A", Players = new[] { "PlayerA1", "PlayerA2" } };
             var team2 = new Team { Name = "Team B", Players = new[] { "PlayerB1", "PlayerB2" } };
             var team3 = new Team { Name = "Team C", Players = new[] { "PlayerC1", "PlayerC2" } };
             controllerTests.TeamContext.Items.AddRange(team1, team2, team3);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             controllerTests.GameContext.Items.AddRange(
                 new Game { Team1 = team1.Id, Team2 = team2.Id, Status = GameStatus.Playing, ModifyDate = DateTime.Now.AddDays(-1).ToUniversalTime() },
@@ -66,10 +66,10 @@ namespace API.Tests.Controllers
                 new Game { Team1 = team1.Id, Team2 = team3.Id, Status = GameStatus.NotStarted, ModifyDate = DateTime.Now.AddDays(-3).ToUniversalTime() },
                 new Game { Team1 = team3.Id, Team2 = team2.Id, Status = GameStatus.Completed, CompleteDate = DateTime.Now.AddDays(-4).ToUniversalTime(), ModifyDate = DateTime.Now.AddDays(-4).ToUniversalTime() }
             );
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
 
             // Act - filter by Status=Completed
-            var result = controllerTests.GameController.GetGames(status: "Completed");
+            var result = await controllerTests.GameController.GetGames(status: "Completed");
 
             // Assert - returns 2 completed games
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -78,7 +78,7 @@ namespace API.Tests.Controllers
             Assert.True(listDto.List?.All(x => (x as GameDTO)?.Status == GameStatus.Completed.ToString()));
 
             // Act - filter by team1
-            result = controllerTests.GameController.GetGames(team1: team1.Id);
+            result = await controllerTests.GameController.GetGames(team1: team1.Id);
 
             // Assert - returns 3 games with team1
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -87,7 +87,7 @@ namespace API.Tests.Controllers
             Assert.True(listDto.List?.All(x => (x as GameDTO)?.Team1Detail?.Id == team1.Id || (x as GameDTO)?.Team2Detail?.Id == team1.Id));
 
             // Act - filter by team1 and team2
-            result = controllerTests.GameController.GetGames(team1: team1.Id, team2: team2.Id);
+            result = await controllerTests.GameController.GetGames(team1: team1.Id, team2: team2.Id);
 
             // Assert - returns 2 games between team1 and team2
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -95,7 +95,7 @@ namespace API.Tests.Controllers
             Assert.Equal(2, listDto.Total);
             
             // Act - filter by players
-            result = controllerTests.GameController.GetGames(players: "PlayerA1, PlayerB1");
+            result = await controllerTests.GameController.GetGames(players: "PlayerA1, PlayerB1");
 
             // Assert - returns 4 games with PlayerA1 and PlayerB1
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -104,7 +104,7 @@ namespace API.Tests.Controllers
 
             // Act - filter by fromDate
             var fromDate = DateTime.Now.AddDays(-2).ToUniversalTime();
-            result = controllerTests.GameController.GetGames(fromDate: fromDate);
+            result = await controllerTests.GameController.GetGames(fromDate: fromDate);
 
             // Assert - returns 1 game completed after fromDate
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -114,7 +114,7 @@ namespace API.Tests.Controllers
 
             // Act - filter by toDate
             var toDate = DateTime.Now.AddDays(-3).ToUniversalTime();
-            result = controllerTests.GameController.GetGames(toDate: toDate);
+            result = await controllerTests.GameController.GetGames(toDate: toDate);
 
             // Assert - returns 1 game completed before toDate
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -124,13 +124,13 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetGames_Pagination_ReturnsOkResultWithNPages()
+        public async void GetGames_Pagination_ReturnsOkResultWithNPages()
         {
             // Arrange
             var team1 = new Team { Name = "Team 1", Players = new[] { "Player1", "Player2" } };
             var team2 = new Team { Name = "Team 2", Players = new[] { "Player3", "Player4" } };
             controllerTests.TeamContext.Items.AddRange(team1, team2);
-            controllerTests.TeamContext.SaveChanges();
+            await controllerTests.TeamContext.SaveChangesAsync();
 
             controllerTests.GameContext.Items.AddRange(
                 new Game { Team1 = team1.Id, Team2 = team2.Id, Status = GameStatus.Playing, ModifyDate = DateTime.Now.AddDays(-1).ToUniversalTime() },
@@ -140,10 +140,10 @@ namespace API.Tests.Controllers
                 new Game { Team1 = team1.Id, Team2 = team2.Id, Status = GameStatus.Playing, ModifyDate = DateTime.Now.AddDays(-5).ToUniversalTime() },
                 new Game { Team1 = team2.Id, Team2 = team1.Id, Status = GameStatus.NotStarted,ModifyDate = DateTime.Now.AddDays(-6).ToUniversalTime() } 
             );
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
 
             // Act - get all games, page 1
-            var result = controllerTests.GameController.GetGames(page: 1, limit: 2);
+            var result = await controllerTests.GameController.GetGames(page: 1, limit: 2);
 
             // Assert - returns 1st page
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -155,7 +155,7 @@ namespace API.Tests.Controllers
             Assert.Equal(2, listDto.List?.Count()); 
 
             // Act - get all games, page 2
-            result = controllerTests.GameController.GetGames(page: 2, limit: 2);
+            result = await controllerTests.GameController.GetGames(page: 2, limit: 2);
 
             // Assert - returns 2nd page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -167,7 +167,7 @@ namespace API.Tests.Controllers
             Assert.Equal(2, listDto.List?.Count());
 
             // Act - get all games, page 3
-            result = controllerTests.GameController.GetGames(page: 3, limit: 2);
+            result = await controllerTests.GameController.GetGames(page: 3, limit: 2);
 
             // Assert - returns 3rd page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -179,7 +179,7 @@ namespace API.Tests.Controllers
             Assert.Equal(2, listDto.List?.Count());
 
             // Act - get all games, page 4 (out of range)
-            result = controllerTests.GameController.GetGames(page: 4, limit: 2);
+            result = await controllerTests.GameController.GetGames(page: 4, limit: 2);
 
             // Assert - returns last page (3)
             okResult = Assert.IsType<OkObjectResult>(result);

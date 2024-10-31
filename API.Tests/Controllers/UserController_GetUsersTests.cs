@@ -20,7 +20,7 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetUsers_NoParameters_ReturnsOkResultWithAllUsers()
+        public async void GetUsers_NoParameters_ReturnsOkResultWithAllUsers()
         {   
             // Arrange
             controllerTests.UserContext.Items.AddRange(
@@ -28,10 +28,10 @@ namespace API.Tests.Controllers
                 new User { Username = Guid.NewGuid().ToString(), Status = UserStatus.Deleted },
                 new User { Username = Guid.NewGuid().ToString(), Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
             
             // Act
-            var result = controllerTests.UserController.GetUsers(); // No parameters
+            var result = await controllerTests.UserController.GetUsers(); // No parameters
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -44,7 +44,7 @@ namespace API.Tests.Controllers
 
 
         [DockerRequiredFact]
-        public void GetUsers_WithParameters_ReturnsOkResultWithFilteredUsers()
+        public async void GetUsers_WithParameters_ReturnsOkResultWithFilteredUsers()
         {  
             // Arrange
             controllerTests.UserContext.Items.AddRange(
@@ -54,10 +54,10 @@ namespace API.Tests.Controllers
                 new User { Username = "user4", Status = UserStatus.Active },
                 new User { Username = "test5", Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
             
             // Act - filter by Status=Deleted
-            var result = controllerTests.UserController.GetUsers(status: "Deleted"); // filter by status
+            var result = await controllerTests.UserController.GetUsers(status: "Deleted"); // filter by status
 
             // Assert - returns 1 user
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -68,7 +68,7 @@ namespace API.Tests.Controllers
             Assert.Equal(UserStatus.Deleted.ToString(), (listDto.List?.FirstOrDefault(x => true) as UserDTO)?.Status);
 
             // Act - filter by exact Username
-            result = controllerTests.UserController.GetUsers("user2"); // filter by username
+            result = await controllerTests.UserController.GetUsers("user2"); // filter by username
 
             // Assert - returns 1 user
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -79,7 +79,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user2", (listDto.List?.FirstOrDefault(x => true) as UserDTO)?.Username);
 
             // Act - search by username
-            result = controllerTests.UserController.GetUsers("ser"); // search by part of username
+            result = await controllerTests.UserController.GetUsers("ser"); // search by part of username
 
             // Assert - returns 4 users with 'ser' in username
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -90,7 +90,7 @@ namespace API.Tests.Controllers
             Assert.True(listDto.List?.All(x => (x as UserDTO)?.Username?.Contains("ser") == true));
 
             // Act - search by username case insensitive
-            result = controllerTests.UserController.GetUsers("sEr"); // search by part of username (case insensitive)
+            result = await controllerTests.UserController.GetUsers("sEr"); // search by part of username (case insensitive)
 
             // Assert - returns 4 users with 'ser' in username
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -101,7 +101,7 @@ namespace API.Tests.Controllers
             Assert.True(listDto.List?.All(x => (x as UserDTO)?.Username?.Contains("ser") == true));
 
             // Act - returns empty list if nothing found
-            result = controllerTests.UserController.GetUsers("yyyyyyyy"); // search by part of username
+            result = await controllerTests.UserController.GetUsers("yyyyyyyy"); // search by part of username
 
             // Assert - returns 0 users with 'yyyyyyyy' in username
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -112,7 +112,7 @@ namespace API.Tests.Controllers
         }  
 
         [DockerRequiredFact]
-        public void GetUsers_Pagination_ReturnsOkResultNUsersByPage()
+        public async void GetUsers_Pagination_ReturnsOkResultNUsersByPage()
         {   
             // Arrange
             controllerTests.UserContext.Items.AddRange(
@@ -123,10 +123,10 @@ namespace API.Tests.Controllers
                 new User { Username = "user5", Status = UserStatus.Active },
                 new User { Username = "user6", Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
 
             // Act - get all users, page 1
-            var result = controllerTests.UserController.GetUsers(page: 1, limit: 2); 
+            var result = await controllerTests.UserController.GetUsers(page: 1, limit: 2); 
 
             // Assert - returns 1st page
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -141,7 +141,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user2", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 2
-            result = controllerTests.UserController.GetUsers(page: 2, limit: 2); 
+            result = await controllerTests.UserController.GetUsers(page: 2, limit: 2); 
 
             // Assert - returns 2nd page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -156,7 +156,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user4", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 3
-            result = controllerTests.UserController.GetUsers(page: 3, limit: 2); 
+            result = await controllerTests.UserController.GetUsers(page: 3, limit: 2); 
 
             // Assert - returns the last page
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -171,7 +171,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user6", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 4
-            result = controllerTests.UserController.GetUsers(page: 4, limit: 2); 
+            result = await controllerTests.UserController.GetUsers(page: 4, limit: 2); 
 
             // Assert - returns last page if the page index exceeds 
             okResult = Assert.IsType<OkObjectResult>(result);
@@ -186,7 +186,7 @@ namespace API.Tests.Controllers
             Assert.Equal("user6", (listDto.List?[1] as UserDTO)?.Username);
 
             // Act - get all users, page 2 with 4 users per page            
-            result = controllerTests.UserController.GetUsers(page: 2, limit: 4); 
+            result = await controllerTests.UserController.GetUsers(page: 2, limit: 4); 
 
             // Assert - returns last page if the page index exceeds 
             okResult = Assert.IsType<OkObjectResult>(result);

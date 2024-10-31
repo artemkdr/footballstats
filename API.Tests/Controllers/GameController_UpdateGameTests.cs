@@ -20,10 +20,10 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateGame_ExistingGame_ReturnsOkResult()
+        public async void UpdateGame_ExistingGame_ReturnsOkResult()
         {            
             // Arrange
-            CreatedAtActionResult? gameResult = controllerTests.GameController.CreateGame(new GameDTO {
+            CreatedAtActionResult? gameResult = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = 1, Team2 = 2,
                 Goals1 = 1, Goals2 = 3
             }) as CreatedAtActionResult;
@@ -31,21 +31,21 @@ namespace API.Tests.Controllers
             int id = (gameResult?.Value as Game)!.Id;
 
             // Act
-            var result = controllerTests.GameController.UpdateGame(id, new GameDTO() {
+            var result = await controllerTests.GameController.UpdateGame(id, new GameDTO() {
                 Goals2 = 4
             }); 
 
-            Game? updatedGame = controllerTests.GameContext.Items.Find(id);
+            Game? updatedGame = await controllerTests.GameContext.Items.FindAsync(id);
             // Assert
             Assert.IsType<OkObjectResult>(result);            
             Assert.Equal(4, updatedGame?.Goals2);
         }
 
         [DockerRequiredFact]
-        public void UpdateGame_WithStatusCompleted_SetsCompleteDate()
+        public async void UpdateGame_WithStatusCompleted_SetsCompleteDate()
         {            
             // Arrange
-            CreatedAtActionResult? gameResult = controllerTests.GameController.CreateGame(new GameDTO {
+            CreatedAtActionResult? gameResult = await controllerTests.GameController.CreateGame(new GameDTO {
                 Team1 = 1, Team2 = 2,
                 Goals1 = 1, Goals2 = 3
             }) as CreatedAtActionResult;
@@ -53,11 +53,11 @@ namespace API.Tests.Controllers
             int id = (gameResult?.Value as Game)!.Id;
 
             // Act
-            var result = controllerTests.GameController.UpdateGame(id, new GameDTO() {
+            var result = await controllerTests.GameController.UpdateGame(id, new GameDTO() {
                 Status = GameStatus.Completed.ToString()
             }); 
 
-            Game? updatedGame = controllerTests.GameContext.Items.Find(id);
+            Game? updatedGame = await controllerTests.GameContext.Items.FindAsync(id);
             // Assert
             Assert.IsType<OkObjectResult>(result);            
             Assert.Equal(GameStatus.Completed, updatedGame?.Status);
@@ -67,10 +67,10 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateGame_NonExistingGame_ReturnsNotFoundResult()
+        public async void UpdateGame_NonExistingGame_ReturnsNotFoundResult()
         {
             // Act
-            var result = controllerTests.GameController.UpdateGame(Guid.NewGuid().ToString().GetHashCode(), new GameDTO()); 
+            var result = await controllerTests.GameController.UpdateGame(Guid.NewGuid().ToString().GetHashCode(), new GameDTO()); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    

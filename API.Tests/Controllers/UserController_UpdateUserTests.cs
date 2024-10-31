@@ -3,6 +3,7 @@ using System.Text.Json;
 using API.Controllers;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Tests.Controllers
 {
@@ -21,17 +22,17 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateUser_ExistingUser_ReturnsOkResult()
+        public async void UpdateUser_ExistingUser_ReturnsOkResult()
         {            
             // Arrange
             var username = Guid.NewGuid().ToString();
             controllerTests.UserContext.Items.AddRange(
                 new User { Username = username, Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTO() {
+            var result = await controllerTests.UserController.UpdateUser(username, new UserDTO() {
                 Status = UserStatus.Deleted.ToString(),
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }") 
             }); 
@@ -39,7 +40,7 @@ namespace API.Tests.Controllers
             // Assert
             var typedResult = Assert.IsType<OkObjectResult>(result);
             
-            var updatedUser = controllerTests.UserContext.Items.Single(x => x.Username == username);
+            var updatedUser = await controllerTests.UserContext.Items.SingleAsync(x => x.Username == username);
             Assert.Equal(UserStatus.Deleted, updatedUser.Status);
             Assert.NotNull(updatedUser.Vars);            
             JsonElement el = new JsonElement();
@@ -48,13 +49,13 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateUser_NonExistingUser_ReturnsNotFoundResult()
+        public async void UpdateUser_NonExistingUser_ReturnsNotFoundResult()
         {
             // Arrange
             var username = Guid.NewGuid().ToString();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTO()); 
+            var result = await controllerTests.UserController.UpdateUser(username, new UserDTO()); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    
@@ -64,17 +65,17 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateUser_UpdateUsername_ReturnsInternalServerErrorResult()
+        public async void UpdateUser_UpdateUsername_ReturnsInternalServerErrorResult()
         {
             // Arrange
             var username = Guid.NewGuid().ToString();
             controllerTests.UserContext.Items.AddRange(
                 new User { Username = username, Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
 
             // Act
-            var result = controllerTests.UserController.UpdateUser(username, new UserDTO { Username = "newusername" }); 
+            var result = await controllerTests.UserController.UpdateUser(username, new UserDTO { Username = "newusername" }); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    

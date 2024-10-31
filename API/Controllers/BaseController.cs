@@ -8,9 +8,6 @@ namespace API.Controllers;
 [ApiController]
 abstract public class BaseController : ControllerBase
 {    
-    public static int MAX_TEAM_PLAYERS = 2;
-    public static int MIN_TEAM_PLAYERS = 1;
-    
     protected readonly IConfiguration _configuration;
     
     protected readonly Logger _logger;

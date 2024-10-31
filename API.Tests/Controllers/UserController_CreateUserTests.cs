@@ -2,6 +2,7 @@ using System.Net;
 using API.Controllers;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Tests.Controllers
 {
@@ -22,10 +23,10 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]        
-        public void CreatesUser_ReturnsCreatedAtActionResult() {
+        public async void CreatesUser_ReturnsCreatedAtActionResult() {
             string username = Guid.NewGuid().ToString();
 
-            var result = controllerTests.UserController.CreateUser(new UserDTO {
+            var result = await controllerTests.UserController.CreateUser(new UserDTO {
                 Username = username                
             });
             
@@ -38,15 +39,15 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreatesUser_CreatesTeamWithUser() {
+        public async void CreatesUser_CreatesTeamWithUser() {
             string username = Guid.NewGuid().ToString();
 
-            var result = controllerTests.UserController.CreateUser(new UserDTO {
+            var result = await controllerTests.UserController.CreateUser(new UserDTO {
                 Username = username                
             });
             
             // checks that the team exists
-            var team = controllerTests.TeamContext.Items.Single(x => x.Name == username);
+            var team = await controllerTests.TeamContext.Items.SingleAsync(x => x.Name == username);
 
             // team exists
             Assert.NotNull(team);            
@@ -55,18 +56,18 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreateUser_ExistingUsername_ReturnsInternalServerErrorResult()
+        public async void CreateUser_ExistingUsername_ReturnsInternalServerErrorResult()
         {
             // Arrange 
             var username = Guid.NewGuid().ToString();
             controllerTests.UserContext.Items.AddRange(
                 new User { Username = username, Status = UserStatus.Active }
             );
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
 
             // Act
-            Assert.Throws<InvalidOperationException>(() => {
-                controllerTests.UserController.CreateUser(new UserDTO {
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => {
+                await controllerTests.UserController.CreateUser(new UserDTO {
                     Username = username,
                     Status = UserStatus.Active.ToString()
                 });
@@ -74,10 +75,10 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void CreateUser_EmptyUsername_ReturnsBadRequestResult()
+        public async void CreateUser_EmptyUsername_ReturnsBadRequestResult()
         {
             // Act
-            var result = controllerTests.UserController.CreateUser(new UserDTO {
+            var result = await controllerTests.UserController.CreateUser(new UserDTO {
                 Status = UserStatus.Active.ToString()
             });
 

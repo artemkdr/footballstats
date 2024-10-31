@@ -23,7 +23,7 @@ namespace API.Tests.Controllers
             
 
         [DockerRequiredFact]
-        public void GetUser_ExistingUser_ReturnsOkResultWithUserData()
+        public async void GetUser_ExistingUser_ReturnsOkResultWithUserData()
         {
             // Arrange
             var username = Guid.NewGuid().ToString();
@@ -33,10 +33,10 @@ namespace API.Tests.Controllers
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }") 
             };
             controllerTests.UserContext.Items.Add(user);
-            controllerTests.UserContext.SaveChanges();
+            await controllerTests.UserContext.SaveChangesAsync();
 
             // Act
-            var result = controllerTests.UserController.GetUser(username);
+            var result = await controllerTests.UserController.GetUser(username);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -48,14 +48,14 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetUser_NonExistingUser_ReturnsNotFoundResult()
+        public async void GetUser_NonExistingUser_ReturnsNotFoundResult()
         {
             // Arrange
             var username = Guid.NewGuid().ToString();
             var user = new User { Username = username };
             
             // Act
-            var result = controllerTests.UserController.GetUser(username);
+            var result = await controllerTests.UserController.GetUser(username);
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    

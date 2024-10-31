@@ -22,7 +22,7 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateTeam_ExistingTeam_ReturnsOkResult()
+        public async void UpdateTeam_ExistingTeam_ReturnsOkResult()
         {            
             // Arrange
             var p1 = new User { Username = Guid.NewGuid().ToString() };
@@ -30,18 +30,18 @@ namespace API.Tests.Controllers
             controllerTests.UserContext.SaveChanges();
             
             string name = Guid.NewGuid().ToString();
-            CreatedAtActionResult? teamResult = controllerTests.TeamController.CreateTeam(new TeamDTO {
+            CreatedAtActionResult? teamResult = await controllerTests.TeamController.CreateTeam(new TeamDTO {
                 Name = name,
                 Players = new string[] { p1.Username }
             }) as CreatedAtActionResult;
             int id = (teamResult?.Value as Team)!.Id;
 
             // Act
-            var result = controllerTests.TeamController.UpdateTeam(id, new TeamDTO() {
+            var result = await controllerTests.TeamController.UpdateTeam(id, new TeamDTO() {
                 Status = TeamStatus.Deleted.ToString()                
             }); 
 
-            var updatedTeam = controllerTests.TeamContext.Items.Find(id);
+            var updatedTeam = await controllerTests.TeamContext.Items.FindAsync(id);
 
             // Assert
             var typedResult = Assert.IsType<OkObjectResult>(result);
@@ -49,10 +49,10 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void UpdateTeam_NonExistingTeam_ReturnsNotFoundResult()
+        public async void UpdateTeam_NonExistingTeam_ReturnsNotFoundResult()
         {
             // Act
-            var result = controllerTests.TeamController.UpdateTeam(Guid.NewGuid().ToString().GetHashCode(), new TeamDTO()); 
+            var result = await controllerTests.TeamController.UpdateTeam(Guid.NewGuid().ToString().GetHashCode(), new TeamDTO()); 
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    

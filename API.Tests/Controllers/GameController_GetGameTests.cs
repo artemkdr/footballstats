@@ -21,7 +21,7 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetGame_ExistingGame_ReturnsOkResultWithGameData()
+        public async void GetGame_ExistingGame_ReturnsOkResultWithGameData()
         {
             // Arrange
             DateTime date = DateTime.Now.AddDays(-10);
@@ -34,10 +34,10 @@ namespace API.Tests.Controllers
                 Vars = JsonDocument.Parse("{ \"key1\": \"value\", \"key2\": 2 }")
             };
             controllerTests.GameContext.Items.Add(game);
-            controllerTests.GameContext.SaveChanges();
+            await controllerTests.GameContext.SaveChangesAsync();
 
             // Act
-            var result = controllerTests.GameController.GetGame(game.Id);
+            var result = await controllerTests.GameController.GetGame(game.Id);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -51,13 +51,13 @@ namespace API.Tests.Controllers
         }
 
         [DockerRequiredFact]
-        public void GetGame_NonExistingGameReturnsNotFoundResult()
+        public async void GetGame_NonExistingGameReturnsNotFoundResult()
         {
             // Arrange
             var id = Math.Abs(Guid.NewGuid().ToString().GetHashCode());
 
             // Act
-            var result = controllerTests.GameController.GetGame(id);
+            var result = await controllerTests.GameController.GetGame(id);
 
             // Assert
             var objectResult = Assert.IsType<ObjectResult>(result);                    
