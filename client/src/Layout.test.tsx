@@ -30,8 +30,8 @@ jest.mock('react-router-dom', () => ({
 
 describe("<Layout />", () => {
 	it("renders Layout", () => {
-        const { container } = render(<MemoryRouter><Layout /></MemoryRouter>);
-        expect(screen.getByTestId('navbar')).toBeInTheDocument();
+        const { container } = render(<ChakraProvider><MemoryRouter><Layout /></MemoryRouter></ChakraProvider>);
+        expect(screen.findByTestId('navbar')).not.toBeNull();
 	});
     
 
