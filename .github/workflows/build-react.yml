@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'                       # Cache npm dependencies for speed
           cache-dependency-path: '${{ inputs.working-directory }}/package-lock.json'
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: '${{ inputs.working-directory }}/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('${{ inputs.working-directory }}/package-lock.json') }}
