@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom";
 import { Layout } from "@/features/layout/layout";
 
-jest.mock("./lib/api");
+jest.mock("@/lib/api");
 
 jest.mock("react-i18next", () => ({
     I18nextProvider: jest.fn(),
