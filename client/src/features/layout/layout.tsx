@@ -1,8 +1,8 @@
 import { Box } from '@chakra-ui/react'
 import { FunctionComponent, ReactElement } from 'react'
 import { Outlet, useNavigation } from 'react-router-dom'
-import { LoadingIndicator } from './components/LoadingIndicator'
-import { NavBar } from './components/NavBar'
+import { LoadingIndicator } from '@/features/layout/loading-indicator'
+import { NavBar } from '@/features/navigation/nav-bar'
 
 export const Layout: FunctionComponent = (): ReactElement => {	
 	const navigation = useNavigation();

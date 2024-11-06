@@ -1,5 +1,5 @@
 import { Select, SelectProps } from '@chakra-ui/react';
-import { User } from '../models/User';
+import { User } from '@/types/user';
 
 interface SelectPlayerProps extends SelectProps {        
     players : User[];    

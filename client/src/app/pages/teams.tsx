@@ -8,12 +8,12 @@ import {
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { CustomLink } from '../components/CustomLink';
-import { convertDataToTeamList, TeamStatus } from '../models/Team';
-import { EditTeamModal } from '../components/EditTeamModal';
-import { convertDataToUserList, User } from '../models/User';
-import callApi from '../net/api';
-import { convertDataToList } from '../models/List';
+import { CustomLink } from '@/components/custom-link';
+import { convertDataToTeamList, TeamStatus } from '@/types/team';
+import { EditTeamModal } from '@/features/teams/modal-team';
+import { convertDataToUserList, User } from '@/types/user';
+import callApi from '@/lib/api';
+import { convertDataToList } from '@/types/list';
 
 export const Teams: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	

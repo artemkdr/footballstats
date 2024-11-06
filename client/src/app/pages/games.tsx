@@ -12,16 +12,16 @@ import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClear } from "react-icons/md";
 import { useLoaderData } from 'react-router-dom';
-import { CreateNewGameModal } from '../components/CreateNewGameModal';
-import { CustomLink } from '../components/CustomLink';
-import { SelectTeam } from '../components/SelectTeam';
-import { convertDataToGameList, Game, GameStatus } from '../models/Game';
-import { convertDataToRivalStats, RivalStats } from '../models/RivalStats';
-import { convertDataToTeamList, Team } from '../models/Team';
-import callApi from '../net/api';
-import { Subheader } from '../components/Subheader';
-import config from '../config';
-import { convertDataToList, List } from '../models/List';
+import { CreateNewGameModal } from '@/features/games/modal-game';
+import { CustomLink } from '@/components/custom-link';
+import { SelectTeam } from '@/features/games/select-team';
+import { convertDataToGameList, Game, GameStatus } from '@/types/game';
+import { convertDataToRivalStats, RivalStats } from '@/features/games/types/rival-stats';
+import { convertDataToTeamList, Team } from '@/types/team';
+import callApi from '@/lib/api';
+import { Subheader } from '@/components/subheader';
+import config from '@/config/config';
+import { convertDataToList, List } from '@/types/list';
 
 export const Games: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	

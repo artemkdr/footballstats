@@ -1,10 +1,10 @@
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import theme from './themes/theme';
+import theme from '@/app/themes/theme';
 
-import { AppRouter } from './components/AppRouter';
-import './i18n';
+import { AppRouter } from '@/app/router';
+import '@/app/i18n';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

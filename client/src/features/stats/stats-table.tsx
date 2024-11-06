@@ -1,8 +1,8 @@
 import { HStack, Table, TableContainer, TableContainerProps, Tbody, Td, Th, Thead, Tr, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { TeamStat } from "../models/TeamStat";
-import { CustomLink } from "./CustomLink";
-import { Subheader } from "./Subheader";
+import { TeamStat } from "@/features/stats/types/team-stat";
+import { CustomLink } from "@/components/custom-link";
+import { Subheader } from "@/components/subheader";
 
 interface StatsTableProps extends TableContainerProps {    
     stats: TeamStat[];

@@ -3,10 +3,10 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Game, GameStatus, isValidGame } from "../models/Game";
-import { Team } from "../models/Team";
-import callApi from "../net/api";
-import { SelectTeam } from "./SelectTeam";
+import { Game, GameStatus, isValidGame } from "@/types/game";
+import { Team } from "@/types/team";
+import callApi from "@/lib/api";
+import { SelectTeam } from "@/features/games/select-team";
 
 interface CreateNewGameModalProps {    
     isOpen: boolean;

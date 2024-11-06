@@ -1,4 +1,4 @@
-import config from "../config";
+import config from "@/config/config";
 
 export const callApi = async (endpoint: string, options: object = {}, token : string | null = null, toast : any = null) => {  
   const toastId = toast != null ? toast({ title: '...', status: 'info' }) : null;  

@@ -10,12 +10,12 @@ import {
 import { FunctionComponent, ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { CustomLink } from '../components/CustomLink';
-import { EditUserModal } from '../components/EditUserModal';
-import { convertDataToUserList, UserStatus } from '../models/User';
-import callApi from '../net/api';
-import config from '../config';
-import { convertDataToList } from '../models/List';
+import { CustomLink } from '@/components/custom-link';
+import { EditUserModal } from '@/features/players/modal-player';
+import { convertDataToUserList, UserStatus } from '@/types/user';
+import callApi from '@/lib/api';
+import config from '@/config/config';
+import { convertDataToList } from '@/types/list';
 
 
 export const Players: FunctionComponent = (): ReactElement => {

@@ -2,9 +2,9 @@ import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalF
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { isValidUser, User, UserStatus } from "../models/User";
-import callApi from "../net/api";
-import { InputInlineLabel } from "./InputInlineLabel";
+import { isValidUser, User, UserStatus } from "@/types/user";
+import callApi from "@/lib/api";
+import { InputInlineLabel } from "@/components/input-inline-label";
 
 interface EditUserModalProps {    
     isOpen: boolean;

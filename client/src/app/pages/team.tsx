@@ -2,14 +2,14 @@ import { Badge, Heading, HStack, VStack } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { CustomLink } from '../components/CustomLink';
-import { StatsTable } from '../components/StatsTable';
-import { Subheader } from '../components/Subheader';
-import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor } from '../models/Game';
-import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '../models/Team';
-import { convertDataToTeamStatList, TeamStat } from '../models/TeamStat';
-import callApi from '../net/api';
-import { convertDataToList } from '../models/List';
+import { CustomLink } from '@/components/custom-link';
+import { StatsTable } from '@/features/stats/stats-table';
+import { Subheader } from '@/components/subheader';
+import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor } from '@/types/game';
+import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '@/types/team';
+import { convertDataToTeamStatList, TeamStat } from '@/features/stats/types/team-stat';
+import callApi from '@/lib/api';
+import { convertDataToList } from '@/types/list';
 
 
 export const TeamPage: FunctionComponent = (): ReactElement => {

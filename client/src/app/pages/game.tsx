@@ -3,9 +3,9 @@ import moment from 'moment';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { CustomLink } from '../components/CustomLink';
-import { convertToGame, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor, isValidGame } from '../models/Game';
-import callApi from '../net/api';
+import { CustomLink } from '@/components/custom-link';
+import { convertToGame, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor, isValidGame } from '@/types/game';
+import callApi from '@/lib/api';
 
 export const GamePage: FunctionComponent = (): ReactElement => {
 	const data : any = useLoaderData();

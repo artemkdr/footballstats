@@ -69,7 +69,7 @@ When you first run the service, the database tables will be empty. You have two 
 
 **2. Automatic Generation:**
 
-By default 'simulating mode' is on in the [client config](client/src/config.ts): 
+By default 'simulating mode' is on in the [client config](client/src/config/config.ts): 
 ``` javascript
 SIMULATE_MODE: true,
 SIMULATE_USERS_NUM: 10,
@@ -125,7 +125,7 @@ docker stop footballstats-api
 
 (Assuming you have the API running separately or want to connect to an external API)
 
-If you need to adjust a root API url you can do it in [client config](client/src/config.ts): 
+If you need to adjust a root API url you can do it in [client config](client/src/config/config.ts): 
 ``` javascript
 // dev
 const config = {

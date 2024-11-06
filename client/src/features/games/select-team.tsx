@@ -1,5 +1,5 @@
 import { Select, SelectProps } from '@chakra-ui/react';
-import { Team } from '../models/Team';
+import { Team } from '@/types/team';
 
 interface SelectTeamProps extends SelectProps {        
     teams : Team[];    

@@ -2,7 +2,7 @@ import { Link as ChakraLink, Flex, HStack, Select, useColorMode } from '@chakra-
 import { FunctionComponent, ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink as ReactRouterLink } from 'react-router-dom'
-import { ColorModeSwitcher } from './ColorModeSwitcher'
+import { ColorModeSwitcher } from '@/features/navigation/color-mode-switcher'
 
 export const NavBar: FunctionComponent = (): ReactElement => {
 	const { colorMode } = useColorMode();		

@@ -7,7 +7,7 @@ RUN npm ci
 
 # Use docker config file
 COPY client ./
-COPY client/src/config.docker.ts ./src/config.ts
+COPY client/src/config/config.docker.ts ./src/config/config.ts
 # do not generate source map
 ENV GENERATE_SOURCEMAP=false
 RUN npm run build

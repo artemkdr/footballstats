@@ -2,13 +2,13 @@ import { Badge, Button, Heading, HStack, useToast, VStack } from '@chakra-ui/rea
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { CustomLink } from '../components/CustomLink';
-import { Subheader } from '../components/Subheader';
-import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultForUser, getGameStatusColor } from '../models/Game';
-import { convertDataToList } from '../models/List';
-import { convertDataToTeamList, Team } from '../models/Team';
-import { convertToUser, getUserStatusColor, User, UserStatus } from '../models/User';
-import callApi from '../net/api';
+import { CustomLink } from '@/components/custom-link';
+import { Subheader } from '@/components/subheader';
+import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultForUser, getGameStatusColor } from '@/types/game';
+import { convertDataToList } from '@/types/list';
+import { convertDataToTeamList, Team } from '@/types/team';
+import { convertToUser, getUserStatusColor, User, UserStatus } from '@/types/user';
+import callApi from '@/lib/api';
 
 export const PlayerPage: FunctionComponent = (): ReactElement => {
 	const userData : any = useLoaderData();

@@ -1,4 +1,4 @@
-import { convertToTeam, Team, teamHasPlayer } from "./Team";
+import { convertToTeam, Team, teamHasPlayer } from "@/types/team";
 
 export type Game = {
     Id: number;        

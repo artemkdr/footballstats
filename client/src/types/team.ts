@@ -1,4 +1,4 @@
-import { convertDataToUserList, User } from "./User";
+import { convertDataToUserList, User } from "@/types/user";
 
 export type Team = {
     Id: number,   

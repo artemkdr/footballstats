@@ -1,17 +1,17 @@
 import { Router } from "@remix-run/router";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import { Layout } from "../Layout";
-import { Dashboard } from "../pages/Dashboard";
-import { NotFound } from "../pages/NotFound";
-import { RouterError } from "../pages/RouterError";
+import { Layout } from "@/features/layout/layout"
+import { Dashboard } from "@/app/pages/dashboard";
+import { NotFound } from "@/app/pages/errors/not-found";
+import { RouterError } from "@/app/pages/errors/router-error";
 import { ErrorBoundary } from "react-error-boundary";
-import { Teams } from "../pages/Teams";
-import { TeamPage } from "../pages/TeamPage";
-import { Players } from "../pages/Players";
-import { PlayerPage } from "../pages/PlayerPage";
-import { Games } from "../pages/Games";
-import { GamePage } from "../pages/GamePage";
-import callApi from "../net/api";
+import { Teams } from "@/app/pages/teams";
+import { TeamPage } from "@/app/pages/team";
+import { Players } from "@/app/pages/players";
+import { PlayerPage } from "@/app/pages/player";
+import { Games } from "@/app/pages/games";
+import { GamePage } from "@/app/pages/game";
+import callApi from "@/lib/api";
 
 export const router: Router = createBrowserRouter([
 	{

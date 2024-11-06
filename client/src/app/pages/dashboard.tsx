@@ -2,8 +2,8 @@ import { Heading, VStack } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
-import { StatsTable } from '../components/StatsTable';
-import { convertDataToTeamStatList, TeamStat } from '../models/TeamStat';
+import { StatsTable } from '@/features/stats/stats-table';
+import { convertDataToTeamStatList, TeamStat } from '@/features/stats/types/team-stat';
 
 export const Dashboard: FunctionComponent = (): ReactElement => {
 	const data : any = useLoaderData();        
