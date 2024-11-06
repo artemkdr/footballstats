@@ -18,10 +18,13 @@ import { SelectTeam } from '@/features/games/select-team';
 import { convertDataToGameList, Game, GameStatus } from '@/types/game';
 import { convertDataToRivalStats, RivalStats } from '@/features/games/types/rival-stats';
 import { convertDataToTeamList, Team } from '@/types/team';
-import callApi from '@/lib/api';
 import { Subheader } from '@/components/subheader';
 import config from '@/config/config';
 import { convertDataToList, List } from '@/types/list';
+import { callGetActiveTeams } from '@/features/teams/api/get-teams';
+import { callGetGames } from '@/features/games/api/get-games';
+import { callGetRivalStats } from '@/features/stats/api/get-rival-stats';
+import { callCreateGame } from '@/features/games/api/create-game';
 
 export const Games: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
@@ -43,7 +46,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 
 	useEffect(() => { 
 		const loadTeams = async() => {
-			const response = await callApi(`team?status=Active`);
+			const response = await callGetActiveTeams();
 			if (response.ok) {
 				var json = await response.json();			
 				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
@@ -60,7 +63,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 				params.push(`team1=${team1}`);
 			if (team2 > 0)
 				params.push(`team2=${team2}`);
-			const response = await callApi("game?" + params.join("&"));
+			const response = await callGetGames(params);
 			if (response.ok) {
 				var json = await response.json();			
 				const list = convertDataToList(json);
@@ -72,7 +75,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 		
 		if (team1 > 0 && team2 > 0) {
 			const loadRivalStats = async() => {
-				const response = await callApi(`statsrivals?team1=${team1}&team2=${team2}`);
+				const response = await callGetRivalStats(team1, team2);
 				if (response.ok) {
 					var json = await response.json();			
 					setRivalStats(convertDataToRivalStats(json));
@@ -113,8 +116,8 @@ export const Games: FunctionComponent = (): ReactElement => {
 					Team2: team2.Id,
 					Status: GameStatus.Completed,
 					CompleteDate: new Date()
-				};				
-				await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});								
+				};
+				await callCreateGame(json);
 				count++;
 				if (count % 10 === 0) toast.update(loadingToast, { description: t("Message.SimulatingCount", {count: count}), ...loadingToastProps });				
 			}

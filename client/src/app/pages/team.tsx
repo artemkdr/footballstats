@@ -8,8 +8,9 @@ import { Subheader } from '@/components/subheader';
 import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor } from '@/types/game';
 import { convertToTeam, getTeamStatusColor, Team, TeamStatus } from '@/types/team';
 import { convertDataToTeamStatList, TeamStat } from '@/features/stats/types/team-stat';
-import callApi from '@/lib/api';
 import { convertDataToList } from '@/types/list';
+import { callGetTeamStats } from '@/features/stats/api/get-stats';
+import { callGetGamesWithTeam } from '@/features/games/api/get-game';
 
 
 export const TeamPage: FunctionComponent = (): ReactElement => {
@@ -25,7 +26,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 
 	useEffect(() => {				
 		const loadStats = async() => {
-			const response = await callApi(`stats?team=${data.id}`);
+			const response = await callGetTeamStats(data.id);
 			if (response.ok) {
 				var json = await response.json();			
 				setStats(convertDataToTeamStatList(json));
@@ -33,7 +34,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 		}
 	
 		const loadGames = async() => {
-			const response = await callApi(`game?team1=${data.id}`);
+			const response = await callGetGamesWithTeam(data.id);;
 			if (response.ok) {
 				var json = await response.json();			
 				setGames(convertDataToGameList(convertDataToList(json)?.List));

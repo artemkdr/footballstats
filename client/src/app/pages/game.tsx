@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 import { CustomLink } from '@/components/custom-link';
 import { convertToGame, Game, GameStatus, getGameColorForResult, getGameResultFor, getGameStatusColor, isValidGame } from '@/types/game';
-import callApi from '@/lib/api';
+import { callUpdateGame } from '@/features/games/api/update-game';
 
 export const GamePage: FunctionComponent = (): ReactElement => {
 	const data : any = useLoaderData();
@@ -64,7 +64,7 @@ export const GamePage: FunctionComponent = (): ReactElement => {
 		if (props.CompleteDate != null) {
 			json["CompleteDate"] = props.CompleteDate;
 		}		
-		const response = await callApi(`game/${game.Id}`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});
+		const response = await callUpdateGame(game.Id, json);
 		const responseJson = await response.json();
 		let error = false;
 		if (response.ok) {

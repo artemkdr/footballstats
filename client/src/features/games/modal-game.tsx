@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Game, GameStatus, isValidGame } from "@/types/game";
 import { Team } from "@/types/team";
-import callApi from "@/lib/api";
 import { SelectTeam } from "@/features/games/select-team";
+import { callCreateGame } from "./api/create-game";
 
 interface CreateNewGameModalProps {    
     isOpen: boolean;
@@ -44,7 +44,7 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, 
         if (game.Status === GameStatus.Completed) {
             json["CompleteDate"] = game.CompleteDate ? game.CompleteDate : new Date();            
         }		
-		const response = await callApi(`game`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});
+		const response = await callCreateGame(json);
         const responseJson = await response.json();
         let error = false;
 		if (response.ok) {

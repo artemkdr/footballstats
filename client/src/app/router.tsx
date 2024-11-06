@@ -11,7 +11,13 @@ import { Players } from "@/app/pages/players";
 import { PlayerPage } from "@/app/pages/player";
 import { Games } from "@/app/pages/games";
 import { GamePage } from "@/app/pages/game";
-import callApi from "@/lib/api";
+import { callGetStats } from "@/features/stats/api/get-stats";
+import { callGetTeams } from "@/features/teams/api/get-teams";
+import { callGetPlayers } from "@/features/players/api/get-players";
+import { callGetGames } from "@/features/games/api/get-games";
+import { callGetGame } from "@/features/games/api/get-game";
+import { callGetPlayer } from "@/features/players/api/get-player";
+import { callGetTeam } from "@/features/teams/api/get-team";
 
 export const router: Router = createBrowserRouter([
 	{
@@ -28,7 +34,7 @@ export const router: Router = createBrowserRouter([
 				path: '/dashboard',
 				element: <Dashboard />,
 				loader: async({ params }) => {											
-					const response = await callApi(`stats`);
+					const response = await callGetStats();
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -40,7 +46,7 @@ export const router: Router = createBrowserRouter([
 				path: '/teams',
 				element: <Teams />,
 				loader: async({ request, params }) => {																
-					const response = await callApi(`team`);
+					const response = await callGetTeams();
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -52,7 +58,7 @@ export const router: Router = createBrowserRouter([
 				path: '/team/:id',
 				element: <TeamPage />,
 				loader: async({ params }) => {											
-					const response = await callApi(`team/${params.id}`);
+					const response = await callGetTeam(params.id);
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -64,7 +70,7 @@ export const router: Router = createBrowserRouter([
 				path: '/players',
 				element: <Players />,
 				loader: async({ params }) => {											
-					const response = await callApi(`user`);
+					const response = await callGetPlayers();
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -76,7 +82,7 @@ export const router: Router = createBrowserRouter([
 				path: '/player/:id',
 				element: <PlayerPage />,
 				loader: async({ params }) => {											
-					const response = await callApi(`user/${params.id}`);
+					const response = await callGetPlayer(params.id);
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -88,7 +94,7 @@ export const router: Router = createBrowserRouter([
 				path: '/games',
 				element: <Games />,
 				loader: async({ params }) => {											
-					const response = await callApi(`game`);
+					const response = await callGetGames();
 					if (response.ok) {
 						var json = await response.json();
 						return json;
@@ -100,7 +106,7 @@ export const router: Router = createBrowserRouter([
 				path: '/game/:id',
 				element: <GamePage />,
 				loader: async({ params }) => {											
-					const response = await callApi(`game/${params.id}`);
+					const response = await callGetGame(params.id);
 					if (response.ok) {
 						var json = await response.json();
 						return json;

@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { isValidTeam, Team, TeamStatus } from "@/types/team";
 import { User } from "@/types/user";
-import callApi from "@/lib/api";
 import { InputInlineLabel } from "@/components/input-inline-label";
 import { SelectPlayer } from "@/features/teams/select-player";
+import { callCreateTeam } from "./api/create-team";
 
 interface EditTeamModalProps {    
     isOpen: boolean;
@@ -37,7 +37,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, onClose, o
             Players: team.Players?.filter(x => x.Username != null).map(x => x.Username)
         };
         
-		const response = await callApi(`team`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});
+		const response = await callCreateTeam(json);
         const responseJson = await response.json();
         let error = false;
 		if (response.ok) {

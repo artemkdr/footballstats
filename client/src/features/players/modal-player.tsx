@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { isValidUser, User, UserStatus } from "@/types/user";
-import callApi from "@/lib/api";
 import { InputInlineLabel } from "@/components/input-inline-label";
+import { callCreatePlayer } from "./api/create-player";
 
 interface EditUserModalProps {    
     isOpen: boolean;
@@ -32,7 +32,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose, o
             Username: user.Username
         };
         
-		const response = await callApi(`user`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});
+		const response = await callCreatePlayer(json);
         const responseJson = await response.json();
         let error = false;
 		if (response.ok) {

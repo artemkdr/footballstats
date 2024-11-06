@@ -12,8 +12,8 @@ import { CustomLink } from '@/components/custom-link';
 import { convertDataToTeamList, TeamStatus } from '@/types/team';
 import { EditTeamModal } from '@/features/teams/modal-team';
 import { convertDataToUserList, User } from '@/types/user';
-import callApi from '@/lib/api';
 import { convertDataToList } from '@/types/list';
+import { callGetActivePlayers } from '@/features/players/api/get-players';
 
 export const Teams: FunctionComponent = (): ReactElement => {
 	const { t } = useTranslation();	
@@ -24,7 +24,7 @@ export const Teams: FunctionComponent = (): ReactElement => {
 	
 	useEffect(() => { 
 		const loadPlayers = async() => {
-			const response = await callApi(`user?status=Active`);
+			const response = await callGetActivePlayers();
 			if (response.ok) {
 				var json = await response.json();			
 				setPlayers(convertDataToUserList(convertDataToList(json)?.List));

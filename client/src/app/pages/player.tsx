@@ -8,7 +8,9 @@ import { convertDataToGameList, Game, GameStatus, getGameColorForResult, getGame
 import { convertDataToList } from '@/types/list';
 import { convertDataToTeamList, Team } from '@/types/team';
 import { convertToUser, getUserStatusColor, User, UserStatus } from '@/types/user';
-import callApi from '@/lib/api';
+import { callGetTeamsWithPlayers } from '@/features/teams/api/get-teams';
+import { callGetGamesWithPlayers } from '@/features/games/api/get-games';
+import { callUpdatePlayer } from '@/features/players/api/update-player';
 
 export const PlayerPage: FunctionComponent = (): ReactElement => {
 	const userData : any = useLoaderData();
@@ -24,7 +26,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 
 	useEffect(() => {				
 		const loadTeams = async() => {
-			const response = await callApi(`team?players=${userData.username}`);
+			const response = await callGetTeamsWithPlayers(userData.username);
 			if (response.ok) {
 				var json = await response.json();			
 				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
@@ -32,7 +34,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		}
 	
 		const loadGames = async() => {
-			const response = await callApi(`game?players=${userData.username}`);
+			const response = await callGetGamesWithPlayers(userData.username);
 			if (response.ok) {
 				var json = await response.json();			
 				setGames(convertDataToGameList(convertDataToList(json)?.List));
@@ -67,7 +69,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		if (props.Status != null) {
 			json["Status"] = props.Status.toString();			
 		}		
-		const response = await callApi(`user/${user.Username}`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});
+		const response = await callUpdatePlayer(user.Username, json);
 		const responseJson = await response.json();
 		let error = false;
 		if (response.ok) {

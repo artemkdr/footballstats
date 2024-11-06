@@ -13,9 +13,9 @@ import { useLoaderData } from 'react-router-dom';
 import { CustomLink } from '@/components/custom-link';
 import { EditUserModal } from '@/features/players/modal-player';
 import { convertDataToUserList, UserStatus } from '@/types/user';
-import callApi from '@/lib/api';
 import config from '@/config/config';
 import { convertDataToList } from '@/types/list';
+import { callCreatePlayer } from '@/features/players/api/create-player';
 
 
 export const Players: FunctionComponent = (): ReactElement => {
@@ -41,8 +41,8 @@ export const Players: FunctionComponent = (): ReactElement => {
 			let json : any = {           
 				Username: uname,
 				Status: UserStatus.Active
-			};				
-			await callApi(`user`, { method: 'POST', body: JSON.stringify(json), headers: { "Content-Type": "application/json" }});				
+			};							
+			callCreatePlayer(json);
 			count++;
 			if (count % 2 === 0) toast.update(loadingToast, { description: t("Message.GeneratingCount", {count: count}), ...loadingToastProps });			
 			
