@@ -1,6 +1,6 @@
 # Football (baby-foot) Stats Service
 
-This project is a coding challenge that implements a service for storing and displaying football game results. It includes a .NET API for managing data and a React client application for viewing and interacting with the data. The client application consumes the API to display data and allow users to interact with the service.
+This project is a .NET API + React showcase that implements a service for storing and displaying football game results. It includes a .NET API for managing data and a React client application for viewing and interacting with the data. The client application consumes the API to display data and allow users to interact with the service.
 
 The service uses a PostgreSQL database to store information about teams, players, and games. [See the database creation script here](psqlinit/init.sql).
 
