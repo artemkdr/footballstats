@@ -1,9 +1,9 @@
-import callApi from "@/lib/api";
+import callApi from '@/lib/api';
 
-export const callGetStats = async() => {
+export const callGetStats = async () => {
     return callApi(`stats`);
-}
+};
 
-export const callGetTeamStats = async(id : number) => {
+export const callGetTeamStats = async (id: number) => {
     return callApi(`stats?team=${id}`);
-}
+};

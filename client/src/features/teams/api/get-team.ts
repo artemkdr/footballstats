@@ -1,5 +1,5 @@
-import callApi from "@/lib/api";
+import callApi from '@/lib/api';
 
-export const callGetTeam = async(id : any) => {
+export const callGetTeam = async (id: any) => {
     return callApi(`team/${id}`);
-}
+};

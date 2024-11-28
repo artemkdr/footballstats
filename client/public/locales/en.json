@@ -18,7 +18,7 @@
     },
     "Dashboard": {
         "Title": "Dashboard",
-        "Empty": "Looks like there are no games yet.",                
+        "Empty": "Looks like there are no games yet.",
         "GotoPlayers": "Add players",
         "GotoTeams": "Add teams",
         "GotoGames": "Add games",
@@ -50,7 +50,7 @@
         "ScoreDelimiter": ":",
         "TeamsDelimiter": "vs",
         "Status": "Status",
-        "AddNewGame": "Add new game",        
+        "AddNewGame": "Add new game",
         "SimulateGames": "Simulate games between the teams",
         "NewGame": "New game",
         "Filter": "Filter by team or select 2 teams to see their head-to-head wins",
@@ -62,7 +62,7 @@
             "Status": "Choose the game status"
         },
         "Win": "Win",
-        "Loss": "Loss", 
+        "Loss": "Loss",
         "Draw": "Draw",
         "Cancel": "Delete game",
         "Start": "Start",
@@ -81,7 +81,7 @@
         "Placeholder": {
             "Player1": "1st player",
             "Player2": "2nd player (optional)",
-            "Name": "Team name (unique)"            
+            "Name": "Team name (unique)"
         }
     },
     "GameStatus": {

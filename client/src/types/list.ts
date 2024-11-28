@@ -1,4 +1,3 @@
-
 export interface List {
     Page: number;
     PageSize: number;
@@ -7,12 +6,12 @@ export interface List {
     List: any[];
 }
 
-export const convertDataToList = (data : any) => {
+export const convertDataToList = (data: any) => {
     const list = {} as List;
     list.Page = parseInt(data?.page);
     list.PageSize = parseInt(data?.pageSize);
     list.TotalPages = parseInt(data?.totalPages);
     list.Total = parseInt(data?.total);
-    list.List = data?.list instanceof Array ? data?.list : [] as any[];
+    list.List = data?.list instanceof Array ? data?.list : ([] as any[]);
     return list;
-}
+};

@@ -1,8 +1,8 @@
-import { Select, SelectProps } from '@chakra-ui/react';
 import { User } from '@/types/user';
+import { Select, SelectProps } from '@chakra-ui/react';
 
-interface SelectPlayerProps extends SelectProps {        
-    players : User[];    
+interface SelectPlayerProps extends SelectProps {
+    players: User[];
 }
 
 export const SelectPlayer: React.FC<SelectPlayerProps> = (props) => {
@@ -10,8 +10,10 @@ export const SelectPlayer: React.FC<SelectPlayerProps> = (props) => {
     return (
         <Select {...rest}>
             {players.map((item) => (
-                <option key={item.Username} value={item.Username}>{item.Username}</option>
+                <option key={item.Username} value={item.Username}>
+                    {item.Username}
+                </option>
             ))}
-        </Select>                            
-    )
-}
+        </Select>
+    );
+};

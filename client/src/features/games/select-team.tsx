@@ -1,17 +1,19 @@
-import { Select, SelectProps } from '@chakra-ui/react';
 import { Team } from '@/types/team';
+import { Select, SelectProps } from '@chakra-ui/react';
 
-interface SelectTeamProps extends SelectProps {        
-    teams : Team[];    
+interface SelectTeamProps extends SelectProps {
+    teams: Team[];
 }
 
 export const SelectTeam: React.FC<SelectTeamProps> = (props) => {
     const { teams, ...rest } = props;
     return (
-        <Select {...rest}>            
+        <Select {...rest}>
             {teams.map((item) => (
-                <option key={item.Id} value={item.Id}>{item.Name}</option>
+                <option key={item.Id} value={item.Id}>
+                    {item.Name}
+                </option>
             ))}
-        </Select>                            
-    )
-}
+        </Select>
+    );
+};
