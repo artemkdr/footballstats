@@ -28,7 +28,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		const loadTeams = async() => {
 			const response = await callGetTeamsWithPlayers(userData.username);
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
 			}
 		}
@@ -36,7 +36,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		const loadGames = async() => {
 			const response = await callGetGamesWithPlayers(userData.username);
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setGames(convertDataToGameList(convertDataToList(json)?.List));
 			}
 		}
@@ -45,24 +45,9 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		loadGames();		
 	}, [userData?.username]);
 
-	const deleteUser = () => {
-		setUser(prevUser => ({
-			...prevUser, 
-			Status: UserStatus.Deleted
-		}));
-		updateUser({ Status: UserStatus.Deleted } as User);
-	}
 
-	const activateUser = () => {
-		setUser(prevUser => ({
-			...prevUser, 
-			Status: UserStatus.Active
-		}));
-		updateUser({ Status: UserStatus.Active } as User);
-	}
-	
 	const updateUser = async (props: User = {} as User) => {		
-		let json : any = {           
+		const json : any = {           
 			Username: user.Username,
 			Status: user.Status	
 		};
@@ -84,6 +69,22 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
 		if (error) {                          
 			toast({ title: t('Message.UpdateUserError'), status: 'error' });            
 		}		
+	}
+
+	const deleteUser = () => {
+		setUser(prevUser => ({
+			...prevUser, 
+			Status: UserStatus.Deleted
+		}));
+		updateUser({ Status: UserStatus.Deleted } as User);
+	}
+
+	const activateUser = () => {
+		setUser(prevUser => ({
+			...prevUser, 
+			Status: UserStatus.Active
+		}));
+		updateUser({ Status: UserStatus.Active } as User);
 	}
 
 	return (

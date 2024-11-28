@@ -28,7 +28,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 		const loadStats = async() => {
 			const response = await callGetTeamStats(data.id);
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setStats(convertDataToTeamStatList(json));
 			}
 		}
@@ -36,7 +36,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
 		const loadGames = async() => {
 			const response = await callGetGamesWithTeam(data.id);;
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setGames(convertDataToGameList(convertDataToList(json)?.List));
 			}
 		}

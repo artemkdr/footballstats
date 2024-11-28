@@ -30,15 +30,16 @@ jest.mock('react-router-dom', () => ({
 
 describe("<Layout />", () => {
 	it("renders Layout", () => {
-        const { container } = render(<ChakraProvider><MemoryRouter><Layout /></MemoryRouter></ChakraProvider>);
+        render(<ChakraProvider><MemoryRouter><Layout /></MemoryRouter></ChakraProvider>);
         expect(screen.findByTestId('navbar')).not.toBeNull();
 	});
     
 
     it("check that dark/light mode switcher works", async () => {        
-        const { container } = render(<ChakraProvider><MemoryRouter><Layout /></MemoryRouter></ChakraProvider>);        
+        render(<ChakraProvider><MemoryRouter><Layout /></MemoryRouter></ChakraProvider>);        
         const darkModeButton = screen.getByLabelText(new RegExp("switch to (dark|light) mode", "i"));                
-        const newMode = darkModeButton.getAttribute("aria-label")!?.indexOf(" dark") >= 0 ? "dark" : "light";
+        const lbl = darkModeButton?.getAttribute("aria-label");
+        const newMode = lbl != null && lbl.indexOf(" dark") >= 0 ? "dark" : "light";
         act(() => fireEvent.click(darkModeButton));
         await waitFor(() => {
             expect(document.querySelector(`body.chakra-ui-${newMode}`)).not.toBeNull()

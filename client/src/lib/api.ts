@@ -12,7 +12,8 @@ export const callApi = async (endpoint: string, options: object = {}, token : st
   const data : object = { ...authData, ...options };
   try {
     const response = await fetch(endpoint, data);
-    toast != null && typeof(toast.close) == "function" && toast.close(toastId);
+    if (toast != null && typeof(toast.close) == "function")
+      toast.close(toastId);
     if (response.ok) {
       return response;
     } 

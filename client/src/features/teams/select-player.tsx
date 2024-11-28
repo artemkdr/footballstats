@@ -9,7 +9,7 @@ export const SelectPlayer: React.FC<SelectPlayerProps> = (props) => {
     const { players, ...rest } = props;
     return (
         <Select {...rest}>
-            {players.map((item, index) => (
+            {players.map((item) => (
                 <option key={item.Username} value={item.Username}>{item.Username}</option>
             ))}
         </Select>                            

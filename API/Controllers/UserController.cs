@@ -83,7 +83,7 @@ public class UserController : BaseController
     }
 
     [Route("user/{username}")]
-    [HttpPost]
+    [HttpPatch]
     public async Task<IActionResult> UpdateUser(string username, UserDTO userData)
     {   
         if (userData == null)

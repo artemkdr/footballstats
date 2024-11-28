@@ -6,16 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { Game, GameStatus, isValidGame } from "@/types/game";
 import { Team } from "@/types/team";
 import { SelectTeam } from "@/features/games/select-team";
-import { callCreateGame } from "./api/create-game";
+import { callCreateGame } from "@/features/games/api/create-game";
 
 interface CreateNewGameModalProps {    
     isOpen: boolean;
-    onClose: () => void;
-    onCreate: () => void;
+    onClose: () => void;    
     teams: Team[];
 }
 
-export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, onClose, onCreate, teams }) => {
+export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, onClose, teams }) => {
     const { t } = useTranslation();    
     const [game, setGame] = useState<Game>({        
         Id: -1, // needs not null value for validation
@@ -34,7 +33,7 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({ isOpen, 
     }, [game]);
 
     const createGame = async () => {
-        let json : any = {           
+        const json : any = {           
             Goals1: game.Goals1,
             Goals2: game.Goals2,
             Team1: game.Team1?.Id,

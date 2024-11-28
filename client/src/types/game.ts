@@ -1,6 +1,12 @@
 import { convertToTeam, Team, teamHasPlayer } from "@/types/team";
 
-export type Game = {
+export enum GameStatus {
+    NotStarted = "NotStarted",
+    Playing = "Playing", 
+    Completed = "Completed",
+    Cancelled = "Cancelled"
+}
+export interface Game {
     Id: number;        
     Team1: Team;
     Team2: Team;
@@ -13,15 +19,8 @@ export type Game = {
     Status: GameStatus
 }
 
-export enum GameStatus {
-    NotStarted = "NotStarted",
-    Playing = "Playing", 
-    Completed = "Completed",
-    Cancelled = "Cancelled"
-}
-
 export const convertToGame = (data : any) => {
-    var game = {} as Game;    
+    const game = {} as Game;    
     game.Id = parseInt(data?.id);
     game.Team1 = data?.team1 != null ? convertToTeam(data?.team1Detail ?? data?.team1) : {} as Team;
     game.Team2 = data?.team2 != null ? convertToTeam(data?.team2Detail ?? data?.team2) : {} as Team;
@@ -36,10 +35,10 @@ export const convertToGame = (data : any) => {
 }
 
 export const convertDataToGameList = (listData : any) => {
-    let list = [] as Game[];
+    const list = [] as Game[];
     if (listData instanceof Array) {
-        for (let i = 0; i < listData.length; i++) {				
-            const o = convertToGame(listData[i]);
+        for (const ol of listData) {				
+            const o = convertToGame(ol);
             if (o != null && o.Id != null) {
                 list.push(o);
             }

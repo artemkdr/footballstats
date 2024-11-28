@@ -48,7 +48,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 		const loadTeams = async() => {
 			const response = await callGetActiveTeams();
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setTeams(convertDataToTeamList(convertDataToList(json)?.List));
 			}
 		}
@@ -58,14 +58,14 @@ export const Games: FunctionComponent = (): ReactElement => {
 
 	useEffect(() => {		
 		const loadGames = async() => {
-			let params : string[] = [];
+			const params : string[] = [];
 			if (team1 > 0)
 				params.push(`team1=${team1}`);
 			if (team2 > 0)
 				params.push(`team2=${team2}`);
 			const response = await callGetGames(params);
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				const list = convertDataToList(json);
 				setList(list);
 				setGames(convertDataToGameList(list.List));
@@ -77,7 +77,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 			const loadRivalStats = async() => {
 				const response = await callGetRivalStats(team1, team2);
 				if (response.ok) {
-					var json = await response.json();			
+					const json = await response.json();			
 					setRivalStats(convertDataToRivalStats(json));
 				}
 			}
@@ -109,7 +109,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 				if (count > limit) break;
 
 				const team2 = teams[j];				
-				let json : any = {           
+				const json : any = {           
 					Goals1: Math.floor(Math.random() * 11),
 					Goals2: Math.floor(Math.random() * 11),
 					Team1: team1.Id,
@@ -174,8 +174,7 @@ export const Games: FunctionComponent = (): ReactElement => {
 			</VStack>
 			<CreateNewGameModal
 				isOpen={isNewGameModalOpen} 				
-				onClose={() => setIsNewGameModalOpen(false)} 
-				onCreate={() => {}}
+				onClose={() => setIsNewGameModalOpen(false)} 				
 				teams={teams}
 				/>
 		</VStack>

@@ -1,17 +1,16 @@
 import { convertDataToUserList, User } from "@/types/user";
 
-export type Team = {
+export enum TeamStatus {
+    Active = "Active",
+    Deleted = "Deleted"
+}
+export interface Team {
     Id: number,   
     Name: string,
     Players: User[],
     CreateDate: Date,
     ModifyDate: Date,
     Status: TeamStatus    
-}
-
-export enum TeamStatus {
-    Active = "Active",
-    Deleted = "Deleted"
 }
 
 export const teamHasPlayer = (team: Team, username: string) : boolean => {
@@ -29,7 +28,7 @@ export const getTeamStatusColor = (status: TeamStatus) : string => {
 }
 
 export const convertToTeam = (data : any) => {
-    var team = {} as Team;    
+    const team = {} as Team;    
     team.Id = parseInt(data?.id);
     team.Name = data?.name?.toString();
     team.Players = convertDataToUserList(data?.playerDetails ?? data?.players);
@@ -40,10 +39,10 @@ export const convertToTeam = (data : any) => {
 }
 
 export const convertDataToTeamList = (listData : any) => {
-    let list = [] as Team[];
+    const list = [] as Team[];
     if (listData instanceof Array) {
-        for (let i = 0; i < listData.length; i++) {				
-            const o = convertToTeam(listData[i]);
+        for (const ol of listData) {				
+            const o = convertToTeam(ol);
             if (o != null && o.Id != null) {
                 list.push(o);
             }

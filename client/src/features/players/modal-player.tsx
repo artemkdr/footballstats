@@ -4,15 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { isValidUser, User, UserStatus } from "@/types/user";
 import { InputInlineLabel } from "@/components/input-inline-label";
-import { callCreatePlayer } from "./api/create-player";
+import { callCreatePlayer } from "@/features/players/api/create-player";
 
 interface EditUserModalProps {    
     isOpen: boolean;
-    onClose: () => void;
-    onCreate: () => void;    
+    onClose: () => void;    
 }
 
-export const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose, onCreate }) => {
+export const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();    
     const [user, setUser] = useState<User>({        
         Status: UserStatus.Active
@@ -27,7 +26,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({ isOpen, onClose, o
     }, [user]);
 
     const createUser = async () => {
-        let json : any = {           
+        const json : any = {           
             Status: user.Status,
             Username: user.Username
         };

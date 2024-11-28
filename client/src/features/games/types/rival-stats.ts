@@ -1,5 +1,5 @@
 
-export type RivalStats = {
+export interface RivalStats {
     Team1: number,   
     Team2: number,   
     Wins1: number,   
@@ -7,7 +7,7 @@ export type RivalStats = {
 }
 
 export const convertDataToRivalStats = (data : any) => {
-    var stat = {} as RivalStats; 
+    const stat = {} as RivalStats; 
     stat.Team1 = parseInt(data?.team1);
     stat.Team2 = parseInt(data?.team2);
     stat.Wins1 = parseInt(data?.wins1);

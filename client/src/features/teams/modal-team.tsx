@@ -6,16 +6,15 @@ import { isValidTeam, Team, TeamStatus } from "@/types/team";
 import { User } from "@/types/user";
 import { InputInlineLabel } from "@/components/input-inline-label";
 import { SelectPlayer } from "@/features/teams/select-player";
-import { callCreateTeam } from "./api/create-team";
+import { callCreateTeam } from "@/features/teams/api/create-team";
 
 interface EditTeamModalProps {    
     isOpen: boolean;
     onClose: () => void;
-    onCreate: () => void;
     players: User[];
 }
 
-export const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, onClose, onCreate, players }) => {
+export const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, onClose, players }) => {
     const { t } = useTranslation();    
     const [team, setTeam] = useState<Team>({
         Id: -1, // needs not null value for validation        
@@ -31,7 +30,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, onClose, o
     }, [team]);
 
     const createTeam = async () => {
-        let json : any = {           
+        const json : any = {           
             Status: team.Status,
             Name: team.Name,
             Players: team.Players?.filter(x => x.Username != null).map(x => x.Username)
@@ -62,7 +61,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({ isOpen, onClose, o
         let newValue = value;
 
         if (name === "Player1" || name === "Player2") {
-            var players = team.Players ?? [{} as User, {} as User];
+            const players = team.Players ?? [{} as User, {} as User];
             if (name === "Player1") players[0] = { Username: value } as User;
             if (name === "Player2") players[1] = { Username: value } as User;
             newName = "Players";

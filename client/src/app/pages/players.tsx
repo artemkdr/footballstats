@@ -38,7 +38,7 @@ export const Players: FunctionComponent = (): ReactElement => {
 		const loadingToast = toast({ title: t("Message.GeneratingUsers"), description: t("Message.GeneratingCount", {count: count}), ...loadingToastProps });
 		for (let i = 0; i < limit; i++) {			
 			const uname = dict[randomN(dict.length - 1)] + "_" + dict[randomN(dict.length - 1)] + "_" + dict[randomN(dict.length - 1)] + "_" + randomN(100000);
-			let json : any = {           
+			const json : any = {           
 				Username: uname,
 				Status: UserStatus.Active
 			};							
@@ -71,8 +71,7 @@ export const Players: FunctionComponent = (): ReactElement => {
 			</VStack>
 			<EditUserModal
 				isOpen={isUserModalOpen} 				
-				onClose={() => setIsUserModalOpen(false)} 
-				onCreate={() => {}}				
+				onClose={() => setIsUserModalOpen(false)} 				
 				/>
 		</VStack>
 	)

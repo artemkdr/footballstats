@@ -1,4 +1,9 @@
-export type User = {
+export enum UserStatus {
+    Active = "Active",
+    Deleted = "Deleted"
+}
+
+export interface User {
     Username: string,
     Status: UserStatus,
     Vars: any,
@@ -6,13 +11,8 @@ export type User = {
     ModifyDate: Date
 }
 
-export enum UserStatus {
-    Active = "Active",
-    Deleted = "Deleted"
-}
-
 export const convertToUser = (data : any) => {
-    var user = {} as User;    
+    const user = {} as User;    
     user.Username = data?.username?.toString();
     user.Status = data?.status as UserStatus;    
     user.Vars = data?.vars;
@@ -32,10 +32,10 @@ export const getUserStatusColor = (status: UserStatus) : string => {
 }
 
 export const convertDataToUserList = (listData : any) => {
-    let list = [] as User[];
+    const list = [] as User[];
     if (listData instanceof Array) {
-        for (let i = 0; i < listData.length; i++) {				
-            const u = convertToUser(listData[i]);
+        for (const ol of listData) {				
+            const u = convertToUser(ol);
             if (u != null && u.Username != null) {
                 list.push(u);
             }

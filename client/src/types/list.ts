@@ -1,5 +1,5 @@
 
-export type List = {
+export interface List {
     Page: number;
     PageSize: number;
     TotalPages: number;
@@ -8,7 +8,7 @@ export type List = {
 }
 
 export const convertDataToList = (data : any) => {
-    var list = {} as List;
+    const list = {} as List;
     list.Page = parseInt(data?.page);
     list.PageSize = parseInt(data?.pageSize);
     list.TotalPages = parseInt(data?.totalPages);

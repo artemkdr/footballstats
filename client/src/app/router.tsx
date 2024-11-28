@@ -19,110 +19,109 @@ import { callGetGame } from "@/features/games/api/get-game";
 import { callGetPlayer } from "@/features/players/api/get-player";
 import { callGetTeam } from "@/features/teams/api/get-team";
 
-export const router: Router = createBrowserRouter([
-	{
-		path: '/',
-		element: <ErrorBoundary FallbackComponent={RouterError}><Layout /></ErrorBoundary>,
-		errorElement: <RouterError />,				
-		children: [
-			{
-				index: true,
-				path: '/',
-				element: <Navigate to={'/dashboard'} replace={true} />
-			},
-			{				
-				path: '/dashboard',
-				element: <Dashboard />,
-				loader: async({ params }) => {											
-					const response = await callGetStats();
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/teams',
-				element: <Teams />,
-				loader: async({ request, params }) => {																
-					const response = await callGetTeams();
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/team/:id',
-				element: <TeamPage />,
-				loader: async({ params }) => {											
-					const response = await callGetTeam(params.id);
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/players',
-				element: <Players />,
-				loader: async({ params }) => {											
-					const response = await callGetPlayers();
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/player/:id',
-				element: <PlayerPage />,
-				loader: async({ params }) => {											
-					const response = await callGetPlayer(params.id);
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/games',
-				element: <Games />,
-				loader: async({ params }) => {											
-					const response = await callGetGames();
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{				
-				path: '/game/:id',
-				element: <GamePage />,
-				loader: async({ params }) => {											
-					const response = await callGetGame(params.id);
-					if (response.ok) {
-						var json = await response.json();
-						return json;
-					}
-					throw new Error("LoaderError", { cause: response.status });
-				}
-			},
-			{
-				path: '*',
-				element: <NotFound />,
-			},
-		],
-	},
-]);
-
 export const AppRouter: React.FC = () => {
+	const router: Router = createBrowserRouter([
+		{
+			path: '/',
+			element: <ErrorBoundary FallbackComponent={RouterError}><Layout /></ErrorBoundary>,
+			errorElement: <RouterError />,				
+			children: [
+				{
+					index: true,
+					path: '/',
+					element: <Navigate to={'/dashboard'} replace={true} />
+				},
+				{				
+					path: '/dashboard',
+					element: <Dashboard />,
+					loader: async() => {											
+						const response = await callGetStats();
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/teams',
+					element: <Teams />,
+					loader: async() => {																
+						const response = await callGetTeams();
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/team/:id',
+					element: <TeamPage />,
+					loader: async({ params }) => {											
+						const response = await callGetTeam(params.id);
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/players',
+					element: <Players />,
+					loader: async() => {											
+						const response = await callGetPlayers();
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/player/:id',
+					element: <PlayerPage />,
+					loader: async({ params }) => {											
+						const response = await callGetPlayer(params.id);
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/games',
+					element: <Games />,
+					loader: async() => {											
+						const response = await callGetGames();
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{				
+					path: '/game/:id',
+					element: <GamePage />,
+					loader: async({ params }) => {											
+						const response = await callGetGame(params.id);
+						if (response.ok) {
+							const json = await response.json();
+							return json;
+						}
+						throw new Error("LoaderError", { cause: response.status });
+					}
+				},
+				{
+					path: '*',
+					element: <NotFound />,
+				},
+			],
+		},
+	]);
 	return (
 		<RouterProvider router={router} />	   
 	)

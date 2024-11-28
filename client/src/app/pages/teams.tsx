@@ -26,7 +26,7 @@ export const Teams: FunctionComponent = (): ReactElement => {
 		const loadPlayers = async() => {
 			const response = await callGetActivePlayers();
 			if (response.ok) {
-				var json = await response.json();			
+				const json = await response.json();			
 				setPlayers(convertDataToUserList(convertDataToList(json)?.List));
 			}
 		}
@@ -50,8 +50,7 @@ export const Teams: FunctionComponent = (): ReactElement => {
 			</VStack>
 			<EditTeamModal
 				isOpen={isTeamModalOpen} 				
-				onClose={() => setIsTeamModalOpen(false)} 
-				onCreate={() => {}}		
+				onClose={() => setIsTeamModalOpen(false)} 				
 				players={players}		
 				/>
 		</VStack>

@@ -1,5 +1,5 @@
 
-export type TeamStat = {
+export interface TeamStat {
     Id: number,   
     Name: string,
     Games: number,
@@ -10,7 +10,7 @@ export type TeamStat = {
 }
 
 export const convertToTeamStat = (data : any) => {
-    var stat = {} as TeamStat; 
+    const stat = {} as TeamStat; 
     stat.Id = parseInt(data?.id);
     stat.Name = data?.name?.toString();
     stat.Games = parseInt(data?.games);
@@ -22,10 +22,10 @@ export const convertToTeamStat = (data : any) => {
 }
 
 export const convertDataToTeamStatList = (listData : any) => {
-    let list = [] as TeamStat[];
+    const list = [] as TeamStat[];
     if (listData instanceof Array) {
-        for (let i = 0; i < listData.length; i++) {				
-            const o = convertToTeamStat(listData[i]);
+        for (const ol of listData) {				
+            const o = convertToTeamStat(ol);
             if (o != null && o.Id != null) {
                 list.push(o);
             }

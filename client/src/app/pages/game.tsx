@@ -26,34 +26,8 @@ export const GamePage: FunctionComponent = (): ReactElement => {
         setIsValid(isValidGame(game));        
     }, [game]);
 
-	const startGame = () => {
-		setGame(prevGame => ({
-			...prevGame, 
-			Status: GameStatus.Playing
-		}));
-		updateGame({ Status: GameStatus.Playing } as Game);
-	}
-
-	const endGame = () => {
-		const date = new Date();
-		setGame(prevGame => ({
-			...prevGame, 
-			CompleteDate: date,
-			Status: GameStatus.Completed
-		}));
-		updateGame({ Status: GameStatus.Completed, CompleteDate: date } as Game);
-	}
-
-	const deleteGame = () => {
-		setGame(prevGame => ({
-			...prevGame, 
-			Status: GameStatus.Cancelled
-		}));
-		updateGame({ Status: GameStatus.Cancelled } as Game);
-	}
-
 	const updateGame = async (props: Game = {} as Game) => {		
-		let json : any = {           
+		const json : any = {           
 			Id: game.Id,
 			Goals1: game.Goals1,
 			Goals2: game.Goals2			
@@ -79,6 +53,32 @@ export const GamePage: FunctionComponent = (): ReactElement => {
 		if (error) {                          
 			toast({ title: t('Message.UpdateGameError'), status: 'error' });            
 		}		
+	}
+
+	const startGame = () => {
+		setGame(prevGame => ({
+			...prevGame, 
+			Status: GameStatus.Playing
+		}));
+		updateGame({ Status: GameStatus.Playing } as Game);
+	}
+
+	const endGame = () => {
+		const date = new Date();
+		setGame(prevGame => ({
+			...prevGame, 
+			CompleteDate: date,
+			Status: GameStatus.Completed
+		}));
+		updateGame({ Status: GameStatus.Completed, CompleteDate: date } as Game);
+	}
+
+	const deleteGame = () => {
+		setGame(prevGame => ({
+			...prevGame, 
+			Status: GameStatus.Cancelled
+		}));
+		updateGame({ Status: GameStatus.Cancelled } as Game);
 	}
 
 	const handleChange = (event: any) => {

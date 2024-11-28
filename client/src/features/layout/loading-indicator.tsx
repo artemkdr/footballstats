@@ -1,10 +1,6 @@
 import { Box, InputAddonProps } from '@chakra-ui/react';
 
-interface LoadingIndicatorProps extends InputAddonProps {            
-    
-}
-
-export const LoadingIndicator: React.FC<LoadingIndicatorProps> = (props) => {
+export const LoadingIndicator: React.FC<InputAddonProps> = (props) => {
     const { ...rest } = props;    
     return (
         <Box 

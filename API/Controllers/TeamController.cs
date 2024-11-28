@@ -113,7 +113,7 @@ public class TeamController : BaseController
     }
 
     [Route("team/{id}")]
-    [HttpPost]
+    [HttpPatch]
     public async Task<IActionResult> UpdateTeam(int id, TeamDTO data)
     {
         try {

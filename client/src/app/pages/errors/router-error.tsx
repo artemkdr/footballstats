@@ -7,7 +7,7 @@ import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-d
 // in the <Outlet> of the Root component. So it will fill the whole screen and create an unfriendly user experience.
 // For this reason, we have a catch-all route in src\index.tsx with a <NotFound> component that will be rendered in the <Outlet> of the Root component.
 
-type RouterErrorProps = {
+interface RouterErrorProps {
 	error?: Error; // Make the error prop optional	
 };
 

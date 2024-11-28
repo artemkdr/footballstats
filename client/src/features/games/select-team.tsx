@@ -9,7 +9,7 @@ export const SelectTeam: React.FC<SelectTeamProps> = (props) => {
     const { teams, ...rest } = props;
     return (
         <Select {...rest}>            
-            {teams.map((item, index) => (
+            {teams.map((item) => (
                 <option key={item.Id} value={item.Id}>{item.Name}</option>
             ))}
         </Select>                            

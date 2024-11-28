@@ -169,7 +169,7 @@ public class GameController : BaseController
     }
 
     [Route("game/{id}")]
-    [HttpPost]
+    [HttpPatch]
     public async Task<IActionResult> UpdateGame(int id, GameDTO data)
     {
         try {
