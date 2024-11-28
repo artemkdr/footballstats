@@ -6,7 +6,7 @@
     "dependencies": {
         "@chakra-ui/react": "^2.8.2",
         "@emotion/react": "^11.13.3",
-        "@emotion/styled": "^11.13.0",
+        "@emotion/styled": "^11.13.5",
         "@fontsource/roboto-condensed": "^5.0.16",
         "@remix-run/router": "^1.16.1",
         "base-64": "^1.0.0",
