@@ -35,7 +35,7 @@ public class UserController : BaseController
         _userService = userService;
     }
 
-    [Route("user/{username}")]    
+    [Route("users/{username}")]    
     [HttpGet]
     public async Task<IActionResult> GetUser(string username)
     {        
@@ -50,7 +50,7 @@ public class UserController : BaseController
     }
     
 
-    [Route("user")]
+    [Route("users")]
     [HttpGet]
     public async Task<IActionResult> GetUsers(string? username = null, string? status = null, int page = 1, int limit = 0) 
     {
@@ -71,7 +71,7 @@ public class UserController : BaseController
         });
     }
 
-    [Route("user")]
+    [Route("users")]
     [HttpPost]
     public async Task<IActionResult> CreateUser(UserDTO userData)
     {
@@ -82,7 +82,7 @@ public class UserController : BaseController
         return CreatedAtAction(nameof(GetUser), new { username = newItem.Username }, newItem);        
     }
 
-    [Route("user/{username}")]
+    [Route("users/{username}")]
     [HttpPatch]
     public async Task<IActionResult> UpdateUser(string username, UserDTO userData)
     {   

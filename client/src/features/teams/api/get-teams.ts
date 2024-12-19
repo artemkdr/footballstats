@@ -2,13 +2,13 @@ import callApi from '@/lib/api';
 
 export const callGetTeams = async (status?: string) => {
     if (status !== undefined) {
-        return callApi(`team?status=${status}`);
+        return callApi(`teams?status=${status}`);
     }
-    return callApi(`team`);
+    return callApi(`teams`);
 };
 
 export const callGetTeamsWithStatus = async (status: string) => {
-    return callApi(`team?status=${status}`);
+    return callApi(`teams?status=${status}`);
 };
 
 export const callGetActiveTeams = async () => {
@@ -16,5 +16,5 @@ export const callGetActiveTeams = async () => {
 };
 
 export const callGetTeamsWithPlayers = async (players: string) => {
-    return callApi(`team?players=${players}`);
+    return callApi(`teams?players=${players}`);
 };

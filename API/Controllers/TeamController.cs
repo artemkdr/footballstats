@@ -41,7 +41,7 @@ public class TeamController : BaseController
     }    
     
 
-    [Route("team/{id}")]    
+    [Route("teams/{id}")]    
     [HttpGet]
     public async Task<IActionResult> GetTeam(int id)
     {   
@@ -78,7 +78,7 @@ public class TeamController : BaseController
         return Ok(dto);        
     }
 
-    [Route("team")]
+    [Route("teams")]
     [HttpGet]
     public async Task<IActionResult> GetTeams(string? name = null, string? status = null, string? players = null, int page = 1, int limit = 0) 
     {
@@ -100,7 +100,7 @@ public class TeamController : BaseController
         });
     }
 
-    [Route("team")]
+    [Route("teams")]
     [HttpPost]
     public async Task<IActionResult> CreateTeam(TeamDTO data)
     {
@@ -112,7 +112,7 @@ public class TeamController : BaseController
         }       
     }
 
-    [Route("team/{id}")]
+    [Route("teams/{id}")]
     [HttpPatch]
     public async Task<IActionResult> UpdateTeam(int id, TeamDTO data)
     {

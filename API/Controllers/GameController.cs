@@ -57,7 +57,7 @@ public class GameController : BaseController
         _gameService = gameService;
     }
 
-    [Route("game/{id}")]    
+    [Route("games/{id}")]    
     [HttpGet]
     public async Task<IActionResult> GetGame(int id)
     {        
@@ -92,7 +92,7 @@ public class GameController : BaseController
         });        
     }
 
-    [Route("game")]
+    [Route("games")]
     [HttpGet]
     public async Task<IActionResult> GetGames(
         int? team1 = null, int? team2 = null, DateTime? fromDate = null, DateTime? toDate = null, string? status = null, string? players = null,
@@ -156,7 +156,7 @@ public class GameController : BaseController
         });        
     }
 
-    [Route("game")]
+    [Route("games")]
     [HttpPost]
     public async Task<IActionResult> CreateGame(GameDTO data)
     {
@@ -168,7 +168,7 @@ public class GameController : BaseController
         }
     }
 
-    [Route("game/{id}")]
+    [Route("games/{id}")]
     [HttpPatch]
     public async Task<IActionResult> UpdateGame(int id, GameDTO data)
     {
