@@ -10,6 +10,7 @@ import {
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+    ErrorResponse,
     isRouteErrorResponse,
     useNavigate,
     useRouteError,
@@ -38,7 +39,7 @@ export const RouterError = ({ error }: RouterErrorProps) => {
     if (isRouteErrorResponse(displayedError)) {
         // error is type `ErrorResponse`
         errorMessage =
-            (displayedError as any).error?.message || displayedError.statusText;
+            (displayedError as ErrorResponse).data?.message || displayedError.statusText;
     } else if (displayedError instanceof Error) {
         errorMessage = displayedError.message;
     } else if (typeof displayedError === 'string') {
@@ -47,8 +48,8 @@ export const RouterError = ({ error }: RouterErrorProps) => {
         errorMessage = t('Message.UnknownError');
     }
     if (
-        (displayedError as any)?.status === 403 ||
-        (displayedError as any)?.cause === 403
+        (displayedError as { status: number })?.status === 403 ||
+        (displayedError as { cause: number })?.cause === 403
     )
         errorMessage = 'ForbidError';
     return (

@@ -18,7 +18,7 @@
     },
     "Dashboard": {
         "Title": "Tableau de bord",
-        "Empty": "Il n'y pas encore de matchs.",
+        "Empty": "Il n'y a pas encore de matchs ici.",
         "GotoPlayers": "Ajouter des joueurs",
         "GotoTeams": "Ajouter des équipes",
         "GotoGames": "Ajouter des matchs",

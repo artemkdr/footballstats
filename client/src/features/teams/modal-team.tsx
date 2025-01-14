@@ -1,7 +1,7 @@
 import { InputInlineLabel } from '@/components/input-inline-label';
 import { callCreateTeam } from '@/features/teams/api/create-team';
-import { SelectPlayer } from '@/features/teams/select-player';
-import { isValidTeam, Team, TeamStatus } from '@/types/team';
+import { SelectPlayer } from '@/features/teams/components/select-player';
+import { CreateTeamResponse, isValidTeam, Team, TeamStatus } from '@/types/team';
 import { User } from '@/types/user';
 import {
     Button,
@@ -17,7 +17,7 @@ import {
     useToast,
     VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -47,7 +47,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
     }, [team]);
 
     const createTeam = async () => {
-        const json: any = {
+        const json = {
             Status: team.Status,
             Name: team.Name,
             Players: team.Players?.filter((x) => x.Username != null).map(
@@ -55,16 +55,15 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
             ),
         };
 
-        const response = await callCreateTeam(json);
-        const responseJson = await response.json();
+        const response = await callCreateTeam<CreateTeamResponse>(json);        
         let error = false;
-        if (response.ok) {
-            if (responseJson?.id > 0) {
+        if (response.success) {
+            if (response.data != undefined && response.data?.id > 0) {
                 toast({
                     title: t('Message.CreateTeamSuccess'),
                     status: 'success',
                 });
-                nav('/team/' + responseJson.id);
+                nav('/team/' + response.data.id);
             } else {
                 error = true;
             }
@@ -76,7 +75,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
         }
     };
 
-    const handleChange = (event: any) => {
+    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = event.target;
 
         let newName = name;
@@ -87,7 +86,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
             if (name === 'Player1') players[0] = { Username: value } as User;
             if (name === 'Player2') players[1] = { Username: value } as User;
             newName = 'Players';
-            newValue = players;
+            newValue = players.toString();
         }
 
         setTeam((prevTeam) => ({

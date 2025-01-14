@@ -6,14 +6,14 @@ import { callGetGames } from '@/features/games/api/get-games';
 import { CreateNewGameModal } from '@/features/games/modal-game';
 import { SelectTeam } from '@/features/games/select-team';
 import {
-    convertDataToRivalStats,
+    convertToRivalStats,
     RivalStats,
 } from '@/features/games/types/rival-stats';
 import { callGetRivalStats } from '@/features/stats/api/get-rival-stats';
 import { callGetActiveTeams } from '@/features/teams/api/get-teams';
-import { convertDataToGameList, Game, GameStatus } from '@/types/game';
-import { convertDataToList, List } from '@/types/list';
-import { convertDataToTeamList, Team } from '@/types/team';
+import { convertToGameList, Game, GameStatus } from '@/types/game';
+import { convertToList, List } from '@/lib/types/list';
+import { convertToTeamList, Team } from '@/types/team';
 import {
     Button,
     Heading,
@@ -24,14 +24,14 @@ import {
     UseToastOptions,
     VStack,
 } from '@chakra-ui/react';
-import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { ChangeEvent, FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClear } from 'react-icons/md';
 import { useLoaderData } from 'react-router-dom';
 
 export const Games: FunctionComponent = (): ReactElement => {
     const { t } = useTranslation();
-    const data = useLoaderData();
+    const data = useLoaderData() as List<Game>;
     const toast = useToast();
     const [games, setGames] = useState<Game[]>([] as Game[]);
     const [isNewGameModalOpen, setIsNewGameModalOpen] = useState(false);
@@ -41,18 +41,16 @@ export const Games: FunctionComponent = (): ReactElement => {
     const [rivalStats, setRivalStats] = useState<RivalStats>({} as RivalStats);
     const [list, setList] = useState<List>({} as List);
 
-    useEffect(() => {
-        const list = convertDataToList(data);
-        setList(list);
-        setGames(convertDataToGameList(list.List));
+    useEffect(() => {      
+        setList(data);
+        setGames(data.List);
     }, [data]);
 
     useEffect(() => {
         const loadTeams = async () => {
             const response = await callGetActiveTeams();
-            if (response.ok) {
-                const json = await response.json();
-                setTeams(convertDataToTeamList(convertDataToList(json)?.List));
+            if (response.success) {                
+                setTeams(convertToTeamList(convertToList(response.data)?.List));
             }
         };
 
@@ -65,11 +63,10 @@ export const Games: FunctionComponent = (): ReactElement => {
             if (team1 > 0) params.push(`team1=${team1}`);
             if (team2 > 0) params.push(`team2=${team2}`);
             const response = await callGetGames(params);
-            if (response.ok) {
-                const json = await response.json();
-                const list = convertDataToList(json);
+            if (response.success) {                
+                const list = convertToList(response.data);
                 setList(list);
-                setGames(convertDataToGameList(list.List));
+                setGames(convertToGameList(list.List));
             }
         };
         loadGames();
@@ -77,23 +74,22 @@ export const Games: FunctionComponent = (): ReactElement => {
         if (team1 > 0 && team2 > 0) {
             const loadRivalStats = async () => {
                 const response = await callGetRivalStats(team1, team2);
-                if (response.ok) {
-                    const json = await response.json();
-                    setRivalStats(convertDataToRivalStats(json));
+                if (response.success) {                    
+                    setRivalStats(convertToRivalStats(response.data));
                 }
             };
             loadRivalStats();
         }
     }, [team1, team2]);
 
-    const handleChange = (event: any) => {
+    const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = event.target;
         switch (name) {
             case 'Team1':
-                setTeam1(value);
+                setTeam1(Number(value));
                 break;
             case 'Team2':
-                setTeam2(value);
+                setTeam2(Number(value));
                 break;
         }
     };
@@ -118,7 +114,7 @@ export const Games: FunctionComponent = (): ReactElement => {
                 if (count > limit) break;
 
                 const team2 = teams[j];
-                const json: any = {
+                const json = {
                     Goals1: Math.floor(Math.random() * 11),
                     Goals2: Math.floor(Math.random() * 11),
                     Team1: team1.Id,

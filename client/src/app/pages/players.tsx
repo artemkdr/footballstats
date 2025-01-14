@@ -2,8 +2,7 @@ import { CustomLink } from '@/components/custom-link';
 import config from '@/config/config';
 import { callCreatePlayer } from '@/features/players/api/create-player';
 import { EditUserModal } from '@/features/players/modal-player';
-import { convertDataToList } from '@/types/list';
-import { convertDataToUserList, UserStatus } from '@/types/user';
+import { User, UserStatus } from '@/types/user';
 import {
     Button,
     Heading,
@@ -19,9 +18,8 @@ import { useLoaderData } from 'react-router-dom';
 
 export const Players: FunctionComponent = (): ReactElement => {
     const { t } = useTranslation();
-    const data = useLoaderData();
-    const toast = useToast();
-    const usersList = convertDataToUserList(convertDataToList(data)?.List);
+    const usersList = useLoaderData() as User[];
+    const toast = useToast();    
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
     const dict = [
@@ -71,7 +69,7 @@ export const Players: FunctionComponent = (): ReactElement => {
                 dict[randomN(dict.length - 1)] +
                 '_' +
                 randomN(100000);
-            const json: any = {
+            const json = {
                 Username: uname,
                 Status: UserStatus.Active,
             };

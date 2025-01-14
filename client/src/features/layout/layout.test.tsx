@@ -9,7 +9,7 @@ import {
 } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@/lib/api');
+jest.mock('@/lib/net/api');
 
 jest.mock('react-i18next', () => ({
     I18nextProvider: jest.fn(),
@@ -28,7 +28,7 @@ jest.mock('react-i18next', () => ({
 const mockedUseNavigate = jest.fn();
 const mockedUseNavigation = jest.fn();
 jest.mock('react-router-dom', () => ({
-    ...(jest.requireActual('react-router-dom') as any),
+    ...jest.requireActual('react-router-dom'),
     useNavigate: () => mockedUseNavigate,
     useNavigation: () => mockedUseNavigation,
 }));

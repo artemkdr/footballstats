@@ -1,5 +1,5 @@
-import callApi from '@/lib/api';
+import callApi from '@/lib/net/api';
 
-export const callGetPlayer = async (id: any) => {
-    return callApi(`users/${id}`);
+export const callGetPlayer = async <T>(id: unknown) => {
+    return await callApi<T>(`users/${id}`);
 };

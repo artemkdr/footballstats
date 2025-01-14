@@ -4,18 +4,18 @@ import { callGetGamesWithPlayers } from '@/features/games/api/get-games';
 import { callUpdatePlayer } from '@/features/players/api/update-player';
 import { callGetTeamsWithPlayers } from '@/features/teams/api/get-teams';
 import {
-    convertDataToGameList,
+    convertToGameList,
     Game,
     GameStatus,
     getGameColorForResult,
     getGameResultForUser,
     getGameStatusColor,
 } from '@/types/game';
-import { convertDataToList } from '@/types/list';
-import { convertDataToTeamList, Team } from '@/types/team';
+import { convertToList } from '@/lib/types/list';
+import { convertToTeamList, Team } from '@/types/team';
 import {
-    convertToUser,
     getUserStatusColor,
+    UpdatePlayerResponse,
     User,
     UserStatus,
 } from '@/types/user';
@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
 export const PlayerPage: FunctionComponent = (): ReactElement => {
-    const userData: any = useLoaderData();
+    const userData = useLoaderData() as User;
     const [user, setUser] = useState<User>({} as User);
     const { t } = useTranslation();
     const toast = useToast();
@@ -40,43 +40,34 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
     const [teams, setTeams] = useState<Team[]>([] as Team[]);
 
     useEffect(() => {
-        setUser(convertToUser(userData));
+        setUser(userData);
     }, [userData]);
 
     useEffect(() => {
         const loadTeams = async () => {
-            const response = await callGetTeamsWithPlayers(userData.username);
-            if (response.ok) {
-                const json = await response.json();
-                setTeams(convertDataToTeamList(convertDataToList(json)?.List));
+            const response = await callGetTeamsWithPlayers(userData.Username);
+            if (response.success) {                
+                setTeams(convertToTeamList(convertToList(response.data)?.List));
             }
         };
 
         const loadGames = async () => {
-            const response = await callGetGamesWithPlayers(userData.username);
-            if (response.ok) {
-                const json = await response.json();
-                setGames(convertDataToGameList(convertDataToList(json)?.List));
+            const response = await callGetGamesWithPlayers(userData.Username);
+            if (response.success) {                
+                setGames(convertToGameList(convertToList(response.data)?.List));
             }
         };
 
         loadTeams();
         loadGames();
-    }, [userData?.username]);
+    }, [userData?.Username]);
 
     const updateUser = async (props: User = {} as User) => {
-        const json: any = {
-            Username: user.Username,
-            Status: user.Status,
-        };
-        if (props.Status != null) {
-            json['Status'] = props.Status.toString();
-        }
-        const response = await callUpdatePlayer(user.Username, json);
-        const responseJson = await response.json();
+        const json = { ...user, ...props };
+        const response = await callUpdatePlayer<UpdatePlayerResponse>(user.Username, json);        
         let error = false;
-        if (response.ok) {
-            if (responseJson?.username != null) {
+        if (response.success) {
+            if (response.data?.username != null) {
                 toast({
                     title: t('Message.UpdateUserSuccess'),
                     status: 'success',

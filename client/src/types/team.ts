@@ -1,9 +1,30 @@
-import { convertDataToUserList, User } from '@/types/user';
+import { toInt, toString } from '@/lib/utils/converters';
+import { convertToUserList as convertToUserList, User } from '@/types/user';
 
 export enum TeamStatus {
     Active = 'Active',
     Deleted = 'Deleted',
 }
+
+
+export interface CreateTeamResponse {
+    id: number;
+}
+
+export interface UpdateTeamResponse {
+    id: number;
+}
+
+export interface GetTeamResponse {
+    id: number;
+    name: string;
+    players: number[];
+    playerDetails: unknown[];
+    status: string;
+    createDate: string;
+    modifyDate: string;
+}
+
 export interface Team {
     Id: number;
     Name: string;
@@ -27,18 +48,19 @@ export const getTeamStatusColor = (status: TeamStatus): string => {
     return '';
 };
 
-export const convertToTeam = (data: any) => {
-    const team = {} as Team;
-    team.Id = parseInt(data?.id);
-    team.Name = data?.name?.toString();
-    team.Players = convertDataToUserList(data?.playerDetails ?? data?.players);
-    team.CreateDate = new Date(data?.createDate);
-    team.ModifyDate = new Date(data?.modifyDate);
-    team.Status = data?.status as TeamStatus;
-    return team;
+export const convertToTeam = (json: unknown): Team => {
+    const data = json as GetTeamResponse;
+    return {
+        Id: toInt(data.id),
+        Name: toString(data.name),
+        Players: convertToUserList(data.playerDetails ?? data.players),
+        CreateDate: new Date(data.createDate),
+        ModifyDate: new Date(data.modifyDate),
+        Status: data.status as TeamStatus,
+    };
 };
 
-export const convertDataToTeamList = (listData: any) => {
+export const convertToTeamList = (listData: unknown[]) => {
     const list = [] as Team[];
     if (listData instanceof Array) {
         for (const ol of listData) {

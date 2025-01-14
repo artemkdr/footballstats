@@ -1,3 +1,4 @@
+import { toInt } from '@/lib/utils/converters';
 import { convertToTeam, Team, teamHasPlayer } from '@/types/team';
 
 export enum GameStatus {
@@ -6,41 +7,58 @@ export enum GameStatus {
     Completed = 'Completed',
     Cancelled = 'Cancelled',
 }
+
+export interface GetGameResponse {
+    id: number;
+    team1: unknown;
+    team1Detail: unknown;    
+    team2: unknown;
+    team2Detail: unknown;
+    goals1: number;
+    goals2: number;
+    status: string;
+    completeDate: string;
+    createDate: string;
+    modifyDate: string;
+    vars: unknown;
+}
+
+export interface CreateGameResponse {
+    id: number;
+}
+export interface UpdateGameResponse {
+    id: number;
+}
 export interface Game {
     Id: number;
     Team1: Team;
     Team2: Team;
     Goals1: number;
     Goals2: number;
-    Vars: any;
+    Vars: unknown;
     CreateDate: Date;
     ModifyDate: Date;
     CompleteDate: Date;
     Status: GameStatus;
 }
 
-export const convertToGame = (data: any) => {
-    const game = {} as Game;
-    game.Id = parseInt(data?.id);
-    game.Team1 =
-        data?.team1 != null
-            ? convertToTeam(data?.team1Detail ?? data?.team1)
-            : ({} as Team);
-    game.Team2 =
-        data?.team2 != null
-            ? convertToTeam(data?.team2Detail ?? data?.team2)
-            : ({} as Team);
-    game.Goals1 = parseInt(data?.goals1);
-    game.Goals2 = parseInt(data?.goals2);
-    game.Vars = data?.vars;
-    game.CreateDate = new Date(data?.createDate);
-    game.ModifyDate = new Date(data?.modifyDate);
-    game.CompleteDate = new Date(data?.completeDate);
-    game.Status = data?.status as GameStatus;
-    return game;
+export const convertToGame = <T = Game>(json: unknown): T => {
+    const data = json as GetGameResponse;
+    return {
+        Id: toInt(data?.id),
+        Team1: data.team1 ? convertToTeam(data.team1Detail ?? data.team1) : {} as Team,
+        Team2: data.team2 ? convertToTeam(data.team2Detail ?? data.team2) : {} as Team,
+        Goals1: toInt(data?.goals1),
+        Goals2: toInt(data?.goals2),
+        Vars: data.vars,
+        CreateDate: new Date(data.createDate),
+        ModifyDate: new Date(data.modifyDate),
+        CompleteDate: new Date(data.completeDate),
+        Status: data.status as GameStatus,
+    } as T;
 };
 
-export const convertDataToGameList = (listData: any) => {
+export const convertToGameList = (listData: unknown[]) => {
     const list = [] as Game[];
     if (listData instanceof Array) {
         for (const ol of listData) {

@@ -1,6 +1,6 @@
 import { callCreateGame } from '@/features/games/api/create-game';
 import { SelectTeam } from '@/features/games/select-team';
-import { Game, GameStatus, isValidGame } from '@/types/game';
+import { CreateGameResponse, Game, GameStatus, isValidGame } from '@/types/game';
 import { Team } from '@/types/team';
 import {
     Button,
@@ -19,7 +19,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -52,28 +52,23 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({
     }, [game]);
 
     const createGame = async () => {
-        const json: any = {
+        const json = {
             Goals1: game.Goals1,
             Goals2: game.Goals2,
             Team1: game.Team1?.Id,
             Team2: game.Team2?.Id,
             Status: game.Status.toString(),
+            ...(game.Status === GameStatus.Completed && { CompleteDate: game.CompleteDate || new Date() }),
         };
-        if (game.Status === GameStatus.Completed) {
-            json['CompleteDate'] = game.CompleteDate
-                ? game.CompleteDate
-                : new Date();
-        }
-        const response = await callCreateGame(json);
-        const responseJson = await response.json();
+        const response = await callCreateGame<CreateGameResponse>(json);        
         let error = false;
-        if (response.ok) {
-            if (responseJson?.id > 0) {
+        if (response.success) {
+            if (response.data != undefined && response.data?.id > 0) {
                 toast({
                     title: t('Message.CreateGameSuccess'),
                     status: 'success',
                 });
-                nav('/game/' + responseJson.id);
+                nav('/game/' + response.data.id);
             } else {
                 error = true;
             }
@@ -85,9 +80,9 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({
         }
     };
 
-    const handleChange = (event: any) => {
+    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = event.target;
-        let newValue = value;
+        let newValue : unknown;
 
         switch (name) {
             case 'Team1':
@@ -106,6 +101,8 @@ export const CreateNewGameModal: React.FC<CreateNewGameModalProps> = ({
             case 'CompleteDate':
                 newValue = new Date(value);
                 break;
+            default:
+                newValue = value;
         }
 
         setGame((prevGame) => ({

@@ -4,20 +4,21 @@ import { callGetGamesWithTeam } from '@/features/games/api/get-game';
 import { callGetTeamStats } from '@/features/stats/api/get-stats';
 import { StatsTable } from '@/features/stats/stats-table';
 import {
-    convertDataToTeamStatList,
+    convertToTeamStatList,
+    GetTeamStatsResponse,
     TeamStat,
 } from '@/features/stats/types/team-stat';
 import {
-    convertDataToGameList,
+    convertToGameList,
     Game,
     GameStatus,
     getGameColorForResult,
+    GetGameResponse,
     getGameResultFor,
     getGameStatusColor,
 } from '@/types/game';
-import { convertDataToList } from '@/types/list';
+import { convertToList, ListResponse } from '@/lib/types/list';
 import {
-    convertToTeam,
     getTeamStatusColor,
     Team,
     TeamStatus,
@@ -28,36 +29,35 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
 export const TeamPage: FunctionComponent = (): ReactElement => {
-    const data: any = useLoaderData();
+    const data = useLoaderData() as Team;
     const [team, setTeam] = useState<Team>({} as Team);
     const { t } = useTranslation();
     const [games, setGames] = useState<Game[]>([] as Game[]);
     const [stats, setStats] = useState<TeamStat[]>([] as TeamStat[]);
 
     useEffect(() => {
-        setTeam(convertToTeam(data));
+        setTeam(data);
     }, [data]);
 
     useEffect(() => {
         const loadStats = async () => {
-            const response = await callGetTeamStats(data.id);
-            if (response.ok) {
-                const json = await response.json();
-                setStats(convertDataToTeamStatList(json));
+            const response = await callGetTeamStats<GetTeamStatsResponse[]>(data.Id);
+            if (response.success) {            
+                if (response.data)    
+                    setStats(convertToTeamStatList(response.data));
             }
         };
 
         const loadGames = async () => {
-            const response = await callGetGamesWithTeam(data.id);
-            if (response.ok) {
-                const json = await response.json();
-                setGames(convertDataToGameList(convertDataToList(json)?.List));
+            const response = await callGetGamesWithTeam<ListResponse<GetGameResponse>>(data.Id);
+            if (response.success) {
+                setGames(convertToGameList(convertToList(response.data)?.List));
             }
         };
 
         loadGames();
         loadStats();
-    }, [data?.id]);
+    }, [data?.Id]);
 
     return (
         <VStack spacing={5} align="start">

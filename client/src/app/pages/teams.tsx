@@ -1,34 +1,36 @@
 import { CustomLink } from '@/components/custom-link';
 import { callGetActivePlayers } from '@/features/players/api/get-players';
 import { EditTeamModal } from '@/features/teams/modal-team';
-import { convertDataToList } from '@/types/list';
-import { convertDataToTeamList, TeamStatus } from '@/types/team';
-import { convertDataToUserList, User } from '@/types/user';
+import { convertToList, ListResponse } from '@/lib/types/list';
+import { Team, TeamStatus } from '@/types/team';
+import { convertToUserList, GetPlayerResponse, User } from '@/types/user';
 import { Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
-import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
-export const Teams: FunctionComponent = (): ReactElement => {
-    const { t } = useTranslation();
-    const data = useLoaderData();
-    const teamsList = convertDataToTeamList(convertDataToList(data)?.List);
+export const Teams = (): ReactElement => {
+    const { t } = useTranslation();    
+    const teamsList = useLoaderData() as Team[];
     const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
     const [players, setPlayers] = useState<User[]>([] as User[]);
+    const [playersLoaded, setPlayersLoaded] = useState(false);
 
-    useEffect(() => {
-        const loadPlayers = async () => {
-            const response = await callGetActivePlayers();
-            if (response.ok) {
-                const json = await response.json();
-                setPlayers(
-                    convertDataToUserList(convertDataToList(json)?.List)
-                );
-            }
-        };
+    useEffect(() => {        
+        if (isTeamModalOpen && !playersLoaded) {
+            setPlayersLoaded(true);
+            const loadPlayers = async () => {
+                const response = await callGetActivePlayers<ListResponse<GetPlayerResponse>>();
+                if (response.success) {                
+                    setPlayers(
+                        convertToUserList(convertToList(response.data)?.List)
+                    );
+                }
+            };
 
-        loadPlayers();
-    }, []);
+            loadPlayers();
+        }        
+    }, [isTeamModalOpen, playersLoaded]);
 
     return (
         <VStack spacing={5} align="left">

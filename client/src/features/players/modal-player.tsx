@@ -1,6 +1,6 @@
 import { InputInlineLabel } from '@/components/input-inline-label';
 import { callCreatePlayer } from '@/features/players/api/create-player';
-import { isValidUser, User, UserStatus } from '@/types/user';
+import { CreatePlayerResponse, isValidUser, User, UserStatus } from '@/types/user';
 import {
     Button,
     Input,
@@ -15,7 +15,7 @@ import {
     useToast,
     VStack,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,21 +42,20 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
     }, [user]);
 
     const createUser = async () => {
-        const json: any = {
+        const json = {
             Status: user.Status,
             Username: user.Username,
         };
 
-        const response = await callCreatePlayer(json);
-        const responseJson = await response.json();
+        const response = await callCreatePlayer<CreatePlayerResponse>(json);        
         let error = false;
-        if (response.ok) {
-            if (responseJson?.username != null) {
+        if (response.success) {
+            if (response.data != undefined && response.data?.username != null) {
                 toast({
                     title: t('Message.CreateUserSuccess'),
                     status: 'success',
                 });
-                nav('/player/' + responseJson.username);
+                nav('/player/' + response.data.username);
             } else {
                 error = true;
             }
@@ -68,7 +67,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
         }
     };
 
-    const handleChange = (event: any) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
 
         setUser((prevUser) => ({

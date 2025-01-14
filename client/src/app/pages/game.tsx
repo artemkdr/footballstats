@@ -8,6 +8,7 @@ import {
     getGameResultFor,
     getGameStatusColor,
     isValidGame,
+    UpdateGameResponse,
 } from '@/types/game';
 import {
     Badge,
@@ -21,12 +22,12 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import moment from 'moment';
-import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { ChangeEvent, FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
 export const GamePage: FunctionComponent = (): ReactElement => {
-    const data: any = useLoaderData();
+    const data: unknown = useLoaderData();
     const [game, setGame] = useState<Game>({
         Goals1: 0,
         Goals2: 0,
@@ -44,23 +45,12 @@ export const GamePage: FunctionComponent = (): ReactElement => {
         setIsValid(isValidGame(game));
     }, [game]);
 
-    const updateGame = async (props: Game = {} as Game) => {
-        const json: any = {
-            Id: game.Id,
-            Goals1: game.Goals1,
-            Goals2: game.Goals2,
-        };
-        if (props.Status != null) {
-            json['Status'] = props.Status.toString();
-        }
-        if (props.CompleteDate != null) {
-            json['CompleteDate'] = props.CompleteDate;
-        }
-        const response = await callUpdateGame(game.Id, json);
-        const responseJson = await response.json();
+    const updateGame = async (props: Game | null = null) => {
+        const json = { ...game, ...props };
+        const response = await callUpdateGame<UpdateGameResponse>(game.Id, json);        
         let error = false;
-        if (response.ok) {
-            if (responseJson?.id > 0) {
+        if (response.success) {
+            if (response.data != undefined && response.data.id > 0) {
                 toast({
                     title: t('Message.UpdateGameSuccess'),
                     status: 'success',
@@ -105,9 +95,9 @@ export const GamePage: FunctionComponent = (): ReactElement => {
         updateGame({ Status: GameStatus.Cancelled } as Game);
     };
 
-    const handleChange = (event: any) => {
+    const handleChange = (event: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = event.target;
-        let newValue = value;
+        let newValue : unknown = value;
 
         switch (name) {
             case 'Goals1':

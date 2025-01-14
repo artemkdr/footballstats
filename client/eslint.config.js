@@ -24,8 +24,7 @@ export default tseslint.config(
             'react-refresh': reactRefresh,
         },
         rules: {
-            ...reactHooks.configs.recommended.rules,
-            '@typescript-eslint/no-explicit-any': 'off',
+            ...reactHooks.configs.recommended.rules,            
             '@typescript-eslint/no-unused-vars': ['error'],
             camelcase: 'error',
             'no-unused-vars': 'off',

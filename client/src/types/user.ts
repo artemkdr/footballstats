@@ -1,24 +1,43 @@
+import { toString } from "@/lib/utils/converters";
+
 export enum UserStatus {
     Active = 'Active',
     Deleted = 'Deleted',
 }
 
+export interface CreatePlayerResponse {
+    username: string;
+}
+
+export interface UpdatePlayerResponse {
+    username: string;
+}
+
+export interface GetPlayerResponse {
+    username: string;
+    status: UserStatus;
+    vars: unknown;
+    createDate: string;
+    modifyDate: string;
+}
+
 export interface User {
     Username: string;
     Status: UserStatus;
-    Vars: any;
+    Vars: unknown;
     CreateDate: Date;
     ModifyDate: Date;
 }
 
-export const convertToUser = (data: any) => {
-    const user = {} as User;
-    user.Username = data?.username?.toString();
-    user.Status = data?.status as UserStatus;
-    user.Vars = data?.vars;
-    user.CreateDate = new Date(data?.createDate);
-    user.ModifyDate = new Date(data?.modifyDate);
-    return user;
+export const convertToUser = (json: unknown): User => {    
+    const data = json as GetPlayerResponse;
+    return {
+        Username: toString(data.username),
+        Status: data.status as UserStatus,
+        Vars: data.vars,
+        CreateDate: new Date(data.createDate),
+        ModifyDate: new Date(data.modifyDate),
+    };
 };
 
 export const getUserStatusColor = (status: UserStatus): string => {
@@ -31,7 +50,7 @@ export const getUserStatusColor = (status: UserStatus): string => {
     return '';
 };
 
-export const convertDataToUserList = (listData: any) => {
+export const convertToUserList = (listData: unknown[]) => {
     const list = [] as User[];
     if (listData instanceof Array) {
         for (const ol of listData) {

@@ -1,9 +1,9 @@
-import callApi from '@/lib/api';
+import callApi from '@/lib/net/api';
 
-export const callGetStats = async () => {
-    return callApi(`stats`);
+export const callGetStats = async <T>() => {
+    return await callApi<T>(`stats`);
 };
 
-export const callGetTeamStats = async (id: number) => {
-    return callApi(`stats?team=${id}`);
+export const callGetTeamStats = async <T>(id: number) => {
+    return await callApi<T>(`stats?team=${id}`);
 };

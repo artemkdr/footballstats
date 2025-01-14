@@ -1,6 +1,5 @@
 import { StatsTable } from '@/features/stats/stats-table';
-import {
-    convertDataToTeamStatList,
+import {    
     TeamStat,
 } from '@/features/stats/types/team-stat';
 import { Heading, VStack } from '@chakra-ui/react';
@@ -9,12 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
 export const Dashboard: FunctionComponent = (): ReactElement => {
-    const data: any = useLoaderData();
+    const data = useLoaderData() as TeamStat[];
     const { t } = useTranslation();
     const [teamStats, setTeamStats] = useState<TeamStat[]>([]);
 
     useEffect(() => {
-        setTeamStats(convertDataToTeamStatList(data));
+        setTeamStats(data);
     }, [data]);
 
     return (
