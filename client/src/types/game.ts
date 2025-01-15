@@ -121,7 +121,7 @@ export const getGameResultFor = (game: Game, teamId: number): GameResult => {
     return GameResult.None;
 };
 
-export const getGameResultForUser = (
+export const getGameResultForPlayer = (
     game: Game,
     username: string
 ): GameResult => {
@@ -145,7 +145,7 @@ export const getGameResultForUser = (
     return GameResult.None;
 };
 
-export const isValidGame = (game: Game) => {
+export const isValidGame = (game: Game | undefined | null) => {
     if (
         game == null ||
         game.Id == null ||

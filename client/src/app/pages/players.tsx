@@ -1,15 +1,14 @@
 import { CustomLink } from '@/components/custom-link';
+import { SimpleSuspense } from '@/components/simple-suspense';
 import config from '@/config/config';
-import { callCreatePlayer } from '@/features/players/api/create-player';
-import { EditUserModal } from '@/features/players/modal-player';
-import { User, UserStatus } from '@/types/user';
+import { EditPlayerModal } from '@/features/players/components/edit-player-modal';
+import { generatePlayers } from '@/features/players/utils/generate-players';
+import { Player, PlayerStatus } from '@/types/player';
 import {
     Button,
     Heading,
     HStack,
     Text,
-    useToast,
-    UseToastOptions,
     VStack,
 } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useState } from 'react';
@@ -18,76 +17,8 @@ import { useLoaderData } from 'react-router-dom';
 
 export const Players: FunctionComponent = (): ReactElement => {
     const { t } = useTranslation();
-    const usersList = useLoaderData() as User[];
-    const toast = useToast();    
-    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-
-    const dict = [
-        'leo',
-        'rick',
-        'charly',
-        'nick',
-        'bertrand',
-        'jules',
-        'alex',
-        'chris',
-        'dima',
-        'vova',
-        'matt',
-        'franck',
-        'eva',
-        'lena',
-        'laura',
-        'gwen',
-        'alexia',
-        'clara',
-    ];
-
-    const randomN = (n: number) => {
-        return Math.floor(Math.random() * (n + 1));
-    };
-
-    const generateUsers = async () => {
-        const limit = config.SIMULATE_USERS_NUM;
-        let count = 0;
-        const loadingToastProps = {
-            status: 'loading',
-            isClosable: false,
-            duration: 30000,
-        } as UseToastOptions;
-        const loadingToast = toast({
-            title: t('Message.GeneratingUsers'),
-            description: t('Message.GeneratingCount', { count: count }),
-            ...loadingToastProps,
-        });
-        for (let i = 0; i < limit; i++) {
-            const uname =
-                dict[randomN(dict.length - 1)] +
-                '_' +
-                dict[randomN(dict.length - 1)] +
-                '_' +
-                dict[randomN(dict.length - 1)] +
-                '_' +
-                randomN(100000);
-            const json = {
-                Username: uname,
-                Status: UserStatus.Active,
-            };
-            callCreatePlayer(json);
-            count++;
-            if (count % 2 === 0)
-                toast.update(loadingToast, {
-                    description: t('Message.GeneratingCount', { count: count }),
-                    ...loadingToastProps,
-                });
-        }
-        toast.close(loadingToast);
-        toast({
-            title: t('Message.GeneratingSuccess', { count: count }),
-            status: 'success',
-        });
-        window.location.reload();
-    };
+    const playersList = useLoaderData() as Player[];    
+    const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
 
     return (
         <VStack spacing={5} align="left">
@@ -98,14 +29,14 @@ export const Players: FunctionComponent = (): ReactElement => {
                 <Button
                     alignSelf={'start'}
                     colorScheme="green"
-                    onClick={() => setIsUserModalOpen(true)}
+                    onClick={() => setIsPlayerModalOpen(true)}
                 >
                     {t('Players.AddNewPlayer')}
                 </Button>
                 {config.SIMULATE_MODE ? (
-                    <Button colorScheme="gray" onClick={() => generateUsers()}>
-                        {t('Players.GenerateUsers', {
-                            count: config.SIMULATE_USERS_NUM,
+                    <Button colorScheme="gray" onClick={() => generatePlayers()}>
+                        {t('Players.GeneratePlayers', {
+                            count: config.SIMULATE_PLAYERS_NUM,
                         })}
                     </Button>
                 ) : (
@@ -113,23 +44,25 @@ export const Players: FunctionComponent = (): ReactElement => {
                 )}
             </HStack>
             <VStack spacing={5} align="left" paddingLeft={3}>
-                {usersList?.map((item, index) => (
-                    <HStack spacing={2} key={index}>
-                        <CustomLink
-                            link={`/player/${item.Username}`}
-                            text={item.Username}
-                        />
-                        {item.Status !== UserStatus.Active ? (
-                            <Text>({t('UserStatus.' + item.Status)})</Text>
-                        ) : (
-                            ''
-                        )}
-                    </HStack>
-                ))}
+                <SimpleSuspense fallback={t('Loading')} emptyText={t('Empty')}>
+                    {playersList?.map((item, index) => (
+                        <HStack spacing={2} key={index}>
+                            <CustomLink
+                                link={`/player/${item.Username}`}
+                                text={item.Username}
+                            />
+                            {item.Status !== PlayerStatus.Active ? (
+                                <Text>({t('PlayerStatus.' + item.Status)})</Text>
+                            ) : (
+                                ''
+                            )}
+                        </HStack>
+                    ))}
+                </SimpleSuspense>
             </VStack>
-            <EditUserModal
-                isOpen={isUserModalOpen}
-                onClose={() => setIsUserModalOpen(false)}
+            <EditPlayerModal
+                isOpen={isPlayerModalOpen}
+                onClose={() => setIsPlayerModalOpen(false)}
             />
         </VStack>
     );

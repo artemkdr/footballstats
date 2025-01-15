@@ -2,7 +2,7 @@ import { InputInlineLabel } from '@/components/input-inline-label';
 import { callCreateTeam } from '@/features/teams/api/create-team';
 import { SelectPlayer } from '@/features/teams/components/select-player';
 import { CreateTeamResponse, isValidTeam, Team, TeamStatus } from '@/types/team';
-import { User } from '@/types/user';
+import { Player } from '@/types/player';
 import {
     Button,
     Input,
@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom';
 interface EditTeamModalProps {
     isOpen: boolean;
     onClose: () => void;
-    players: User[];
+    players: Player[];
 }
 
 export const EditTeamModal: React.FC<EditTeamModalProps> = ({
@@ -79,9 +79,9 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
         let newValue = value;
 
         if (name === 'Player1' || name === 'Player2') {
-            const players = team.Players ?? [{} as User, {} as User];
-            if (name === 'Player1') players[0] = { Username: value } as User;
-            if (name === 'Player2') players[1] = { Username: value } as User;
+            const players = team.Players ?? [{} as Player, {} as Player];
+            if (name === 'Player1') players[0] = { Username: value } as Player;
+            if (name === 'Player2') players[1] = { Username: value } as Player;
             newName = 'Players';
             newValue = players.toString();
         }

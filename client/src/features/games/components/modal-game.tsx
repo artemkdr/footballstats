@@ -1,5 +1,5 @@
 import { callCreateGame } from '@/features/games/api/create-game';
-import { SelectTeam } from '@/features/games/select-team';
+import { SelectTeam } from '@/features/games/components/select-team';
 import { CreateGameResponse, Game, GameStatus, isValidGame } from '@/types/game';
 import { Team } from '@/types/team';
 import {

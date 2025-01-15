@@ -1,8 +1,8 @@
-import { User } from '@/types/user';
+import { Player } from '@/types/player';
 import { Select, SelectProps } from '@chakra-ui/react';
 
 interface SelectPlayerProps extends SelectProps {
-    players: User[];
+    players: Player[];
 }
 
 export const SelectPlayer: React.FC<SelectPlayerProps> = (props) => {

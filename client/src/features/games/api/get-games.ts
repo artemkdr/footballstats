@@ -1,13 +1,22 @@
 import callApi from '@/lib/net/api';
 
-// pairs like "team1=1", "team2=2"
-export const callGetGames = async <T>(pairs?: string[]) => {
-    if (pairs !== undefined) {
-        return await callApi<T>(`games?${pairs.join('&')}`);
+/**
+ * 
+ * @example
+ * ```
+ * callGetGames<GameResponse[]>("1", "2"); // team ids
+ * callGetGames<GameResponse[]>(1, 2); // team ids
+ * ```
+ */
+export const callGetGames = async <T>(...teams : number[]) => {
+    const props = [];
+    for (const team of teams) {        
+        props.push(`team${props.length + 1}=${team}`);        
+        if (props.length === 2) break;
     }
-    return await callApi<T>(`games`);
+    return await callApi<T>(`games?${props.join('&')}`);
 };
 
-export const callGetGamesWithPlayers = async <T>(players: string) => {
-    return await callApi<T>(`games?players=${players}`);
+export const callGetGamesWithPlayers = async <T>(...players: string[]) => {
+    return await callApi<T>(`games?players=${players.join(',')}`);
 };

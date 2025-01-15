@@ -1,6 +1,6 @@
 import { InputInlineLabel } from '@/components/input-inline-label';
 import { callCreatePlayer } from '@/features/players/api/create-player';
-import { CreatePlayerResponse, isValidUser, User, UserStatus } from '@/types/user';
+import { CreatePlayerResponse, isValidPlayer, Player, PlayerStatus } from '@/types/player';
 import {
     Button,
     Input,
@@ -19,32 +19,32 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-interface EditUserModalProps {
+interface EditPlayerModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-export const EditUserModal: React.FC<EditUserModalProps> = ({
+export const EditPlayerModal: React.FC<EditPlayerModalProps> = ({
     isOpen,
     onClose,
 }) => {
     const { t } = useTranslation();
-    const [user, setUser] = useState<User>({
-        Status: UserStatus.Active,
-    } as User);
+    const [player, setPlayer] = useState<Player>({
+        Status: PlayerStatus.Active,
+    } as Player);
 
     const nav = useNavigate();
     const toast = useToast();
     const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
-        setIsValid(isValidUser(user));
-    }, [user]);
+        setIsValid(isValidPlayer(player));
+    }, [player]);
 
-    const createUser = async () => {
+    const createPlayer = async () => {
         const json = {
-            Status: user.Status,
-            Username: user.Username,
+            Status: player.Status,
+            Username: player.Username,
         };
 
         const response = await callCreatePlayer<CreatePlayerResponse>(json);        
@@ -70,8 +70,8 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
 
-        setUser((prevUser) => ({
-            ...prevUser,
+        setPlayer((prevPlayer) => ({
+            ...prevPlayer,
             [name]: value,
         }));
     };
@@ -97,12 +97,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                             <Select
                                 name={'Status'}
                                 placeholder={t('Players.Status')}
-                                value={user.Status}
+                                value={player.Status}
                                 onChange={handleChange}
                             >
-                                {Object.values(UserStatus).map((type) => (
+                                {Object.values(PlayerStatus).map((type) => (
                                     <option key={type} value={type}>
-                                        {t('UserStatus.' + type)}
+                                        {t('PlayerStatus.' + type)}
                                     </option>
                                 ))}
                             </Select>
@@ -114,7 +114,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                         colorScheme="green"
                         mr={3}
                         onClick={() => {
-                            createUser();
+                            createPlayer();
                         }}
                         isDisabled={!isValid}
                     >

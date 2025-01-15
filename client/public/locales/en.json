@@ -5,7 +5,9 @@
     "Save": "Save",
     "Cancel": "Cancel",
     "Loading": "loading...",
-    "Player": "Player",
+    "Empty": "Nothing here yet.",
+    "EmptyWithPlaceholder": "No {{name}}.",
+    "Player": "Player",    
     "Game": "Game",
     "Team": "Team",
     "OnDate": "on {{date}}",
@@ -32,15 +34,15 @@
         "GD": "GD"
     },
     "Players": {
-        "Title": "Players (users)",
+        "Title": "Players",
         "AddNewPlayer": "Add new player",
         "EditPlayer": "Edit player",
-        "NewPlayer": "New player (user)",
+        "NewPlayer": "New player",
         "DeletePlayer": "Delete player",
         "ActivatePlayer": "Activate player",
         "Username": "Username",
         "Status": "Status",
-        "GenerateUsers": "Generate {{count}} new users",
+        "GenerateUsers": "Generate {{count}} new players",
         "Placeholder": {
             "Username": "Username (unique)"
         }
@@ -90,7 +92,7 @@
         "Completed": "Completed",
         "Cancelled": "Cancelled"
     },
-    "UserStatus": {
+    "PlayerStatus": {
         "Active": "Active",
         "Deleted": "Deleted"
     },
@@ -109,13 +111,13 @@
         "CreateTeamError": "An error occurred while creating the team",
         "UpdateGameSuccess": "Game updated",
         "UpdateGameError": "An error occurred while updating the game",
-        "UpdateUserSuccess": "User updated",
-        "UpdateUserError": "An error occurred while updating the user",
+        "UpdateUserSuccess": "Player updated",
+        "UpdateUserError": "An error occurred while updating the player",
         "SimulatingGames": "Simulating games",
         "SimulatingCount": "{{count}} new games have been added.",
         "SimulateSuccess": "Done! {{count}} new games have been added.",
-        "GeneratingUsers": "Generating users",
-        "GeneratingCount": "{{count}} new users have been added.",
-        "GeneratingSuccess": "Done! {{count}} new users have been added."
+        "GeneratingPlayers": "Generating players",
+        "GeneratingCount": "{{count}} new players have been added.",
+        "GeneratingSuccess": "Done! {{count}} new players have been added."
     }
 }

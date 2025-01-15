@@ -27,13 +27,14 @@ import { Badge, Heading, HStack, VStack } from '@chakra-ui/react';
 import { FunctionComponent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
+import { SimpleSuspense } from '@/components/simple-suspense';
 
 export const TeamPage: FunctionComponent = (): ReactElement => {
     const data = useLoaderData() as Team;
     const [team, setTeam] = useState<Team>({} as Team);
     const { t } = useTranslation();
-    const [games, setGames] = useState<Game[]>([] as Game[]);
-    const [stats, setStats] = useState<TeamStat[]>([] as TeamStat[]);
+    const [games, setGames] = useState<Game[] | undefined>(undefined);
+    const [stats, setStats] = useState<TeamStat[] | undefined>(undefined);
 
     useEffect(() => {
         setTeam(data);
@@ -78,47 +79,53 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
             </HStack>
             <VStack spacing={5} align="start" paddingLeft={2}>
                 <Subheader marginTop={0}>{t('Teams.Players')}</Subheader>
-                {team.Players?.map((item, index) => (
-                    <HStack spacing={2} key={index} paddingLeft={4}>
-                        <CustomLink
-                            link={`/player/${item.Username}`}
-                            text={item.Username}
-                        />
-                    </HStack>
-                ))}
+                <SimpleSuspense fallback={t('Loading')} emptyText={t('Empty')}>
+                    {team.Players?.map((item, index) => (
+                        <HStack spacing={2} key={index} paddingLeft={4}>
+                            <CustomLink
+                                link={`/player/${item.Username}`}
+                                text={item.Username}
+                            />
+                        </HStack>
+                    ))}
+                </SimpleSuspense>
 
                 <Subheader>{t('Teams.Stats')}</Subheader>
-                <StatsTable stats={stats} />
+                <SimpleSuspense fallback={t('Loading')} emptyText={t('Empty')}>
+                    {stats && <StatsTable stats={stats} />}
+                </SimpleSuspense>                
 
                 <Subheader>{t('Games.Title')}</Subheader>
-                {games?.map((item, index) => (
-                    <HStack spacing={2} key={index} paddingLeft={4}>
-                        <CustomLink
-                            link={`/game/${item.Id}`}
-                            text={t('GameTitle', {
-                                team1: item.Team1?.Name,
-                                team2: item.Team2?.Name,
-                                goals1: item.Goals1,
-                                goals2: item.Goals2,
-                            })}
-                        />
-                        {item.Status === GameStatus.Completed ? (
-                            <Badge
-                                colorScheme={getGameColorForResult(
-                                    getGameResultFor(item, team.Id)
-                                )}
-                            >
-                                {t('Games.' + getGameResultFor(item, team.Id))}
-                            </Badge>
-                        ) : (
-                            <Badge
-                                colorScheme={getGameStatusColor(item.Status)}
-                            >
-                                {t('GameStatus.' + item.Status)}
-                            </Badge>
-                        )}
-                    </HStack>
-                ))}
+                <SimpleSuspense fallback={t('Loading')} emptyText={t('Empty')}>
+                    {games?.map((item, index) => (
+                        <HStack spacing={2} key={index} paddingLeft={4}>
+                            <CustomLink
+                                link={`/game/${item.Id}`}
+                                text={t('GameTitle', {
+                                    team1: item.Team1?.Name,
+                                    team2: item.Team2?.Name,
+                                    goals1: item.Goals1,
+                                    goals2: item.Goals2,
+                                })}
+                            />
+                            {item.Status === GameStatus.Completed ? (
+                                <Badge
+                                    colorScheme={getGameColorForResult(
+                                        getGameResultFor(item, team.Id)
+                                    )}
+                                >
+                                    {t('Games.' + getGameResultFor(item, team.Id))}
+                                </Badge>
+                            ) : (
+                                <Badge
+                                    colorScheme={getGameStatusColor(item.Status)}
+                                >
+                                    {t('GameStatus.' + item.Status)}
+                                </Badge>
+                            )}
+                        </HStack>
+                    ))}
+                </SimpleSuspense>
             </VStack>
         </VStack>
     );

@@ -1,5 +1,5 @@
 import { toInt, toString } from '@/lib/utils/converters';
-import { convertToUserList as convertToUserList, User } from '@/types/user';
+import { convertToPlayerList as convertToPlayerList, Player } from '@/types/player';
 
 export enum TeamStatus {
     Active = 'Active',
@@ -28,7 +28,7 @@ export interface GetTeamResponse {
 export interface Team {
     Id: number;
     Name: string;
-    Players: User[];
+    Players: Player[];
     CreateDate: Date;
     ModifyDate: Date;
     Status: TeamStatus;
@@ -53,7 +53,7 @@ export const convertToTeam = (json: unknown): Team => {
     return {
         Id: toInt(data.id),
         Name: toString(data.name),
-        Players: convertToUserList(data.playerDetails ?? data.players),
+        Players: convertToPlayerList(data.playerDetails ?? data.players),
         CreateDate: new Date(data.createDate),
         ModifyDate: new Date(data.modifyDate),
         Status: data.status as TeamStatus,

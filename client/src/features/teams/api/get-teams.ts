@@ -15,6 +15,6 @@ export const callGetActiveTeams = async <T>() => {
     return await callGetTeamsWithStatus<T>('Active');
 };
 
-export const callGetTeamsWithPlayers = async <T>(players: string) => {
-    return await callApi<T>(`teams?players=${players}`);
+export const callGetTeamsWithPlayers = async <T>(...players: string[]) => {
+    return await callApi<T>(`teams?players=${players.join(',')}`);
 };

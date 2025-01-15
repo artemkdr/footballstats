@@ -1,6 +1,6 @@
 import { toString } from "@/lib/utils/converters";
 
-export enum UserStatus {
+export enum PlayerStatus {
     Active = 'Active',
     Deleted = 'Deleted',
 }
@@ -15,46 +15,46 @@ export interface UpdatePlayerResponse {
 
 export interface GetPlayerResponse {
     username: string;
-    status: UserStatus;
+    status: PlayerStatus;
     vars: unknown;
     createDate: string;
     modifyDate: string;
 }
 
-export interface User {
+export interface Player {
     Username: string;
-    Status: UserStatus;
+    Status: PlayerStatus;
     Vars: unknown;
     CreateDate: Date;
     ModifyDate: Date;
 }
 
-export const convertToUser = (json: unknown): User => {    
+export const convertToPlayer = (json: unknown): Player => {    
     const data = json as GetPlayerResponse;
     return {
         Username: toString(data.username),
-        Status: data.status as UserStatus,
+        Status: data.status as PlayerStatus,
         Vars: data.vars,
         CreateDate: new Date(data.createDate),
         ModifyDate: new Date(data.modifyDate),
     };
 };
 
-export const getUserStatusColor = (status: UserStatus): string => {
+export const getPlayerStatusColor = (status: PlayerStatus): string => {
     switch (status) {
-        case UserStatus.Active:
+        case PlayerStatus.Active:
             return 'green';
-        case UserStatus.Deleted:
+        case PlayerStatus.Deleted:
             return 'gray';
     }
     return '';
 };
 
-export const convertToUserList = (listData: unknown[]) => {
-    const list = [] as User[];
+export const convertToPlayerList = (listData: unknown[]) => {
+    const list = [] as Player[];
     if (listData instanceof Array) {
         for (const ol of listData) {
-            const u = convertToUser(ol);
+            const u = convertToPlayer(ol);
             if (u != null && u.Username != null) {
                 list.push(u);
             }
@@ -65,8 +65,8 @@ export const convertToUserList = (listData: unknown[]) => {
 
 export const USERNAME_PATTERN = /^[a-zA-Z0-9_-]{3,20}$/;
 
-export const isValidUser = (user: User) => {
-    if (user == null || user.Username == null) return false;
-    if (!USERNAME_PATTERN.test(user.Username)) return false;
+export const isValidPlayer = (player: Player) => {
+    if (player == null || player.Username == null) return false;
+    if (!USERNAME_PATTERN.test(player.Username)) return false;
     return true;
 };

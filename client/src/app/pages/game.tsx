@@ -1,4 +1,5 @@
 import { CustomLink } from '@/components/custom-link';
+import { SimpleSuspense } from '@/components/simple-suspense';
 import { callUpdateGame } from '@/features/games/api/update-game';
 import {
     Game,
@@ -27,11 +28,7 @@ import { useLoaderData } from 'react-router-dom';
 
 export const GamePage = (): ReactElement => {
     const data = useLoaderData() as Game;
-    const [game, setGame] = useState<Game>({
-        Goals1: 0,
-        Goals2: 0,
-        Status: GameStatus.NotStarted,
-    } as Game);
+    const [game, setGame] = useState<Game | undefined>(undefined);
     const { t } = useTranslation();
     const toast = useToast();
     const [isValid, setIsValid] = useState(false);
@@ -45,6 +42,7 @@ export const GamePage = (): ReactElement => {
     }, [game]);
 
     const updateGame = async (props: Game | null = null) => {
+        if (game === undefined) return;
         const json = { ...game, ...props };
         const response = await callUpdateGame<UpdateGameResponse>(game.Id, json);        
         let error = false;
@@ -65,21 +63,21 @@ export const GamePage = (): ReactElement => {
         }
     };
 
-    const startGame = () => {
-        setGame((prevGame) => ({
+    const startGame = () => {        
+        setGame((prevGame) => prevGame ? ({
             ...prevGame,
             Status: GameStatus.Playing,
-        }));
+        }) : prevGame);
         updateGame({ Status: GameStatus.Playing } as Game);
     };
 
     const endGame = () => {
         const date = new Date();
-        setGame((prevGame) => ({
+        setGame((prevGame) => prevGame ? ({
             ...prevGame,
             CompleteDate: date,
             Status: GameStatus.Completed,
-        }));
+        }) : prevGame);
         updateGame({
             Status: GameStatus.Completed,
             CompleteDate: date,
@@ -87,10 +85,10 @@ export const GamePage = (): ReactElement => {
     };
 
     const deleteGame = () => {
-        setGame((prevGame) => ({
+        setGame((prevGame) => prevGame ? ({
             ...prevGame,
             Status: GameStatus.Cancelled,
-        }));
+        }) : prevGame);
         updateGame({ Status: GameStatus.Cancelled } as Game);
     };
 
@@ -108,118 +106,124 @@ export const GamePage = (): ReactElement => {
                 break;
         }
 
-        setGame((prevGame) => ({
+        setGame((prevGame) => prevGame ? ({
             ...prevGame, // Copy all other properties
             [name]: newValue, // Update the specific property dynamically
-        }));
+        }) : prevGame);
     };
 
     return (
         <VStack spacing={5}>
-            <Badge colorScheme={getGameStatusColor(game.Status)} padding={4}>
-                {t('GameStatus.' + game.Status)}
-                {game.Status === GameStatus.Completed &&
-                moment(game.CompleteDate).isValid()
-                    ? ' ' +
-                      t('OnDate', {
-                          date: moment(game.CompleteDate).format('DD.MM.YYYY'),
-                      })
-                    : ''}
-            </Badge>
-            <HStack>
-                <Card flex={1} minWidth={200} maxWidth={'50%'}>
-                    <CardHeader
-                        height={'4em'}
-                        textAlign={'center'}
-                        color={getGameColorForResult(
-                            getGameResultFor(game, game.Team1?.Id)
-                        )}
-                        fontWeight={'bold'}
-                    >
-                        <CustomLink
-                            link={`/team/${game.Team1?.Id}`}
-                            text={game.Team1?.Name}
-                        />
-                    </CardHeader>
-                    <CardBody textAlign={'center'}>
-                        <Input
-                            type="number"
-                            name="Goals1"
-                            value={game.Goals1}
-                            width={'2em'}
-                            padding={'0.2em 0.2em'}
-                            textAlign={'center'}
-                            onChange={handleChange}
-                            fontSize={'2rem'}
-                            fontWeight={'bold'}
-                        />
-                    </CardBody>
-                </Card>
-                <Card flex={1} minWidth={200} maxWidth={'50%'}>
-                    <CardHeader
-                        height={'4em'}
-                        textAlign={'center'}
-                        color={getGameColorForResult(
-                            getGameResultFor(game, game.Team2?.Id)
-                        )}
-                        fontWeight={'bold'}
-                    >
-                        <CustomLink
-                            link={`/team/${game.Team2?.Id}`}
-                            text={game.Team2?.Name}
-                        />
-                    </CardHeader>
-                    <CardBody textAlign={'center'}>
-                        <Input
-                            type="number"
-                            name="Goals2"
-                            value={game.Goals2}
-                            width={'2em'}
-                            padding={'0.2em 0.2em'}
-                            textAlign={'center'}
-                            onChange={handleChange}
-                            fontSize={'2rem'}
-                            fontWeight={'bold'}
-                        />
-                    </CardBody>
-                </Card>
-            </HStack>
-            <HStack>
-                {game.Status === GameStatus.Completed ||
-                game.Status === GameStatus.Playing ? (
-                    <Button
-                        colorScheme="green"
-                        onClick={() => updateGame()}
-                        isDisabled={!isValid}
-                    >
-                        {t('Save')}
-                    </Button>
-                ) : (
-                    ''
+            <SimpleSuspense fallback={t('Loading')} emptyText={t('Empty')}>
+                {game && (
+                    <>
+                        <Badge colorScheme={getGameStatusColor(game.Status)} padding={4}>
+                            {t('GameStatus.' + game.Status)}
+                            {game.Status === GameStatus.Completed &&
+                            moment(game.CompleteDate).isValid()
+                                ? ' ' +
+                                t('OnDate', {
+                                    date: moment(game.CompleteDate).format('DD.MM.YYYY'),
+                                })
+                                : ''}
+                        </Badge>
+                        <HStack>
+                            <Card flex={1} minWidth={200} maxWidth={'50%'}>
+                                <CardHeader
+                                    height={'4em'}
+                                    textAlign={'center'}
+                                    color={getGameColorForResult(
+                                        getGameResultFor(game, game.Team1?.Id)
+                                    )}
+                                    fontWeight={'bold'}
+                                >
+                                    <CustomLink
+                                        link={`/team/${game.Team1?.Id}`}
+                                        text={game.Team1?.Name}
+                                    />
+                                </CardHeader>
+                                <CardBody textAlign={'center'}>
+                                    <Input
+                                        type="number"
+                                        name="Goals1"
+                                        value={game.Goals1}
+                                        width={'2em'}
+                                        padding={'0.2em 0.2em'}
+                                        textAlign={'center'}
+                                        onChange={handleChange}
+                                        fontSize={'2rem'}
+                                        fontWeight={'bold'}
+                                    />
+                                </CardBody>
+                            </Card>
+                            <Card flex={1} minWidth={200} maxWidth={'50%'}>
+                                <CardHeader
+                                    height={'4em'}
+                                    textAlign={'center'}
+                                    color={getGameColorForResult(
+                                        getGameResultFor(game, game.Team2?.Id)
+                                    )}
+                                    fontWeight={'bold'}
+                                >
+                                    <CustomLink
+                                        link={`/team/${game.Team2?.Id}`}
+                                        text={game.Team2?.Name}
+                                    />
+                                </CardHeader>
+                                <CardBody textAlign={'center'}>
+                                    <Input
+                                        type="number"
+                                        name="Goals2"
+                                        value={game.Goals2}
+                                        width={'2em'}
+                                        padding={'0.2em 0.2em'}
+                                        textAlign={'center'}
+                                        onChange={handleChange}
+                                        fontSize={'2rem'}
+                                        fontWeight={'bold'}
+                                    />
+                                </CardBody>
+                            </Card>
+                        </HStack>
+                        <HStack>
+                            {game.Status === GameStatus.Completed ||
+                            game.Status === GameStatus.Playing ? (
+                                <Button
+                                    colorScheme="green"
+                                    onClick={() => updateGame()}
+                                    isDisabled={!isValid}
+                                >
+                                    {t('Save')}
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                            {game.Status === GameStatus.NotStarted ? (
+                                <Button colorScheme="green" onClick={() => startGame()}>
+                                    {t('Games.Start')}
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                            {game.Status === GameStatus.Playing ? (
+                                <Button colorScheme="blue" onClick={() => endGame()}>
+                                    {t('Games.Finish')}
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                            {game.Status === GameStatus.Completed ||
+                            game.Status === GameStatus.NotStarted ? (
+                                <Button colorScheme="gray" onClick={() => deleteGame()}>
+                                    {t('Games.Cancel')}
+                                </Button>
+                            ) : (
+                                ''
+                            )}
+                        </HStack>
+                    </>
                 )}
-                {game.Status === GameStatus.NotStarted ? (
-                    <Button colorScheme="green" onClick={() => startGame()}>
-                        {t('Games.Start')}
-                    </Button>
-                ) : (
-                    ''
-                )}
-                {game.Status === GameStatus.Playing ? (
-                    <Button colorScheme="blue" onClick={() => endGame()}>
-                        {t('Games.Finish')}
-                    </Button>
-                ) : (
-                    ''
-                )}
-                {game.Status === GameStatus.Completed ||
-                game.Status === GameStatus.NotStarted ? (
-                    <Button colorScheme="gray" onClick={() => deleteGame()}>
-                        {t('Games.Cancel')}
-                    </Button>
-                ) : (
-                    ''
-                )}
-            </HStack>
+            </SimpleSuspense>
         </VStack>
     );
 };
