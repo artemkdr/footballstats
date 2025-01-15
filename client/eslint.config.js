@@ -15,7 +15,7 @@ export default tseslint.config(
         ],
         files: ['src/**/*.{ts,tsx}'],
         languageOptions: {
-            ecmaVersion: 2024,
+            ecmaVersion: 2022,
             globals: globals.browser,
         },
         plugins: {
