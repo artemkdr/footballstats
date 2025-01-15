@@ -72,7 +72,7 @@ When you first run the service, the database tables will be empty. You have two 
 By default 'simulating mode' is on in the [client config](client/src/config/config.ts): 
 ``` javascript
 SIMULATE_MODE: true,
-SIMULATE_USERS_NUM: 10,
+SIMULATE_PLAYERS_NUM: 10,
 SIMULATE_GAMES_LIMIT: 1000
 ```
 So you can do the following:
