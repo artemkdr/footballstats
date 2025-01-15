@@ -77,7 +77,7 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
                 )}
             </HStack>
             <VStack spacing={5} align="start" paddingLeft={2}>
-                <Subheader text={t('Teams.Players')} marginTop={0} />
+                <Subheader marginTop={0}>{t('Teams.Players')}</Subheader>
                 {team.Players?.map((item, index) => (
                     <HStack spacing={2} key={index} paddingLeft={4}>
                         <CustomLink
@@ -87,10 +87,10 @@ export const TeamPage: FunctionComponent = (): ReactElement => {
                     </HStack>
                 ))}
 
-                <Subheader text={t('Teams.Stats')} />
+                <Subheader>{t('Teams.Stats')}</Subheader>
                 <StatsTable stats={stats} />
 
-                <Subheader text={t('Games.Title')} />
+                <Subheader>{t('Games.Title')}</Subheader>
                 {games?.map((item, index) => (
                     <HStack spacing={2} key={index} paddingLeft={4}>
                         <CustomLink

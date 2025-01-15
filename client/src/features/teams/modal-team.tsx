@@ -56,19 +56,16 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
         };
 
         const response = await callCreateTeam<CreateTeamResponse>(json);        
-        let error = false;
+        let error = true;
         if (response.success) {
             if (response.data != undefined && response.data?.id > 0) {
+                error = false;
                 toast({
                     title: t('Message.CreateTeamSuccess'),
                     status: 'success',
                 });
                 nav('/team/' + response.data.id);
-            } else {
-                error = true;
             }
-        } else {
-            error = true;
         }
         if (error) {
             toast({ title: t('Message.CreateTeamError'), status: 'error' });
@@ -103,55 +100,43 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
                 <ModalCloseButton />
                 <ModalBody>
                     <VStack spacing={5}>
-                        <InputInlineLabel
-                            label={t('Teams.Name')}
-                            input={
-                                <Input
-                                    name={'Name'}
-                                    placeholder={t('Teams.Placeholder.Name')}
-                                    onChange={handleChange}
-                                />
-                            }
-                        />
-                        <InputInlineLabel
-                            label={t('Teams.Status')}
-                            input={
-                                <Select
-                                    name={'Status'}
-                                    placeholder={t('Teams.Status')}
-                                    value={team.Status}
-                                    onChange={handleChange}
-                                >
-                                    {Object.values(TeamStatus).map((type) => (
-                                        <option key={type} value={type}>
-                                            {t('TeamStatus.' + type)}
-                                        </option>
-                                    ))}
-                                </Select>
-                            }
-                        />
-                        <InputInlineLabel
-                            label={t('Teams.Player1')}
-                            input={
-                                <SelectPlayer
-                                    placeholder={t('Teams.Placeholder.Player1')}
-                                    players={players}
-                                    onChange={handleChange}
-                                    name={'Player1'}
-                                />
-                            }
-                        />
-                        <InputInlineLabel
-                            label={t('Teams.Player2')}
-                            input={
-                                <SelectPlayer
-                                    placeholder={t('Teams.Placeholder.Player2')}
-                                    players={players}
-                                    onChange={handleChange}
-                                    name={'Player2'}
-                                />
-                            }
-                        />
+                        <InputInlineLabel label={t('Teams.Name')}>
+                            <Input
+                                name={'Name'}
+                                placeholder={t('Teams.Placeholder.Name')}
+                                onChange={handleChange}
+                            />
+                        </InputInlineLabel>
+                        <InputInlineLabel label={t('Teams.Status')}>
+                            <Select
+                                name={'Status'}
+                                placeholder={t('Teams.Status')}
+                                value={team.Status}
+                                onChange={handleChange}
+                            >
+                                {Object.values(TeamStatus).map((type) => (
+                                    <option key={type} value={type}>
+                                        {t('TeamStatus.' + type)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </InputInlineLabel>
+                        <InputInlineLabel label={t('Teams.Player1')}>
+                            <SelectPlayer
+                                placeholder={t('Teams.Placeholder.Player1')}
+                                players={players}
+                                onChange={handleChange}
+                                name={'Player1'}
+                            />
+                        </InputInlineLabel>
+                        <InputInlineLabel label={t('Teams.Player2')}>
+                            <SelectPlayer
+                                placeholder={t('Teams.Placeholder.Player2')}
+                                players={players}
+                                onChange={handleChange}
+                                name={'Player2'}
+                            />
+                        </InputInlineLabel>
                     </VStack>
                 </ModalBody>
                 <ModalFooter>

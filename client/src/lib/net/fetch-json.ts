@@ -2,8 +2,9 @@ const UNKNOWN_ERROR_MESSAGE = 'An unknown error occurred';
 const UNKNOWN_ERROR_STATUS = 500;
 const API_ERROR = 'Failed to fetch data from the API';  
 
+
 interface FetchJsonResponse<T> {
-    data: T | undefined | null;
+    data: T | undefined;
     success: boolean;
     error?: {
         status: number;
@@ -11,6 +12,31 @@ interface FetchJsonResponse<T> {
     };
 }
 
+/**
+ * Fetches JSON data from the specified endpoint.
+ * Cacthes any errors that may occur during the fetch request and returns an error in the response object as FetchJsonResponse.
+ * It expects the server to return a JSON object like `{"error": "User not found"}` in case of an error, "error" field could be also named "message" or "reason".
+ *
+ * @template T - The expected type of the response data.
+ * @param {string} endpoint - The URL endpoint to fetch data from.
+ * @param {RequestInit} [options={}] - Optional configuration for the fetch request.
+ * @returns {Promise<FetchJsonResponse<T>>} A promise that resolves to a FetchJsonResponse object containing the data, success status, and error information if any.
+ *
+ * @example
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ * }
+ *
+ * const response = await fetchJson<User>('/api/user/1', { method: 'GET' });
+ * if (response.success) {
+ *   console.log(response.data);
+ * } else {
+ *   console.error(response.error?.status, response.error?.message);
+ * }
+ * ```
+ */
 const fetchJson = async <T>(
     endpoint: string,
     options: RequestInit = {} as RequestInit,
@@ -32,22 +58,22 @@ const fetchJson = async <T>(
             status: UNKNOWN_ERROR_STATUS
         }});
         const errorResponse = knownError.cause as Response ?? { text: () => knownError.message, status: UNKNOWN_ERROR_STATUS };
-        // accepted bug: https://github.com/eslint/eslint/issues/19245
-        // eslint-disable-next-line no-useless-assignment        
-        let message = knownError.message;
+        let errorMessage = knownError.message;
         try {
             const errorJson = await errorResponse.json();
             // expects that the server returns a JSON object with a ('message' | 'error' | 'reason') field
-            message = errorJson.message || errorJson.error || errorJson.reason || errorJson as string;
+            errorMessage = errorJson.message || errorJson.error || errorJson.reason || errorJson as string;
         } catch {
-            message = await errorResponse.text();
+            errorMessage = await errorResponse.text();
         }
+        if (errorMessage?.length === 0)
+            errorMessage = UNKNOWN_ERROR_MESSAGE;
         return {
             success: false,
-            data: null,
+            data: undefined,
             error: {
                 status: errorResponse.status,
-                message: message
+                message: errorMessage
             }
         };
     }

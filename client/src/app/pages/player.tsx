@@ -141,7 +141,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
                 )}
             </HStack>
             <VStack spacing={5} align="start" paddingLeft={2}>
-                <Subheader text={t('Teams.Title')} marginTop={0} />
+                <Subheader marginTop={0}>{t('Teams.Title')}</Subheader>
                 {teams?.map((item, index) => (
                     <HStack spacing={2} key={index} paddingLeft={4}>
                         <CustomLink
@@ -151,7 +151,7 @@ export const PlayerPage: FunctionComponent = (): ReactElement => {
                     </HStack>
                 ))}
 
-                <Subheader text={t('Games.Title')} />
+                <Subheader>{t('Games.Title')}</Subheader>
                 {games?.map((item, index) => (
                     <HStack spacing={2} key={index} paddingLeft={4}>
                         <CustomLink

@@ -13,33 +13,15 @@ export default tseslint.config(
             ...tseslint.configs.strict,
             ...tseslint.configs.stylistic,
         ],
-        files: ['**/*.{ts,tsx}'],
+        files: ['src/**/*.{ts,tsx}'],
         languageOptions: {
-            ecmaVersion: 2020,
+            ecmaVersion: 2024,
             globals: globals.browser,
         },
         plugins: {
             react: react,
             'react-hooks': reactHooks,
             'react-refresh': reactRefresh,
-        },
-        rules: {
-            ...reactHooks.configs.recommended.rules,            
-            '@typescript-eslint/no-unused-vars': ['error'],
-            camelcase: 'error',
-            'no-unused-vars': 'off',
-            'no-useless-assignment': 'error',
-            'no-use-before-define': 'error',
-            'no-restricted-imports': [
-                'error',
-                {
-                    patterns: ['.*'],
-                },
-            ],
-            'react-refresh/only-export-components': [
-                'warn',
-                { allowConstantExport: true },
-            ],
-        },
+        }        
     }
 );

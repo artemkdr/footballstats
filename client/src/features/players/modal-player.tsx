@@ -84,35 +84,29 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 <ModalCloseButton />
                 <ModalBody>
                     <VStack spacing={5}>
-                        <InputInlineLabel
-                            label={t('Players.Username')}
-                            input={
-                                <Input
-                                    name={'Username'}
-                                    placeholder={t(
-                                        'Players.Placeholder.Username'
-                                    )}
-                                    onChange={handleChange}
-                                />
-                            }
-                        />
-                        <InputInlineLabel
-                            label={t('Players.Status')}
-                            input={
-                                <Select
-                                    name={'Status'}
-                                    placeholder={t('Players.Status')}
-                                    value={user.Status}
-                                    onChange={handleChange}
-                                >
-                                    {Object.values(UserStatus).map((type) => (
-                                        <option key={type} value={type}>
-                                            {t('UserStatus.' + type)}
-                                        </option>
-                                    ))}
-                                </Select>
-                            }
-                        />
+                        <InputInlineLabel label={t('Players.Username')}>
+                            <Input
+                                name={'Username'}
+                                placeholder={t(
+                                    'Players.Placeholder.Username'
+                                )}
+                                onChange={handleChange}
+                            />
+                        </InputInlineLabel>
+                        <InputInlineLabel label={t('Players.Status')}>
+                            <Select
+                                name={'Status'}
+                                placeholder={t('Players.Status')}
+                                value={user.Status}
+                                onChange={handleChange}
+                            >
+                                {Object.values(UserStatus).map((type) => (
+                                    <option key={type} value={type}>
+                                        {t('UserStatus.' + type)}
+                                    </option>
+                                ))}
+                            </Select>
+                        </InputInlineLabel>
                     </VStack>
                 </ModalBody>
                 <ModalFooter>

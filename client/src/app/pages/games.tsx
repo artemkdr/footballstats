@@ -163,7 +163,7 @@ export const Games: FunctionComponent = (): ReactElement => {
                 )}
             </HStack>
             <VStack spacing={2} align={'start'}>
-                <Subheader text={t('Games.Filter')} />
+                <Subheader>{t('Games.Filter')}</Subheader>
                 <HStack width={'100%'}>
                     <SelectTeam
                         teams={teams}

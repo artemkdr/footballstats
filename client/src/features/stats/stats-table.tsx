@@ -25,7 +25,7 @@ export const StatsTable: React.FC<StatsTableProps> = (props) => {
     if (stats.length === 0) {
         return (
             <VStack align={'start'}>
-                <Subheader text={t('Dashboard.Empty')} />
+                <Subheader>{t('Dashboard.Empty')}</Subheader>
                 <HStack>
                     <CustomLink
                         link="/players"

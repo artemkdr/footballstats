@@ -3,19 +3,19 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 
 interface CustomLinkProps extends LinkProps {
     link: string;
-    text: string;
+    text?: string;
 }
 
 export const CustomLink: React.FC<CustomLinkProps> = (props) => {
-    const { link, text, ...rest } = props;
+    const { link, text, children, ...rest } = props;
     return (
         <ChakraLink
             as={ReactRouterLink}
             to={link}
-            textDecoration={'underline'}
+            textDecoration='underline'
             {...rest}
         >
-            <Text>{text}</Text>
+            <Text>{text ?? children}</Text>
         </ChakraLink>
     );
 };

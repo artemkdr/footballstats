@@ -13,13 +13,13 @@ import { Layout } from '@/features/layout/layout';
 import { callGetPlayer } from '@/features/players/api/get-player';
 import { callGetPlayers } from '@/features/players/api/get-players';
 import { callGetStats } from '@/features/stats/api/get-stats';
-import { convertToTeamStatList, GetTeamStatsResponse } from '@/features/stats/types/team-stat';
+import { convertToTeamStatList, GetTeamStatsResponse, TeamStat } from '@/features/stats/types/team-stat';
 import { callGetTeam } from '@/features/teams/api/get-team';
 import { callGetTeams } from '@/features/teams/api/get-teams';
 import { convertToList, ListResponse } from '@/lib/types/list';
 import { convertToGame, Game, GetGameResponse } from '@/types/game';
-import { convertToTeam, convertToTeamList, GetTeamResponse } from '@/types/team';
-import { convertToUser, convertToUserList, GetPlayerResponse } from '@/types/user';
+import { convertToTeam, convertToTeamList, GetTeamResponse, Team } from '@/types/team';
+import { convertToUser, convertToUserList, GetPlayerResponse, User } from '@/types/user';
 import { Router } from '@remix-run/router';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -47,7 +47,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/dashboard',
                     element: <Dashboard />,
-                    loader: async () => {
+                    loader: async () : Promise<TeamStat[]> => {
                         const response = await callGetStats<GetTeamStatsResponse[]>();
                         if (response.success) {
                             return convertToTeamStatList(response.data || []);
@@ -60,7 +60,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/teams',
                     element: <Teams />,
-                    loader: async () => {
+                    loader: async () : Promise<Team[]> => {
                         const response = await callGetTeams<ListResponse<GetTeamResponse>>();
                         if (response.success) {
                             return convertToTeamList(convertToList(response.data).List);
@@ -73,9 +73,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/team/:id',
                     element: <TeamPage />,
-                    loader: async ({ params }) => {
-                        if (params.id === undefined) 
-                            return;
+                    loader: async ({ params }) : Promise<Team> => {                        
                         const response = await callGetTeam<GetTeamResponse>(params.id);
                         if (response.success) {
                             return convertToTeam(response.data);
@@ -88,7 +86,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/players',
                     element: <Players />,
-                    loader: async () => {
+                    loader: async () : Promise<User[]> => {
                         const response = await callGetPlayers<ListResponse<GetPlayerResponse>>();
                         if (response.success) {
                             return convertToUserList(convertToList(response.data)?.List);
@@ -101,7 +99,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/player/:id',
                     element: <PlayerPage />,
-                    loader: async ({ params }) => {
+                    loader: async ({ params }) : Promise<User> => {
                         const response = await callGetPlayer<GetPlayerResponse>(params.id);
                         if (response.success) {
                             return convertToUser(response.data);
@@ -114,7 +112,7 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/games',
                     element: <Games />,
-                    loader: async () => {
+                    loader: async () : Promise<Game[]> => {
                         const response = await callGetGames<ListResponse<GetGameResponse>>();
                         if (response.success) {                            
                             return convertToList<Game>(response.data, convertToGame)?.List;
@@ -127,10 +125,10 @@ export const AppRouter: React.FC = () => {
                 {
                     path: '/game/:id',
                     element: <GamePage />,
-                    loader: async ({ params }) => {
+                    loader: async ({ params }) : Promise<Game> => {
                         const response = await callGetGame<GetGameResponse>(params.id as string);
                         if (response.success) {
-                            return response.data;
+                            return convertToGame(response.data);
                         }
                         throw new Error('LoaderError', {
                             cause: response.error?.status,

@@ -1,13 +1,11 @@
 import { InputAddonProps, InputGroup, InputLeftAddon } from '@chakra-ui/react';
-import { ReactElement } from 'react';
 
 interface InputInlineLabelProps extends InputAddonProps {
-    label: string;
-    input: ReactElement;
+    label: string;    
 }
 
 export const InputInlineLabel: React.FC<InputInlineLabelProps> = (props) => {
-    const { input, label, ...rest } = props;
+    const { children, label, ...rest } = props;
     return (
         <InputGroup {...rest}>
             <InputLeftAddon
@@ -23,7 +21,7 @@ export const InputInlineLabel: React.FC<InputInlineLabelProps> = (props) => {
             >
                 {label}
             </InputLeftAddon>
-            {input}
+            {children}
         </InputGroup>
     );
 };

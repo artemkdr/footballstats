@@ -1,7 +1,6 @@
 import { CustomLink } from '@/components/custom-link';
 import { callUpdateGame } from '@/features/games/api/update-game';
 import {
-    convertToGame,
     Game,
     GameStatus,
     getGameColorForResult,
@@ -22,12 +21,12 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import moment from 'moment';
-import { ChangeEvent, FunctionComponent, ReactElement, useEffect, useState } from 'react';
+import { ChangeEvent, ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 
-export const GamePage: FunctionComponent = (): ReactElement => {
-    const data: unknown = useLoaderData();
+export const GamePage = (): ReactElement => {
+    const data = useLoaderData() as Game;
     const [game, setGame] = useState<Game>({
         Goals1: 0,
         Goals2: 0,
@@ -38,7 +37,7 @@ export const GamePage: FunctionComponent = (): ReactElement => {
     const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
-        setGame(convertToGame(data));
+        setGame(data);
     }, [data]);
 
     useEffect(() => {
