@@ -57,7 +57,7 @@
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^30.2.0",
         "msw": "^2.12.10",
-        "prettier": "^3.3.3",
+        "prettier": "^3.8.1",
         "prettier-plugin-organize-imports": "^4.3.0",
         "ts-jest": "^29.4.0",
         "ts-node": "^10.9.2",
